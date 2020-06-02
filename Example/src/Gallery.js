@@ -14,16 +14,13 @@ import Animated, {
   Extrapolate,
   withTiming,
   withSpring,
-  useEvent,
   cancelAnimation,
   useDerivedValue,
 } from 'react-native-reanimated';
-import FastImage from 'react-native-fast-image';
 import {
   Dimensions,
   StyleSheet,
   View,
-  StatusBar,
   Image,
   Platform,
 } from 'react-native';
@@ -34,6 +31,7 @@ import {
 import { useAnimatedGestureHandler } from './useAnimatedGestureHandler';
 import { ImageTransformer } from './ImageTransformer';
 import { normalizeDimensions } from './utils';
+import * as vec from './vectors';
 
 const dimensions = Dimensions.get('window');
 
@@ -48,9 +46,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const AnimatedFastImage = Animated.createAnimatedComponent(
-  Platform.OS === 'android' ? Image : FastImage,
-);
+const AnimatedImage = Animated.createAnimatedComponent(Image);
 
 class Gallery {
   constructor(fn, totalCount) {
@@ -87,7 +83,7 @@ class Gallery {
     this._onChangeListeners.push(cb);
 
     return () => {
-      this._onChangeListeners.filter((i) => i !== cb);
+      this._onChangeListeners.filter((i) => i === cb);
     };
   }
 
@@ -103,8 +99,9 @@ class Gallery {
 
   _measure(item) {
     return new Promise((resolve, reject) =>
-      item.ref.current.measure(
-        (x, y, width, height, pageX, pageY) => {
+      item.ref.current
+        .getNode()
+        .measure((x, y, width, height, pageX, pageY) => {
           if (width === 0 && height === 0) {
             reject();
             return;
@@ -124,8 +121,7 @@ class Gallery {
           };
 
           resolve();
-        },
-      ),
+        }),
     );
   }
 
@@ -140,9 +136,10 @@ const GalleryContext = React.createContext(null);
 export function useGalleryItem({ index, item }) {
   const gallery = useContext(GalleryContext);
   const ref = useRef();
+  const opacity = useSharedValue(1);
 
   useEffect(() => {
-    gallery.addImage({ ref, index, item });
+    gallery.addImage({ ref, index, item, opacity });
   }, []);
 
   const onPress = useCallback(() => {
@@ -150,6 +147,7 @@ export function useGalleryItem({ index, item }) {
   }, []);
 
   return {
+    opacity,
     ref,
     onPress,
   };
@@ -212,7 +210,7 @@ const Page = React.memo(
               },
             ]}
           >
-            {/* <AnimatedFastImage
+            {/* <AnimatedImage
               source={{ uri: page.item.uri }}
               style={{
                 width: targetWidth,
@@ -243,22 +241,6 @@ const Page = React.memo(
     );
   },
 );
-
-function useRunOnce(cb) {
-  const ref = useRef(null);
-
-  if (ref.current === null) {
-    cb();
-    ref.current = true;
-  }
-}
-
-function useSharedVector(x, y) {
-  return {
-    x: useSharedValue(x),
-    y: useSharedValue(y),
-  };
-}
 
 function getShouldRender(index, activeIndex, diffValue = 3) {
   const diff = Math.abs(index - activeIndex);
@@ -311,6 +293,11 @@ function fixGestureHandler() {
   }, []);
 }
 
+const timingConfig = {
+  duration: 250,
+  easing: Easing.bezier(0.33, 0.01, 0, 1),
+};
+
 /**
  * @typedef {Object} IImageTransitionProps
  * @property {Gallery} gallery
@@ -353,18 +340,21 @@ function ImageTransition({ gallery }) {
   const backdropOpacity = useSharedValue(0);
   const statusBarFix = Platform.OS === 'android' ? 12 : 0;
 
+  const velocity = useSharedValue(0);
   const x = useSharedValue(measurements.x);
   const width = useSharedValue(measurements.width);
   const height = useSharedValue(measurements.height);
   const targetWidth = useSharedValue(measurements.targetWidth);
   const targetHeight = useSharedValue(measurements.targetHeight);
   const y = useSharedValue(measurements.y);
-  const target = useSharedVector(
+  const target = vec.useSharedVector(
     0,
     (dimensions.height - measurements.targetHeight) / 2 -
       statusBarFix,
   );
-  const translate = useSharedVector(0, 0);
+  const translate = vec.useSharedVector(0, 0);
+
+  const [diffValue, setDiffValue] = useState(0);
 
   useEffect(() => {
     const disposer = gallery.addOnChangeListener((nextItem) => {
@@ -378,9 +368,9 @@ function ImageTransition({ gallery }) {
         (dimensions.height - nextItem.measurements.targetHeight) / 2 -
         statusBarFix;
 
-      setCurrentImageOpacity(0);
-
       setActiveImage(nextItem.item.uri);
+
+      setCurrentImageOpacity(0);
     });
 
     return disposer;
@@ -388,11 +378,7 @@ function ImageTransition({ gallery }) {
 
   function setCurrentImageOpacity(value) {
     try {
-      gallery.activeItem.ref.current.setNativeProps({
-        style: {
-          opacity: value,
-        },
-      });
+      gallery.activeItem.opacity.value = value;
     } catch (err) {
       console.log('Error changing opacity');
     }
@@ -401,6 +387,7 @@ function ImageTransition({ gallery }) {
   // S1: Callbacks
   function afterOpen() {
     setCurrentImageOpacity(0);
+    setDiffValue(2);
   }
 
   function onClose() {
@@ -413,24 +400,16 @@ function ImageTransition({ gallery }) {
   const openAnimation = () => {
     'worklet';
 
-    const easing = Easing.bezier(0.33, 0.01, 0, 1);
-
-    animationProgress.value = withTiming(
-      1,
-      {
-        duration: 400,
-        easing,
-      },
-      () => {
-        setPagerVisible(true);
-        afterOpen();
-      },
-    );
-    backdropOpacity.value = withTiming(1, {
-      duration: 400,
-      easing,
+    animationProgress.value = withTiming(1, timingConfig, () => {
+      setPagerVisible(true);
+      afterOpen();
     });
+    backdropOpacity.value = withTiming(1, timingConfig);
   };
+
+  useEffect(() => {
+    runOnUI(openAnimation)();
+  }, []);
 
   // S1: Styles
 
@@ -449,7 +428,6 @@ function ImageTransition({ gallery }) {
       translate.x.value + i([x.value, target.x.value]);
 
     return {
-      // position: 'absolute',
       top: translateY,
       left: translateX,
       width: i([width.value, targetWidth.value]),
@@ -469,19 +447,9 @@ function ImageTransition({ gallery }) {
   });
 
   // S2: Pager related stuff
-  const [diffValue, setDiffValue] = useState(1);
   const [activeIndex, setActiveIndex] = useState(
     gallery.activeItem.index,
   );
-
-  useEffect(() => {
-    setTimeout(() => {
-      // setDiffValue(1);
-    }, 300);
-    // setTimeout(() => {
-    //   setDiffValue(2);
-    // }, 500);
-  }, []);
 
   const index = useSharedValue(gallery.activeItem.index);
   const length = useSharedValue(gallery.totalCount);
@@ -503,17 +471,16 @@ function ImageTransition({ gallery }) {
     return t + g;
   };
 
-  function onIndexChange() {
+  async function onIndexChange() {
     const nextIndex = index.value;
-
-    setActiveIndex(nextIndex);
-
     setCurrentImageOpacity(1);
 
     gallery.setActiveIndex(nextIndex);
+
+    setActiveIndex(nextIndex);
   }
 
-  const onChangePageAnimation = (velocity) => {
+  const onChangePageAnimation = () => {
     'worklet';
 
     offsetX.value = withSpring(toValueAnimation.value, {
@@ -523,7 +490,7 @@ function ImageTransition({ gallery }) {
       overshootClamping: true,
       restDisplacementThreshold: 0.01,
       restSpeedThreshold: 0.01,
-      velocity,
+      velocity: velocity.value,
     });
   };
 
@@ -595,6 +562,7 @@ function ImageTransition({ gallery }) {
 
     onEvent: (evt) => {
       gestureTranslationX.value = evt.translationX;
+      velocity.value = evt.velocityX;
     },
 
     onStart: (evt, ctx) => {
@@ -620,8 +588,8 @@ function ImageTransition({ gallery }) {
 
         scale.value = interpolate(
           translate.y.value,
-          [-1000, -200, 0, 200, 1000],
-          [0.65, 0.65, 1, 0.65, 0.65],
+          [-200, 0, 200],
+          [0.65, 1, 0.65],
           Extrapolate.CLAMP,
         );
 
@@ -652,7 +620,7 @@ function ImageTransition({ gallery }) {
           ? getTranslate(nextIndex)
           : getTranslate(index.value));
 
-        onChangePageAnimation(evt.velocityX);
+        onChangePageAnimation();
 
         if (shouldMoveToNextPage) {
           index.value = nextIndex;
@@ -678,7 +646,9 @@ function ImageTransition({ gallery }) {
               duration: 400,
               easing,
             },
-            onClose,
+            () => {
+              onClose();
+            },
           );
           scale.value = withTiming(1, {
             duration: 400,
@@ -712,10 +682,17 @@ function ImageTransition({ gallery }) {
     },
 
     onStart: () => {
+      if (scale.value !== 1) {
+        return;
+      }
       cancelAnimation(offsetX);
     },
 
     onEnd: () => {
+      if (scale.value !== 1) {
+        return;
+      }
+
       onChangePageAnimation();
     },
   });
@@ -750,11 +727,6 @@ function ImageTransition({ gallery }) {
     };
   });
 
-  useEffect(() => {
-    runOnUI(openAnimation)();
-  }, []);
-  // useRunOnce(runOnUI(openAnimation));
-
   return (
     <View style={StyleSheet.absoluteFillObject}>
       <Animated.View style={[styles.backdrop, backdropStyles]} />
@@ -765,16 +737,14 @@ function ImageTransition({ gallery }) {
           simultaneousHandlers={[tapRef]}
           onGestureEvent={onPan}
           onHandlerStateChange={onPan}
-          minDist={10}
         >
           <Animated.View style={StyleSheet.absoluteFill}>
             <Animated.View
               style={[StyleSheet.absoluteFill, imageWrapperStyles]}
             >
-              <AnimatedFastImage
+              <AnimatedImage
                 source={{ uri: activeImage }}
                 style={imageStyles}
-                // resizeMode={FastImage.resizeMode.cover}
               />
             </Animated.View>
 
@@ -783,7 +753,8 @@ function ImageTransition({ gallery }) {
             >
               <TapGestureHandler
                 ref={tapRef}
-                // enabled={false}
+                // TODO: Fix tap gesture handler
+                enabled={false}
                 simultaneousHandlers={[pagerRef]}
                 onGestureEvent={onTap}
                 onHandlerStateChange={onTap}
