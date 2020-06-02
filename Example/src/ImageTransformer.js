@@ -5,6 +5,7 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   cancelAnimation,
+  useDerivedValue,
 } from 'react-native-reanimated';
 import {
   PinchGestureHandler,
@@ -69,6 +70,10 @@ export const ImageTransformer = React.memo(
     const targetHeight = height / scaleFactor;
     const image = vec.create(targetWidth, targetHeight);
 
+    const canPanVertically = useDerivedValue(() => {
+      return windowDimensions.height < targetHeight * scale.value;
+    });
+
     const maybeRunOnEnd = () => {
       'worklet';
 
@@ -81,21 +86,7 @@ export const ImageTransformer = React.memo(
         restSpeedThreshold: 0.1,
       };
 
-      if (panState.value !== 5 || pinchState.value !== 5) {
-        return;
-      }
-
-      if (
-        vec.eq(offset, 0) &&
-        vec.eq(translation, 0) &&
-        vec.eq(scaleTranslation, 0) &&
-        scale.value === 1
-      ) {
-        // we don't need to run any animations
-        return;
-      }
-
-      const MAX_SCALE = 3;
+      const MAX_SCALE = 4;
       const MIN_SCALE = 0.7;
 
       const target = vec.create(0, 0);
@@ -112,6 +103,24 @@ export const ImageTransformer = React.memo(
 
       const maxVector = vec.create(rightBoundary, topBoundary);
       const minVector = vec.invert(maxVector);
+
+      if (!canPanVertically.value) {
+        offset.y.value = withSpring(target.y, springConfig);
+      }
+
+      if (panState.value !== 5 || pinchState.value !== 5) {
+        return;
+      }
+
+      if (
+        vec.eq(offset, 0) &&
+        vec.eq(translation, 0) &&
+        vec.eq(scaleTranslation, 0) &&
+        scale.value === 1
+      ) {
+        // we don't need to run any animations
+        return;
+      }
 
       if (scale.value <= 1) {
         // just center it
@@ -182,10 +191,15 @@ export const ImageTransformer = React.memo(
             vec.set(ctx.panOffset, ctx.pan);
           } else {
             // subtract the offset and assign fixed pan
-            vec.set(
-              translation,
-              vec.add([ctx.pan, vec.invert(ctx.panOffset)]),
-            );
+            const nextTranslate = vec.add([
+              ctx.pan,
+              vec.invert(ctx.panOffset),
+            ]);
+            translation.x.value = nextTranslate.x;
+
+            if (canPanVertically.value) {
+              translation.y.value = nextTranslate.y;
+            }
           }
         }
       },
@@ -368,7 +382,6 @@ export const ImageTransformer = React.memo(
               <Animated.View style={styles.fill}>
                 <TapGestureHandler
                   ref={tapRef}
-                  // enabled={false}
                   numberOfTaps={1}
                   simultaneousHandlers={[
                     pinchRef,
