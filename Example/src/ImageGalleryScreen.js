@@ -1,11 +1,6 @@
 import React from 'react';
-import FastImage from 'react-native-fast-image';
-import {
-  Dimensions,
-  StyleSheet,
-  Image,
-  Platform,
-} from 'react-native';
+import { Dimensions, StyleSheet, Image } from 'react-native';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import {
   ScrollView,
   TouchableWithoutFeedback,
@@ -15,13 +10,11 @@ import {
   GalleryProvider,
   GalleryOverlay,
 } from './Gallery';
+import { useInit } from './useInit';
 
 const dimensions = Dimensions.get('window');
 
-const ImageComponent = Platform.select({
-  android: Image,
-  ios: FastImage,
-});
+const ImageComponent = Animated.createAnimatedComponent(Image);
 
 function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
@@ -31,7 +24,7 @@ function getRandomIntInclusive(min, max) {
 
 const heights = [300, 400, 500, 540, 580, 600];
 
-const images = Array.from({ length: 3 }, (_, index) => {
+const images = Array.from({ length: 10 }, (_, index) => {
   const height =
     heights[getRandomIntInclusive(0, heights.length - 1)];
 
@@ -72,7 +65,7 @@ function ImageList({ images, onItemPress }) {
 }
 
 function ListItem({ item, index }) {
-  const { ref, onPress } = useGalleryItem({
+  const { ref, onPress, opacity } = useGalleryItem({
     index,
     item,
   });
@@ -82,6 +75,12 @@ function ListItem({ item, index }) {
     marginBottom: GUTTER_WIDTH,
   };
 
+  const imageStyles = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+    };
+  });
+
   return (
     <TouchableWithoutFeedback
       style={containerStyle}
@@ -90,24 +89,17 @@ function ListItem({ item, index }) {
       <ImageComponent
         ref={ref}
         source={{ uri: item.uri }}
-        style={{ width: IMAGE_SIZE, height: IMAGE_SIZE }}
-        resizeMode={FastImage.resizeMode.cover}
+        style={[
+          { width: IMAGE_SIZE, height: IMAGE_SIZE },
+          imageStyles,
+        ]}
       />
     </TouchableWithoutFeedback>
   );
 }
 
 export default function ImageGalleryScreen() {
-  // const dimensions = normalizeDimensions(images[0]);
-  // return (
-  //   <ImageTransformer
-  //     {...{
-  //       width: dimensions.targetWidth,
-  //       height: dimensions.targetHeight,
-  //       uri: images[0].uri,
-  //     }}
-  //   />
-  // );
+  useInit();
 
   return (
     <GalleryOverlay>
