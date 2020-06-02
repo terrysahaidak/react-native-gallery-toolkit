@@ -1,22 +1,24 @@
-export default function withDecay(toValue, userConfig, callback) {
+export default function withDecay(userConfig, callback) {
   'worklet';
 
-  if (!_WORKLET) {
-    return toValue;
-  }
+  // TODO: not sure what should I return here
+  // if (!_WORKLET) {
+  //   return toValue;
+  // }
 
-  const config = Object.assign(
-    {
-      deceleration: 0.998,
-    },
-    userConfig,
-  );
+  const config = {
+    deceleration: 0.998,
+  };
+  if (userConfig) {
+    Object.keys(userConfig).forEach(
+      (key) => (config[key] = userConfig[key]),
+    );
+  }
 
   const VELOCITY_EPS = 5;
 
   function decay(animation, now) {
     const {
-      toValue,
       lastTimestamp,
       initialVelocity,
       current,
@@ -37,21 +39,32 @@ export default function withDecay(toValue, userConfig, callback) {
     animation.current = x;
     animation.velocity = v;
 
-    const toValueIsReached =
-      initialVelocity > 0
-        ? animation.current >= toValue
-        : animation.current <= toValue;
+    let toValueIsReached = null;
 
-    if (Math.abs(v) < VELOCITY_EPS || toValueIsReached) {
-      if (toValueIsReached) {
-        animation.current = toValue;
+    if (Array.isArray(config.clamp)) {
+      if (
+        initialVelocity < 0 &&
+        animation.current <= config.clamp[0]
+      ) {
+        toValueIsReached = config.clamp[0];
+      } else if (
+        initialVelocity > 0 &&
+        animation.current >= config.clamp[1]
+      ) {
+        toValueIsReached = config.clamp[1];
+      }
+    }
+
+    if (Math.abs(v) < VELOCITY_EPS || toValueIsReached !== null) {
+      if (toValueIsReached !== null) {
+        animation.current = toValueIsReached;
       }
 
       return true;
     }
   }
 
-  function start(animation, value, now, previousAnimation) {
+  function start(animation, value, now) {
     animation.current = value;
     animation.lastTimestamp = now;
     animation.initialVelocity = config.velocity;
@@ -60,9 +73,7 @@ export default function withDecay(toValue, userConfig, callback) {
   return {
     animation: decay,
     start,
-    toValue,
     velocity: config.velocity || 0,
-    current: toValue,
     callback,
   };
 }

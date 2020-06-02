@@ -127,30 +127,26 @@ export const ImageTransformer = React.memo(
         Math.abs(panVelocity.x.value) > 0 &&
         scale.value <= MAX_SCALE
       ) {
-        offset.x.value = withDecay(
-          panVelocity.x.value > 0 ? maxVector.x : minVector.x,
-          {
-            velocity: panVelocity.x.value,
-            deceleration,
-          },
-        );
+        offset.x.value = withDecay({
+          velocity: panVelocity.x.value,
+          clamp: [minVector.x, maxVector.x],
+          deceleration,
+        });
       } else {
         // run animation
         offset.x.value = withSpring(target.x, springConfig);
       }
 
       if (
-        target.y === offset.x.value &&
+        target.y === offset.y.value &&
         Math.abs(panVelocity.y.value) > 0 &&
         scale.value <= MAX_SCALE
       ) {
-        offset.y.value = withDecay(
-          panVelocity.y.value > 0 ? maxVector.y : minVector.y,
-          {
-            velocity: panVelocity.y.value,
-            deceleration,
-          },
-        );
+        offset.y.value = withDecay({
+          velocity: panVelocity.y.value,
+          clamp: [minVector.y, maxVector.y],
+          deceleration,
+        });
       } else {
         offset.y.value = withSpring(target.y, springConfig);
       }
@@ -216,7 +212,7 @@ export const ImageTransformer = React.memo(
       },
 
       beforeEach: (evt, ctx) => {
-        const MAX_SCALE = 3.5;
+        const MAX_SCALE = 4.5;
         const MIN_SCALE = 0.7;
 
         // calculate the overall scale value
