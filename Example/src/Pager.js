@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useRef,
-  useContext,
-  useCallback,
-  useEffect,
-} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -30,7 +24,11 @@ import {
 } from 'react-native-gesture-handler';
 import { useAnimatedGestureHandler } from './useAnimatedGestureHandler';
 import { ImageTransformer } from './ImageTransformer';
-import { normalizeDimensions } from './utils';
+import {
+  friction,
+  fixGestureHandler,
+  getShouldRender,
+} from './utils';
 import * as vec from './vectors';
 
 const dimensions = Dimensions.get('window');
@@ -47,138 +45,6 @@ const styles = StyleSheet.create({
 });
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
-
-class Gallery {
-  constructor(fn, totalCount) {
-    this._showFunction = fn;
-    this.images = [];
-    this.currentIndex = null;
-    this._onChangeListeners = [];
-    this.totalCount = totalCount;
-  }
-
-  get activeItem() {
-    return this.images[this.currentIndex];
-  }
-
-  addImage({ ref, index, opacity, item }) {
-    this.images[index] = {
-      ref,
-      index,
-      opacity,
-      item,
-      measurements: {},
-    };
-  }
-
-  async setActiveIndex(index) {
-    this.currentIndex = index;
-
-    await this._measure(this.activeItem);
-
-    this._triggerListeners(this.activeItem);
-  }
-
-  addOnChangeListener(cb) {
-    this._onChangeListeners.push(cb);
-
-    return () => {
-      this._onChangeListeners.filter((i) => i === cb);
-    };
-  }
-
-  async onShow(index) {
-    await this.setActiveIndex(index);
-
-    this._showFunction(this);
-  }
-
-  onClose() {
-    this._showFunction(null);
-  }
-
-  _measure(item) {
-    return new Promise((resolve, reject) =>
-      item.ref.current
-        .getNode()
-        .measure((x, y, width, height, pageX, pageY) => {
-          if (width === 0 && height === 0) {
-            reject();
-            return;
-          }
-
-          const { targetWidth, targetHeight } = normalizeDimensions(
-            item.item,
-          );
-
-          item.measurements = {
-            width,
-            height,
-            x: pageX,
-            y: pageY,
-            targetHeight,
-            targetWidth,
-          };
-
-          resolve();
-        }),
-    );
-  }
-
-  _triggerListeners(item) {
-    this._onChangeListeners.forEach((cb) => cb(item));
-  }
-}
-
-const GalleryOverlayContext = React.createContext(null);
-const GalleryContext = React.createContext(null);
-
-export function useGalleryItem({ index, item }) {
-  const gallery = useContext(GalleryContext);
-  const ref = useRef();
-  const opacity = useSharedValue(1);
-
-  useEffect(() => {
-    gallery.addImage({ ref, index, item, opacity });
-  }, []);
-
-  const onPress = useCallback(() => {
-    gallery.onShow(index);
-  }, []);
-
-  return {
-    opacity,
-    ref,
-    onPress,
-  };
-}
-
-export function GalleryProvider({ totalCount, children }) {
-  const setActiveGallery = useContext(GalleryOverlayContext);
-  const [gallery] = useState(
-    new Gallery(setActiveGallery, totalCount),
-  );
-
-  return (
-    <GalleryContext.Provider value={gallery}>
-      {children}
-    </GalleryContext.Provider>
-  );
-}
-
-export function GalleryOverlay({ children }) {
-  const [activeGallery, setActiveGallery] = useState(null);
-
-  return (
-    <GalleryOverlayContext.Provider value={setActiveGallery}>
-      <View style={StyleSheet.absoluteFill}>
-        {children}
-
-        {activeGallery && <ImageTransition gallery={activeGallery} />}
-      </View>
-    </GalleryOverlayContext.Provider>
-  );
-}
 
 function Gutter({ width }) {
   return <View style={{ width }} />;
@@ -242,39 +108,8 @@ const Page = React.memo(
   },
 );
 
-function getShouldRender(index, activeIndex, diffValue = 3) {
-  const diff = Math.abs(index - activeIndex);
-
-  if (diff > diffValue) {
-    return false;
-  }
-
-  return true;
-}
-
 const GUTTER_WIDTH = dimensions.width / 14;
 const FAR_FAR_AWAY = 9999;
-
-const friction = (value) => {
-  'worklet';
-
-  const MAX_FRICTION = 30;
-  const MAX_VALUE = 200;
-
-  const res = Math.max(
-    1,
-    Math.min(
-      MAX_FRICTION,
-      1 + (Math.abs(value) * (MAX_FRICTION - 1)) / MAX_VALUE,
-    ),
-  );
-
-  if (value < 0) {
-    return -res;
-  }
-
-  return res;
-};
 
 const getPageTranslate = (i) => {
   const t = i * dimensions.width;
@@ -282,31 +117,20 @@ const getPageTranslate = (i) => {
   return -(t + g);
 };
 
-// in order to simultaneousHandlers to work
-// we need to trigger rerender of the screen
-// so refs will be valid then
-function fixGestureHandler() {
-  const [, set] = useState(0);
-
-  useEffect(() => {
-    set((v) => v + 1);
-  }, []);
-}
-
 const timingConfig = {
   duration: 250,
   easing: Easing.bezier(0.33, 0.01, 0, 1),
 };
 
 /**
- * @typedef {Object} IImageTransitionProps
- * @property {Gallery} gallery
+ * @typedef {Object} IImagePagerProps
+ * @property {GalleryState} gallery
  */
 
 /**
- * @param {IImageTransitionProps} - Props
+ * @param {IImagePagerProps} - Props
  */
-function ImageTransition({ gallery }) {
+export function ImagePager({ gallery }) {
   fixGestureHandler();
 
   const pagerRef = useRef();

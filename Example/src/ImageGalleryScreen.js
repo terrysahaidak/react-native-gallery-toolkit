@@ -5,12 +5,12 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
 } from 'react-native-gesture-handler';
+import { useInit } from './useInit';
 import {
   useGalleryItem,
-  GalleryProvider,
   GalleryOverlay,
-} from './Gallery';
-import { useInit } from './useInit';
+  GalleryProvider,
+} from './Provider';
 
 const dimensions = Dimensions.get('window');
 

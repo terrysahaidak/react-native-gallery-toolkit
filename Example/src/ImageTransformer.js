@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef } from 'react';
 import { StyleSheet, Dimensions, Image } from 'react-native';
 import Animated, {
   withSpring,
@@ -14,6 +14,7 @@ import {
 import * as vec from './vectors';
 import { useAnimatedGestureHandler } from './useAnimatedGestureHandler';
 import withDecay from './withDecay';
+import { fixGestureHandler, clamp } from './utils';
 
 const windowDimensions = {
   width: Dimensions.get('window').width,
@@ -35,20 +36,6 @@ const styles = {
   },
 };
 
-function useForceUpdateOnMount() {
-  const [, setState] = useState(0);
-
-  useEffect(() => {
-    setState((i) => i + 1);
-  }, []);
-}
-
-const clamp = function(value, lowerBound, upperBound) {
-  'worklet';
-
-  return Math.min(Math.max(lowerBound, value), upperBound);
-};
-
 export const ImageTransformer = React.memo(
   ({
     pagerRefs = [],
@@ -57,7 +44,7 @@ export const ImageTransformer = React.memo(
     height,
     onPageStateChange = () => {},
   }) => {
-    useForceUpdateOnMount();
+    fixGestureHandler();
 
     const pinchRef = useRef();
     const panRef = useRef();
@@ -279,7 +266,7 @@ export const ImageTransformer = React.memo(
         vec.set(scaleTranslation, nextTranslation);
       },
 
-      onEnd: (evt, ctx) => {
+      onEnd: (evt) => {
         const springConfig = {
           stiffness: 1000,
           damping: 500,
