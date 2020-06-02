@@ -1,24 +1,23 @@
-import React, { useRef, useEffect, useState } from "react";
-import { StyleSheet, Dimensions } from "react-native";
-import Image from "react-native-fast-image";
+import React, { useRef, useEffect, useState } from 'react';
+import { StyleSheet, Dimensions, Image } from 'react-native';
 import Animated, {
   withSpring,
   useSharedValue,
   useAnimatedStyle,
   cancelAnimation,
-} from "react-native-reanimated";
+} from 'react-native-reanimated';
 import {
   PinchGestureHandler,
   PanGestureHandler,
   TapGestureHandler,
-} from "react-native-gesture-handler";
-import * as vec from "./vectors";
-import { useAnimatedGestureHandler } from "./useAnimatedGestureHandler";
-import withDecay from "./withDecay";
+} from 'react-native-gesture-handler';
+import * as vec from './vectors';
+import { useAnimatedGestureHandler } from './useAnimatedGestureHandler';
+import withDecay from './withDecay';
 
 const windowDimensions = {
-  width: Dimensions.get("window").width,
-  height: Dimensions.get("window").height,
+  width: Dimensions.get('window').width,
+  height: Dimensions.get('window').height,
 };
 
 const styles = {
@@ -27,12 +26,12 @@ const styles = {
   },
   wrapper: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   container: {
     flex: 1,
-    backgroundColor: "black",
+    backgroundColor: 'black',
   },
 };
 
@@ -44,14 +43,20 @@ function useForceUpdateOnMount() {
   }, []);
 }
 
-const clamp = function (value, lowerBound, upperBound) {
-  "worklet";
+const clamp = function(value, lowerBound, upperBound) {
+  'worklet';
 
   return Math.min(Math.max(lowerBound, value), upperBound);
 };
 
 export const ImageTransformer = React.memo(
-  ({ pagerRefs = [], uri, width, height, onPageStateChange = () => {} }) => {
+  ({
+    pagerRefs = [],
+    uri,
+    width,
+    height,
+    onPageStateChange = () => {},
+  }) => {
     useForceUpdateOnMount();
 
     const pinchRef = useRef();
@@ -68,14 +73,17 @@ export const ImageTransformer = React.memo(
     const scaleTranslation = vec.useSharedVector(0, 0);
     const offset = vec.useSharedVector(0, 0);
 
-    const canvas = vec.create(windowDimensions.width, windowDimensions.height);
+    const canvas = vec.create(
+      windowDimensions.width,
+      windowDimensions.height,
+    );
     const targetWidth = windowDimensions.width;
     const scaleFactor = width / targetWidth;
     const targetHeight = height / scaleFactor;
     const image = vec.create(targetWidth, targetHeight);
 
     const maybeRunOnEnd = () => {
-      "worklet";
+      'worklet';
 
       const springConfig = {
         stiffness: 1000,
@@ -137,7 +145,7 @@ export const ImageTransformer = React.memo(
           {
             velocity: panVelocity.x.value,
             deceleration,
-          }
+          },
         );
       } else {
         // run animation
@@ -154,7 +162,7 @@ export const ImageTransformer = React.memo(
           {
             velocity: panVelocity.y.value,
             deceleration,
-          }
+          },
         );
       } else {
         offset.y.value = withSpring(target.y, springConfig);
@@ -191,7 +199,10 @@ export const ImageTransformer = React.memo(
             vec.set(ctx.panOffset, ctx.pan);
           } else {
             // subtract the offset and assign fixed pan
-            vec.set(translation, vec.add([ctx.pan, vec.invert(ctx.panOffset)]));
+            vec.set(
+              translation,
+              vec.add([ctx.pan, vec.invert(ctx.panOffset)]),
+            );
           }
         }
       },
@@ -226,7 +237,7 @@ export const ImageTransformer = React.memo(
         ctx.nextScale = clamp(
           evt.scale * scaleOffset.value,
           MIN_SCALE,
-          MAX_SCALE
+          MAX_SCALE,
         );
 
         if (ctx.nextScale > MIN_SCALE && ctx.nextScale < MAX_SCALE) {
@@ -316,10 +327,14 @@ export const ImageTransformer = React.memo(
       const noTranslation =
         translation.x.value === 0 && translation.y.value === 0;
       const noScaleTranslation =
-        scaleTranslation.x.value === 0 && scaleTranslation.y.value === 0;
+        scaleTranslation.x.value === 0 &&
+        scaleTranslation.y.value === 0;
 
       const pagerNextState =
-        scale.value === 1 && noOffset && noTranslation && noScaleTranslation;
+        scale.value === 1 &&
+        noOffset &&
+        noTranslation &&
+        noScaleTranslation;
 
       onPageStateChange(pagerNextState);
 
@@ -327,11 +342,15 @@ export const ImageTransformer = React.memo(
         transform: [
           {
             translateX:
-              scaleTranslation.x.value + translation.x.value + offset.x.value,
+              scaleTranslation.x.value +
+              translation.x.value +
+              offset.x.value,
           },
           {
             translateY:
-              scaleTranslation.y.value + translation.y.value + offset.y.value,
+              scaleTranslation.y.value +
+              translation.y.value +
+              offset.y.value,
           },
           { scale: scale.value },
         ],
@@ -346,7 +365,12 @@ export const ImageTransformer = React.memo(
           ref={pinchRef}
           // enabled={false}
           onGestureEvent={onScaleEvent}
-          simultaneousHandlers={[pinchRef, panRef, tapRef, ...pagerRefs]}
+          simultaneousHandlers={[
+            pinchRef,
+            panRef,
+            tapRef,
+            ...pagerRefs,
+          ]}
           onHandlerStateChange={onScaleEvent}
         >
           <Animated.View style={styles.fill}>
@@ -363,7 +387,11 @@ export const ImageTransformer = React.memo(
                   ref={tapRef}
                   // enabled={false}
                   numberOfTaps={1}
-                  simultaneousHandlers={[pinchRef, panRef, ...pagerRefs]}
+                  simultaneousHandlers={[
+                    pinchRef,
+                    panRef,
+                    ...pagerRefs,
+                  ]}
                   onGestureEvent={onTapEvent}
                   onHandlerStateChange={onTapEvent}
                 >
@@ -390,5 +418,5 @@ export const ImageTransformer = React.memo(
         </PinchGestureHandler>
       </Animated.View>
     );
-  }
+  },
 );
