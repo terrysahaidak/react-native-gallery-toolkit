@@ -11,6 +11,7 @@ import {
   GalleryOverlay,
   GalleryProvider,
 } from './Provider';
+import { ImageTransformer } from './ImageTransformer';
 
 const dimensions = Dimensions.get('window');
 
@@ -24,9 +25,13 @@ function getRandomIntInclusive(min, max) {
 
 const heights = [300, 400, 500, 540, 580, 600];
 
-const images = Array.from({ length: 10 }, (_, index) => {
+const images = Array.from({ length: 1 }, (_, index) => {
   const height =
     heights[getRandomIntInclusive(0, heights.length - 1)];
+
+  // return {
+  //   uri: require('./rainbow_6.jpg'),
+  // };
 
   return {
     uri: `https://picsum.photos/id/${index + 200}/${height}/400`,
@@ -100,6 +105,12 @@ function ListItem({ item, index }) {
 
 export default function ImageGalleryScreen() {
   useInit();
+
+  const asset = require('./rainbow_6.jpg');
+
+  return (
+    <ImageTransformer source={asset} width={4608} height={3072} />
+  );
 
   return (
     <GalleryOverlay>

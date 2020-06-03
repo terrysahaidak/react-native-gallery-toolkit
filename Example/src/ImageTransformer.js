@@ -37,15 +37,29 @@ const styles = {
   },
 };
 
+const springConfig = {
+  stiffness: 1000,
+  damping: 500,
+  mass: 3,
+  overshootClamping: true,
+  restDisplacementThreshold: 0.01,
+  restSpeedThreshold: 0.01,
+};
+
 export const ImageTransformer = React.memo(
   ({
     pagerRefs = [],
+    source,
     uri,
     width,
     height,
     onPageStateChange = () => {},
   }) => {
     fixGestureHandler();
+
+    const MAX_SCALE = 3;
+    const MIN_SCALE = 0.7;
+    const OVER_SCALE = 0.5;
 
     const pinchRef = useRef();
     const panRef = useRef();
@@ -77,17 +91,23 @@ export const ImageTransformer = React.memo(
     const maybeRunOnEnd = () => {
       'worklet';
 
-      const springConfig = {
-        stiffness: 1000,
-        damping: 500,
-        mass: 3,
-        overshootClamping: true,
-        restDisplacementThreshold: 0.01,
-        restSpeedThreshold: 0.1,
-      };
+      // if (!canPanVertically.value) {
+      //   offset.y.value = withSpring(target.y, springConfig);
+      // }
 
-      const MAX_SCALE = 4;
-      const MIN_SCALE = 0.7;
+      if (panState.value !== 5 || pinchState.value !== 5) {
+        return;
+      }
+
+      if (
+        vec.eq(offset, 0) &&
+        vec.eq(translation, 0) &&
+        vec.eq(scaleTranslation, 0) &&
+        scale.value === 1
+      ) {
+        // we don't need to run any animations
+        return;
+      }
 
       const target = vec.create(0, 0);
 
@@ -103,24 +123,6 @@ export const ImageTransformer = React.memo(
 
       const maxVector = vec.create(rightBoundary, topBoundary);
       const minVector = vec.invert(maxVector);
-
-      if (!canPanVertically.value) {
-        offset.y.value = withSpring(target.y, springConfig);
-      }
-
-      if (panState.value !== 5 || pinchState.value !== 5) {
-        return;
-      }
-
-      if (
-        vec.eq(offset, 0) &&
-        vec.eq(translation, 0) &&
-        vec.eq(scaleTranslation, 0) &&
-        scale.value === 1
-      ) {
-        // we don't need to run any animations
-        return;
-      }
 
       if (scale.value <= 1) {
         // just center it
@@ -177,9 +179,10 @@ export const ImageTransformer = React.memo(
         return true;
       },
 
-      onStart: () => {
+      onStart: (evt, ctx) => {
         cancelAnimation(offset.x);
         cancelAnimation(offset.y);
+        // ctx.panOffset = vec.create(0, 0);
       },
 
       onActive: (evt, ctx) => {
@@ -196,9 +199,9 @@ export const ImageTransformer = React.memo(
               vec.invert(ctx.panOffset),
             ]);
             translation.x.value = nextTranslate.x;
+            translation.y.value = nextTranslate.y;
 
             if (canPanVertically.value) {
-              translation.y.value = nextTranslate.y;
             }
           }
         }
@@ -226,9 +229,6 @@ export const ImageTransformer = React.memo(
       },
 
       beforeEach: (evt, ctx) => {
-        const MAX_SCALE = 4.5;
-        const MIN_SCALE = 0.7;
-
         // calculate the overall scale value
         // also limits this.event.scale
         ctx.nextScale = clamp(
@@ -277,15 +277,6 @@ export const ImageTransformer = React.memo(
       },
 
       onEnd: (evt) => {
-        const springConfig = {
-          stiffness: 1000,
-          damping: 500,
-          mass: 3,
-          overshootClamping: true,
-          restDisplacementThreshold: 0.01,
-          restSpeedThreshold: 0.01,
-        };
-
         pinchState.value = evt.state;
         // store scale value
         scaleOffset.value = scale.value;
@@ -299,9 +290,9 @@ export const ImageTransformer = React.memo(
 
           // this runs the spring animation
           scale.value = withSpring(1, springConfig);
-        } else if (scaleOffset.value > 3) {
-          scaleOffset.value = 3;
-          scale.value = withSpring(3, springConfig);
+        } else if (scaleOffset.value > MAX_SCALE) {
+          scaleOffset.value = MAX_SCALE;
+          scale.value = withSpring(MAX_SCALE, springConfig);
         }
 
         maybeRunOnEnd();
@@ -395,9 +386,11 @@ export const ImageTransformer = React.memo(
                     <Animated.View style={styles.wrapper}>
                       <Animated.View style={animatedStyles}>
                         <Image
-                          source={{
-                            uri,
-                          }}
+                          source={
+                            source ?? {
+                              uri,
+                            }
+                          }
                           // resizeMode="cover"
                           style={{
                             width: targetWidth,
