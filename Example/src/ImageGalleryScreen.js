@@ -11,6 +11,7 @@ import {
   GalleryOverlay,
   GalleryProvider,
 } from './Provider';
+import { ImageTransformer } from './ImageTransformer';
 
 const dimensions = Dimensions.get('window');
 
@@ -24,7 +25,7 @@ function getRandomIntInclusive(min, max) {
 
 const heights = [300, 400, 500, 540, 580, 600];
 
-const images = Array.from({ length: 10 }, (_, index) => {
+const images = Array.from({ length: 5 }, (_, index) => {
   const height =
     heights[getRandomIntInclusive(0, heights.length - 1)];
 

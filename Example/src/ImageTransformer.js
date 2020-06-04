@@ -2,10 +2,12 @@ import React, { useRef } from 'react';
 import { StyleSheet, Dimensions, Image } from 'react-native';
 import Animated, {
   withSpring,
+  withTiming,
   useSharedValue,
   useAnimatedStyle,
   cancelAnimation,
   useDerivedValue,
+  Easing,
 } from 'react-native-reanimated';
 import {
   PinchGestureHandler,
@@ -37,15 +39,38 @@ const styles = {
   },
 };
 
+const springConfig = {
+  stiffness: 1000,
+  damping: 500,
+  mass: 3,
+  overshootClamping: true,
+  restDisplacementThreshold: 0.01,
+  restSpeedThreshold: 0.01,
+};
+
+const timingConfig = {
+  duration: 250,
+  easing: Easing.bezier(0.33, 0.01, 0, 1),
+};
+
 export const ImageTransformer = React.memo(
   ({
     pagerRefs = [],
+    source,
     uri,
     width,
     height,
     onPageStateChange = () => {},
   }) => {
     fixGestureHandler();
+
+    const imageSource = source ?? {
+      uri,
+    };
+
+    const MAX_SCALE = 3;
+    const MIN_SCALE = 0.7;
+    const OVER_SCALE = 0.5;
 
     const pinchRef = useRef();
     const panRef = useRef();
@@ -76,18 +101,6 @@ export const ImageTransformer = React.memo(
 
     const maybeRunOnEnd = () => {
       'worklet';
-
-      const springConfig = {
-        stiffness: 1000,
-        damping: 500,
-        mass: 3,
-        overshootClamping: true,
-        restDisplacementThreshold: 0.01,
-        restSpeedThreshold: 0.1,
-      };
-
-      const MAX_SCALE = 4;
-      const MIN_SCALE = 0.7;
 
       const target = vec.create(0, 0);
 
@@ -177,9 +190,10 @@ export const ImageTransformer = React.memo(
         return true;
       },
 
-      onStart: () => {
+      onStart: (evt, ctx) => {
         cancelAnimation(offset.x);
         cancelAnimation(offset.y);
+        ctx.panOffset = vec.create(0, 0);
       },
 
       onActive: (evt, ctx) => {
@@ -226,18 +240,18 @@ export const ImageTransformer = React.memo(
       },
 
       beforeEach: (evt, ctx) => {
-        const MAX_SCALE = 4.5;
-        const MIN_SCALE = 0.7;
-
         // calculate the overall scale value
         // also limits this.event.scale
         ctx.nextScale = clamp(
           evt.scale * scaleOffset.value,
           MIN_SCALE,
-          MAX_SCALE,
+          MAX_SCALE + OVER_SCALE,
         );
 
-        if (ctx.nextScale > MIN_SCALE && ctx.nextScale < MAX_SCALE) {
+        if (
+          ctx.nextScale > MIN_SCALE &&
+          ctx.nextScale < MAX_SCALE + OVER_SCALE
+        ) {
           ctx.gestureScale = evt.scale;
         }
 
@@ -276,16 +290,9 @@ export const ImageTransformer = React.memo(
         vec.set(scaleTranslation, nextTranslation);
       },
 
-      onEnd: (evt) => {
-        const springConfig = {
-          stiffness: 1000,
-          damping: 500,
-          mass: 3,
-          overshootClamping: true,
-          restDisplacementThreshold: 0.01,
-          restSpeedThreshold: 0.01,
-        };
-
+      onEnd: (evt, ctx) => {
+        // reset gestureScale value
+        ctx.gestureScale = 1;
         pinchState.value = evt.state;
         // store scale value
         scaleOffset.value = scale.value;
@@ -298,16 +305,17 @@ export const ImageTransformer = React.memo(
           scaleOffset.value = 1;
 
           // this runs the spring animation
-          scale.value = withSpring(1, springConfig);
-        } else if (scaleOffset.value > 3) {
-          scaleOffset.value = 3;
-          scale.value = withSpring(3, springConfig);
+          scale.value = withTiming(1, timingConfig);
+        } else if (scaleOffset.value > MAX_SCALE) {
+          scaleOffset.value = MAX_SCALE;
+          scale.value = withTiming(MAX_SCALE, timingConfig);
         }
 
         maybeRunOnEnd();
       },
     });
 
+    // FIXME: Tap gesture handler is not working
     const onTapEvent = useAnimatedGestureHandler({
       onStart: () => {
         cancelAnimation(offset.x);
@@ -362,12 +370,7 @@ export const ImageTransformer = React.memo(
           ref={pinchRef}
           // enabled={false}
           onGestureEvent={onScaleEvent}
-          simultaneousHandlers={[
-            pinchRef,
-            panRef,
-            tapRef,
-            ...pagerRefs,
-          ]}
+          simultaneousHandlers={[panRef, tapRef, ...pagerRefs]}
           onHandlerStateChange={onScaleEvent}
         >
           <Animated.View style={styles.fill}>
@@ -395,9 +398,7 @@ export const ImageTransformer = React.memo(
                     <Animated.View style={styles.wrapper}>
                       <Animated.View style={animatedStyles}>
                         <Image
-                          source={{
-                            uri,
-                          }}
+                          source={imageSource}
                           // resizeMode="cover"
                           style={{
                             width: targetWidth,
