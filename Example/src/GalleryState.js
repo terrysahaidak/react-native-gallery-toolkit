@@ -47,6 +47,12 @@ export class GalleryState {
 
   onClose() {
     this._showFunction(null);
+    this._clearListener();
+    this.currentIndex = null;
+  }
+
+  _clearListener() {
+    this._onChangeListeners = [];
   }
 
   _measure(item) {
