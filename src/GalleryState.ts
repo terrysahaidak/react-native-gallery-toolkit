@@ -1,7 +1,35 @@
+import React from 'react';
+import Animated, { SharedValue } from 'react-native-reanimated';
 import { normalizeDimensions } from './utils';
 
+type IShowFunction = (value: GalleryState | null) => void;
+type IGalleryItem = {
+  width: number;
+  height: number;
+  uri: string;
+};
+type IGalleryImage = {
+  ref: React.RefObject<Animated.Image>;
+  index: number;
+  opacity: SharedValue<number>;
+  item: IGalleryItem;
+  measurements?: object;
+};
+
+type IOnChangeCallback = (item: IGalleryImage) => void;
+
 export class GalleryState {
-  constructor(fn, totalCount) {
+  private _showFunction: IShowFunction;
+
+  private images: IGalleryImage[];
+
+  private currentIndex: number | null;
+
+  private _onChangeListeners: IOnChangeCallback[];
+
+  public totalCount: number;
+
+  constructor(fn: IShowFunction, totalCount: number) {
     this._showFunction = fn;
     this.images = [];
     this.currentIndex = null;
@@ -10,28 +38,29 @@ export class GalleryState {
   }
 
   get activeItem() {
+    if (this.currentIndex === null) {
+      return null;
+    }
+
     return this.images[this.currentIndex];
   }
 
-  addImage({ ref, index, opacity, item }) {
-    this.images[index] = {
-      ref,
-      index,
-      opacity,
-      item,
+  addImage(item: IGalleryImage) {
+    this.images[item.index] = {
+      ...item,
       measurements: {},
     };
   }
 
-  async setActiveIndex(index) {
+  async setActiveIndex(index: number) {
     this.currentIndex = index;
 
-    await this._measure(this.activeItem);
+    await this._measure(this.activeItem!);
 
-    this._triggerListeners(this.activeItem);
+    this._triggerListeners(this.activeItem!);
   }
 
-  addOnChangeListener(cb) {
+  addOnChangeListener(cb: IOnChangeCallback) {
     this._onChangeListeners.push(cb);
 
     return () => {
@@ -39,7 +68,7 @@ export class GalleryState {
     };
   }
 
-  async onShow(index) {
+  async onShow(index: number) {
     await this.setActiveIndex(index);
 
     this._showFunction(this);
@@ -55,10 +84,10 @@ export class GalleryState {
     this._onChangeListeners = [];
   }
 
-  _measure(item) {
+  _measure(item: IGalleryImage) {
     return new Promise((resolve, reject) =>
-      item.ref.current
-        .getNode()
+      item.ref
+        .current!.getNode()
         .measure((x, y, width, height, pageX, pageY) => {
           if (width === 0 && height === 0) {
             reject();
@@ -83,7 +112,7 @@ export class GalleryState {
     );
   }
 
-  _triggerListeners(item) {
+  _triggerListeners(item: IGalleryImage) {
     this._onChangeListeners.forEach((cb) => cb(item));
   }
 }

@@ -28,6 +28,11 @@ module.exports = {
     'react/jsx-props-no-spreading': 'off',
     'react/static-property-placement': 'off',
     'react/state-in-constructor': 'off',
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['error'],
+    'no-underscore-dangle': 0,
+    'class-methods-use-this': 0,
+    'no-param-reassign': 0,
   },
   settings: {
     'import/resolver': {
