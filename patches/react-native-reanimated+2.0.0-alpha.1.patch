@@ -1,0 +1,173 @@
+diff --git a/node_modules/react-native-reanimated/react-native-reanimated.d.ts b/node_modules/react-native-reanimated/react-native-reanimated.d.ts
+index 9a6b232..866d68a 100644
+--- a/node_modules/react-native-reanimated/react-native-reanimated.d.ts
++++ b/node_modules/react-native-reanimated/react-native-reanimated.d.ts
+@@ -16,8 +16,15 @@ declare module 'react-native-reanimated' {
+     View as ReactNativeView,
+     Text as ReactNativeText,
+     Image as ReactNativeImage,
+-    ScrollView as ReactNativeScrollView
++    ScrollView as ReactNativeScrollView,
++    NativeScrollEvent,
++    NativeSyntheticEvent,
+   } from 'react-native';
++  import {
++    GestureHandlerGestureEventNativeEvent,
++    PanGestureHandlerGestureEvent,
++    PanGestureHandlerEventExtra,
++  } from 'react-native-gesture-handler';
+   namespace Animated {
+     type Nullable<T> = T | null | undefined;
+ 
+@@ -61,6 +68,12 @@ declare module 'react-native-reanimated' {
+       interpolate(config: InterpolationConfig): AnimatedNode<number>;
+     }
+ 
++    type RawSharedValue = number | string | boolean | object | Function;
++    type SharedValueType = RawSharedValue | RawSharedValue[];
++    interface SharedValue<T extends SharedValueType> {
++      value: T;
++    }
++
+     export type Mapping = { [key: string]: Mapping } | Adaptable<any>;
+     export type Adaptable<T> =
+       | T
+@@ -324,7 +337,7 @@ declare module 'react-native-reanimated' {
+       minVal: Adaptable<number>,
+       maxVal: Adaptable<number>,
+     ): AnimatedNode<number>;
+-    export function interpolate(
++    export function interpolateNode(
+       value: Adaptable<number>,
+       config: InterpolationConfig,
+     ): AnimatedNode<number>;
+@@ -341,6 +354,14 @@ declare module 'react-native-reanimated' {
+     export const max: BinaryOperator;
+     export const min: BinaryOperator;
+ 
++    // reanimated2 derived operations
++    export function interpolate(
++      x: number,
++      input: Array<number>,
++      output: Array<number>,
++      type: Extrapolate
++    ): number;
++
+     // animations
+     export function decay(
+       clock: AnimatedClock,
+@@ -371,6 +392,29 @@ declare module 'react-native-reanimated' {
+       config: DecayConfig,
+     ): BackwardCompatibleWrapper;
+ 
++    // reanimated2 animations
++    export function withTiming(
++      toValue: number,
++      userConfig?: Omit<TimingConfig, 'toValue'>,
++      callback?: (isCancelled: boolean) => void,
++    ): number;
++    export function withSpring(
++      toValue: number,
++      userConfig?: Omit<SpringConfig, 'toValue'>,
++      callback?: (isCancelled: boolean) => void,
++    ): number;
++    export function cancelAnimation<T extends Value>(
++      sharedValue: SharedValue<T>
++    ): void;
++    export function delay(
++      delayMS: number,
++      delayedAnimation: number,
++    ): number;
++    export function loop(
++      loopedAnimation: number,
++      numberOfLoops?: number,
++    ): number;
++
+     // hooks
+     export function useCode(
+       exec: () => Nullable< AnimatedNode<number>[] | AnimatedNode<number> > | boolean,
+@@ -380,8 +424,59 @@ declare module 'react-native-reanimated' {
+       initialValue: T
+     ): AnimatedValue<T>;
+ 
++    // reanimated2 hooks
++    export function useSharedValue<T extends SharedValueType>(
++      initialValue: T
++    ): SharedValue<T>;
++    export function useDerivedValue<T extends SharedValueType>(
++      processor: () => T
++    ): SharedValue<T>;
++    export function useAnimatedStyle<T extends ViewStyle, TextStyle, ImageStyle>(
++      updater: () => T
++    ): T;
++    export function useAnimatedGestureHandler<TContext extends Context>(
++      handlers: GestureHandlers<TContext>
++    ): OnGestureEvent;
++    export function useAnimatedScrollHandler(
++      handler: ScrollHandler
++    ): OnScroll;
++    export function useAnimatedScrollHandler(
++      handlers: ScrollHandlers
++    ): OnScroll;
++
+     // configuration
+     export function addWhitelistedNativeProps(props: { [key: string]: true }): void;
++
++    // gesture-handler
++    type OnGestureEvent = (event: PanGestureHandlerGestureEvent) => void;
++
++    // @TODO: refactor this once worklet parse Typescript syntax
++    type Context = { [key: string]: any };
++
++    type NativeEvent = GestureHandlerGestureEventNativeEvent & PanGestureHandlerEventExtra;
++    type Handler<TContext extends Context> = (event: NativeEvent, context: TContext) => void;
++
++    export interface GestureHandlers<TContext extends Context> {
++      onStart?: Handler<TContext>;
++      onActive?: Handler<TContext>;
++      onEnd?: Handler<TContext>;
++      onFail?: Handler<TContext>;
++      onCancel?: Handler<TContext>;
++      onFinish?: (event: NativeEvent, context: TContext, isCanceledOrFailed: boolean) => void;
++    }
++
++    // scroll view
++    type OnScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
++
++    type ScrollHandler = (event: NativeScrollEvent) => void;
++
++    export interface ScrollHandlers {
++      onScroll?:ScrollHandler;
++      onBeginDrag?:ScrollHandler;
++      onEndDrag?: ScrollHandler;
++      onMomentumBegin?: ScrollHandler;
++      onMomentumEnd?: ScrollHandler;
++    }
+   }
+ 
+   export default Animated;
+@@ -487,7 +582,7 @@ declare module 'react-native-reanimated' {
+   export const interpolateColors: typeof Animated.interpolateColors
+   export const diff: typeof Animated.diff
+   export const diffClamp: typeof Animated.diffClamp
+-  export const interpolate: typeof Animated.interpolate
++  export const interpolateNode: typeof Animated.interpolateNode
+   export const Extrapolate: typeof Animated.Extrapolate
+   export const max: typeof Animated.max
+   export const min: typeof Animated.min
+@@ -500,4 +595,15 @@ declare module 'react-native-reanimated' {
+   export const spring: typeof Animated.spring
+   export const SpringUtils: typeof Animated.SpringUtils
+   export const useValue: typeof Animated.useValue
++  export const useSharedValue: typeof Animated.useSharedValue
++  export const useAnimatedStyle: typeof Animated.useAnimatedStyle
++  export const useDerivedValue: typeof Animated.useDerivedValue
++  export const useAnimatedGestureHandler: typeof Animated.useAnimatedGestureHandler
++  export const useAnimatedScrollHandler: typeof Animated.useAnimatedScrollHandler
++  export const withTiming: typeof Animated.withTiming
++  export const withSpring: typeof Animated.withSpring
++  export const cancelAnimation: typeof Animated.cancelAnimation
++  export const delay: typeof Animated.delay
++  export const loop: typeof Animated.loop
++  export const interpolate: typeof Animated.interpolate
+ }
