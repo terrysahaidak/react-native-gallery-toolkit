@@ -3,7 +3,7 @@ import Animated, { SharedValue } from 'react-native-reanimated';
 import { normalizeDimensions } from './utils';
 
 type IShowFunction = (value: GalleryState | null) => void;
-type IGalleryItem = {
+export type IGalleryItem = {
   width: number;
   height: number;
   uri: string;

@@ -1,10 +1,11 @@
 import { Dimensions } from 'react-native';
 import { useState, useEffect } from 'react';
+import { IGalleryItem } from './GalleryState';
 
 const dimensions = Dimensions.get('window');
 
 export function normalizeDimensions(
-  item,
+  item: IGalleryItem,
   targetWidth = dimensions.width,
 ) {
   const scaleFactor = item.width / targetWidth;
@@ -16,7 +17,7 @@ export function normalizeDimensions(
   };
 }
 
-export function friction(value) {
+export function friction(value: number) {
   'worklet';
 
   const MAX_FRICTION = 30;
@@ -48,7 +49,11 @@ export function fixGestureHandler() {
   }, []);
 }
 
-export function getShouldRender(index, activeIndex, diffValue = 3) {
+export function getShouldRender(
+  index: number,
+  activeIndex: number,
+  diffValue = 3,
+) {
   const diff = Math.abs(index - activeIndex);
 
   if (diff > diffValue) {
@@ -58,7 +63,11 @@ export function getShouldRender(index, activeIndex, diffValue = 3) {
   return true;
 }
 
-export function clamp(value, lowerBound, upperBound) {
+export function clamp(
+  value: number,
+  lowerBound: number,
+  upperBound: number,
+) {
   'worklet';
 
   return Math.min(Math.max(lowerBound, value), upperBound);
