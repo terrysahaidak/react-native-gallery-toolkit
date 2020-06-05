@@ -5,13 +5,12 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
 } from 'react-native-gesture-handler';
-import { useInit } from './useInit';
 import {
+  useGalleryInit,
   useGalleryItem,
   GalleryOverlay,
   GalleryProvider,
-} from './Provider';
-import { ImageTransformer } from './ImageTransformer';
+} from 'reanimated-gallery';
 
 const dimensions = Dimensions.get('window');
 
@@ -100,7 +99,7 @@ function ListItem({ item, index }) {
 }
 
 export default function ImageGalleryScreen() {
-  useInit();
+  useGalleryInit();
 
   return (
     <GalleryOverlay>

@@ -10,6 +10,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "metro-config": "^0.59.0",
     "react": "16.11.0",
     "react-native": "0.62.2",
     "react-native-fast-image": "^8.1.5",
