@@ -5,25 +5,36 @@ import React, {
   useCallback,
   useState,
 } from 'react';
-import { useSharedValue } from 'react-native-reanimated';
+import Animated, { useSharedValue } from 'react-native-reanimated';
 import { View, StyleSheet } from 'react-native';
-import { GalleryState } from './GalleryState';
+import {
+  GalleryState,
+  IShowFunction,
+  IGalleryItem,
+} from './GalleryState';
 import { ImagePager } from './Pager';
 
-const GalleryOverlayContext = React.createContext(null);
-const GalleryContext = React.createContext(null);
+const GalleryOverlayContext = React.createContext<IShowFunction | null>(
+  null,
+);
+const GalleryContext = React.createContext<GalleryState | null>(null);
 
-export function useGalleryItem({ index, item }) {
+type IUseGalleryItem = {
+  index: number;
+  item: IGalleryItem;
+};
+
+export function useGalleryItem({ index, item }: IUseGalleryItem) {
   const gallery = useContext(GalleryContext);
-  const ref = useRef();
+  const ref = useRef<Animated.Image>();
   const opacity = useSharedValue(1);
 
   useEffect(() => {
-    gallery.addImage({ ref, index, item, opacity });
+    gallery!.addImage({ ref, index, item, opacity });
   }, []);
 
   const onPress = useCallback(() => {
-    gallery.onShow(index);
+    gallery!.onShow(index);
   }, []);
 
   return {
@@ -33,8 +44,16 @@ export function useGalleryItem({ index, item }) {
   };
 }
 
-export function GalleryProvider({ totalCount, children }) {
-  const setActiveGallery = useContext(GalleryOverlayContext);
+type IGalleryProviderProps = {
+  totalCount: number;
+  children: React.ReactNode;
+};
+
+export function GalleryProvider({
+  totalCount,
+  children,
+}: IGalleryProviderProps) {
+  const setActiveGallery = useContext(GalleryOverlayContext)!;
   const [gallery] = useState(
     new GalleryState(setActiveGallery, totalCount),
   );
@@ -46,8 +65,14 @@ export function GalleryProvider({ totalCount, children }) {
   );
 }
 
-export function GalleryOverlay({ children }) {
-  const [activeGallery, setActiveGallery] = useState(null);
+type IGalleryOverlayProps = {
+  children: React.ReactNode;
+};
+
+export function GalleryOverlay({ children }: IGalleryOverlayProps) {
+  const [activeGallery, setActiveGallery] = useState<unknown>(
+    null,
+  ) as [GalleryState, IShowFunction];
 
   return (
     <GalleryOverlayContext.Provider value={setActiveGallery}>
