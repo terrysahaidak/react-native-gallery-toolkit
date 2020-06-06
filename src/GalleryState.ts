@@ -2,13 +2,13 @@ import React from 'react';
 import Animated, { SharedValue } from 'react-native-reanimated';
 import { normalizeDimensions } from './utils';
 
-type IShowFunction = (value: GalleryState | null) => void;
+export type IShowFunction = (value: GalleryState | null) => void;
 export type IGalleryItem = {
   width: number;
   height: number;
   uri: string;
 };
-type IGalleryImage = {
+export type IGalleryImage = {
   ref: React.RefObject<Animated.Image>;
   index: number;
   opacity: SharedValue<number>;
@@ -21,11 +21,11 @@ type IOnChangeCallback = (item: IGalleryImage) => void;
 export class GalleryState {
   private _showFunction: IShowFunction;
 
-  private images: IGalleryImage[];
-
   private currentIndex: number | null;
 
   private _onChangeListeners: IOnChangeCallback[];
+
+  public images: IGalleryImage[];
 
   public totalCount: number;
 
