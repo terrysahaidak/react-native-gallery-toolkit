@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Animated, {
+  runOnUI,
   useSharedValue,
   useAnimatedStyle,
-  runOnUI,
   interpolate,
   Easing,
   Extrapolate,
@@ -17,13 +17,17 @@ import {
   View,
   Image,
   Platform,
+  ViewStyle,
 } from 'react-native';
 import {
   PanGestureHandler,
   TapGestureHandler,
+  PanGestureHandlerGestureEvent,
 } from 'react-native-gesture-handler';
+import { GalleryState, IGalleryImage } from './GalleryState';
 import { useAnimatedGestureHandler } from './useAnimatedGestureHandler';
 import { ImageTransformer } from './ImageTransformer';
+
 import {
   friction,
   fixGestureHandler,
@@ -44,13 +48,29 @@ const styles = StyleSheet.create({
   },
 });
 
-const AnimatedImage = Animated.createAnimatedComponent(Image);
+const AnimatedImage = Animated.createAnimatedComponent(
+  Image,
+) as typeof Animated.Image;
 
-function Gutter({ width }) {
+type IGutterProps = {
+  width: number;
+};
+
+function Gutter({ width }: IGutterProps) {
   return <View style={{ width }} />;
 }
 
-const Page = React.memo(
+type IPageProps = {
+  shouldRender: boolean;
+  pagerRefs: React.Ref<any>[];
+  page: IGalleryImage;
+  onPageStateChange: (value: boolean) => void;
+  gutterWidth: number;
+  index: number;
+  length: number;
+};
+
+const Page = React.memo<IPageProps>(
   ({
     shouldRender,
     pagerRefs,
@@ -111,7 +131,7 @@ const Page = React.memo(
 const GUTTER_WIDTH = dimensions.width / 14;
 const FAR_FAR_AWAY = 9999;
 
-const getPageTranslate = (i) => {
+const getPageTranslate = (i: number) => {
   const t = i * dimensions.width;
   const g = GUTTER_WIDTH * i;
   return -(t + g);
@@ -122,15 +142,11 @@ const timingConfig = {
   easing: Easing.bezier(0.33, 0.01, 0, 1),
 };
 
-/**
- * @typedef {Object} IImagePagerProps
- * @property {GalleryState} gallery
- */
+type IImagePager = {
+  gallery: GalleryState;
+};
 
-/**
- * @param {IImagePagerProps} - Props
- */
-export function ImagePager({ gallery }) {
+export function ImagePager({ gallery }: IImagePager) {
   fixGestureHandler();
 
   const pagerRef = useRef();
@@ -138,7 +154,7 @@ export function ImagePager({ gallery }) {
 
   const isActive = useSharedValue(true);
 
-  function onPageStateChange(value) {
+  function onPageStateChange(value: boolean) {
     'worklet';
 
     isActive.value = value;
@@ -147,7 +163,7 @@ export function ImagePager({ gallery }) {
   const imageWrapperPosition = useSharedValue(0);
   const pagerPosition = useSharedValue(FAR_FAR_AWAY);
 
-  const setPagerVisible = (value) => {
+  const setPagerVisible = (value: boolean) => {
     'worklet';
 
     imageWrapperPosition.value = value ? FAR_FAR_AWAY : 0;
@@ -155,7 +171,13 @@ export function ImagePager({ gallery }) {
   };
 
   // S1: Image transition stuff
-  const { measurements, item } = gallery.activeItem;
+  const { measurements, item } = gallery.activeItem!;
+
+  if (!measurements) {
+    throw new Error(
+      'Gallery Pager: Active item should have measurements',
+    );
+  }
 
   const [activeImage, setActiveImage] = useState(item.uri);
 
@@ -182,6 +204,10 @@ export function ImagePager({ gallery }) {
 
   useEffect(() => {
     const disposer = gallery.addOnChangeListener((nextItem) => {
+      if (!nextItem.measurements) {
+        throw new Error('Item should have measurements');
+      }
+
       x.value = nextItem.measurements.x;
       width.value = nextItem.measurements.width;
       height.value = nextItem.measurements.height;
@@ -200,9 +226,9 @@ export function ImagePager({ gallery }) {
     return disposer;
   }, []);
 
-  function setCurrentImageOpacity(value) {
+  function setCurrentImageOpacity(value: 0 | 1) {
     try {
-      gallery.activeItem.opacity.value = value;
+      gallery.activeItem!.opacity.value = value;
     } catch (err) {
       console.log('Error changing opacity');
     }
@@ -237,8 +263,8 @@ export function ImagePager({ gallery }) {
 
   // S1: Styles
 
-  const imageStyles = useAnimatedStyle(() => {
-    const i = (range) =>
+  const imageStyles = useAnimatedStyle<ViewStyle>(() => {
+    const i = (range: [number, number]) =>
       interpolate(
         animationProgress.value,
         [0, 1],
@@ -264,7 +290,7 @@ export function ImagePager({ gallery }) {
     };
   });
 
-  const backdropStyles = useAnimatedStyle(() => {
+  const backdropStyles = useAnimatedStyle<ViewStyle>(() => {
     return {
       opacity: backdropOpacity.value,
     };
@@ -272,22 +298,22 @@ export function ImagePager({ gallery }) {
 
   // S2: Pager related stuff
   const [activeIndex, setActiveIndex] = useState(
-    gallery.activeItem.index,
+    gallery.activeItem!.index,
   );
 
-  const index = useSharedValue(gallery.activeItem.index);
+  const index = useSharedValue(gallery.activeItem!.index);
   const length = useSharedValue(gallery.totalCount);
   const pagerX = useSharedValue(0);
   const toValueAnimation = useSharedValue(
-    getPageTranslate(gallery.activeItem.index),
+    getPageTranslate(gallery.activeItem!.index),
   );
   const gestureTranslationX = useSharedValue(0);
 
   const offsetX = useSharedValue(
-    getPageTranslate(gallery.activeItem.index),
+    getPageTranslate(gallery.activeItem!.index),
   );
 
-  const getTranslate = (i) => {
+  const getTranslate = (i: number) => {
     'worklet';
 
     const t = i * dimensions.width;
@@ -337,7 +363,7 @@ export function ImagePager({ gallery }) {
     return true;
   });
 
-  const getNextIndex = ({ velocity }) => {
+  const getNextIndex = ({ velocity }: { velocity: number }) => {
     'worklet';
 
     const currentTranslate = Math.abs(getTranslate(index.value));
@@ -375,7 +401,12 @@ export function ImagePager({ gallery }) {
     );
   });
 
-  const onPan = useAnimatedGestureHandler({
+  const onPan = useAnimatedGestureHandler<
+    PanGestureHandlerGestureEvent,
+    {
+      pagerActive: boolean;
+    }
+  >({
     shouldHandleEvent: (evt) => {
       return (
         evt.numberOfPointers === 1 &&
@@ -531,7 +562,7 @@ export function ImagePager({ gallery }) {
     };
   });
 
-  const pagerStyles = useAnimatedStyle(() => {
+  const pagerStyles = useAnimatedStyle<ViewStyle>(() => {
     return {
       transform: [
         {
@@ -541,7 +572,7 @@ export function ImagePager({ gallery }) {
     };
   });
 
-  const imageWrapperStyles = useAnimatedStyle(() => {
+  const imageWrapperStyles = useAnimatedStyle<ViewStyle>(() => {
     return {
       transform: [
         {

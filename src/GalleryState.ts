@@ -8,12 +8,22 @@ export type IGalleryItem = {
   height: number;
   uri: string;
 };
+
+type IMeasurements = {
+  width: number;
+  height: number;
+  targetWidth: number;
+  targetHeight: number;
+  x: number;
+  y: number;
+};
+
 export type IGalleryImage = {
   ref: React.RefObject<Animated.Image>;
   index: number;
   opacity: SharedValue<number>;
   item: IGalleryItem;
-  measurements?: object;
+  measurements?: IMeasurements;
 };
 
 type IOnChangeCallback = (item: IGalleryImage) => void;
@@ -46,10 +56,7 @@ export class GalleryState {
   }
 
   addImage(item: IGalleryImage) {
-    this.images[item.index] = {
-      ...item,
-      measurements: {},
-    };
+    this.images[item.index] = item;
   }
 
   async setActiveIndex(index: number) {

@@ -513,5 +513,6 @@
     "node_modules/yallist": true,
     "node_modules/yargs": true,
     "node_modules/yargs-parser": true
-  }
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

@@ -33,6 +33,10 @@ module.exports = {
     'no-underscore-dangle': 0,
     'class-methods-use-this': 0,
     'no-param-reassign': 0,
+    'no-use-before-define': [
+      'error',
+      { functions: false, classes: false },
+    ],
   },
   settings: {
     'import/resolver': {
