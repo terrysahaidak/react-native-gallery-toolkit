@@ -1,8 +1,8 @@
 diff --git a/node_modules/react-native-reanimated/react-native-reanimated.d.ts b/node_modules/react-native-reanimated/react-native-reanimated.d.ts
-index 9a6b232..866d68a 100644
+index 9a6b232..0e438b3 100644
 --- a/node_modules/react-native-reanimated/react-native-reanimated.d.ts
 +++ b/node_modules/react-native-reanimated/react-native-reanimated.d.ts
-@@ -16,8 +16,15 @@ declare module 'react-native-reanimated' {
+@@ -16,8 +16,22 @@ declare module 'react-native-reanimated' {
      View as ReactNativeView,
      Text as ReactNativeText,
      Image as ReactNativeImage,
@@ -16,23 +16,17 @@ index 9a6b232..866d68a 100644
 +    PanGestureHandlerGestureEvent,
 +    PanGestureHandlerEventExtra,
 +  } from 'react-native-gesture-handler';
++
++  type RawSharedValue = number | string | boolean | object | Function;
++  export type SharedValueType = RawSharedValue | RawSharedValue[];
++  export interface SharedValue<T extends SharedValueType> {
++    value: T;
++  }
++
    namespace Animated {
      type Nullable<T> = T | null | undefined;
  
-@@ -61,6 +68,12 @@ declare module 'react-native-reanimated' {
-       interpolate(config: InterpolationConfig): AnimatedNode<number>;
-     }
- 
-+    type RawSharedValue = number | string | boolean | object | Function;
-+    type SharedValueType = RawSharedValue | RawSharedValue[];
-+    interface SharedValue<T extends SharedValueType> {
-+      value: T;
-+    }
-+
-     export type Mapping = { [key: string]: Mapping } | Adaptable<any>;
-     export type Adaptable<T> =
-       | T
-@@ -324,7 +337,7 @@ declare module 'react-native-reanimated' {
+@@ -324,7 +338,7 @@ declare module 'react-native-reanimated' {
        minVal: Adaptable<number>,
        maxVal: Adaptable<number>,
      ): AnimatedNode<number>;
@@ -41,7 +35,7 @@ index 9a6b232..866d68a 100644
        value: Adaptable<number>,
        config: InterpolationConfig,
      ): AnimatedNode<number>;
-@@ -341,6 +354,14 @@ declare module 'react-native-reanimated' {
+@@ -341,6 +355,14 @@ declare module 'react-native-reanimated' {
      export const max: BinaryOperator;
      export const min: BinaryOperator;
  
@@ -56,10 +50,20 @@ index 9a6b232..866d68a 100644
      // animations
      export function decay(
        clock: AnimatedClock,
-@@ -371,6 +392,29 @@ declare module 'react-native-reanimated' {
+@@ -371,6 +393,39 @@ declare module 'react-native-reanimated' {
        config: DecayConfig,
      ): BackwardCompatibleWrapper;
  
++    interface SpringConfig2 {
++      damping: number;
++      mass: number;
++      stiffness: number;
++      overshootClamping: boolean;
++      restSpeedThreshold: number;
++      restDisplacementThreshold: number;
++      velocity?: number;
++    }
++
 +    // reanimated2 animations
 +    export function withTiming(
 +      toValue: number,
@@ -68,10 +72,10 @@ index 9a6b232..866d68a 100644
 +    ): number;
 +    export function withSpring(
 +      toValue: number,
-+      userConfig?: Omit<SpringConfig, 'toValue'>,
++      userConfig?: SpringConfig2,
 +      callback?: (isCancelled: boolean) => void,
 +    ): number;
-+    export function cancelAnimation<T extends Value>(
++    export function cancelAnimation<T extends SharedValueType>(
 +      sharedValue: SharedValue<T>
 +    ): void;
 +    export function delay(
@@ -86,18 +90,19 @@ index 9a6b232..866d68a 100644
      // hooks
      export function useCode(
        exec: () => Nullable< AnimatedNode<number>[] | AnimatedNode<number> > | boolean,
-@@ -380,8 +424,59 @@ declare module 'react-native-reanimated' {
+@@ -380,8 +435,60 @@ declare module 'react-native-reanimated' {
        initialValue: T
      ): AnimatedValue<T>;
  
 +    // reanimated2 hooks
-+    export function useSharedValue<T extends SharedValueType>(
-+      initialValue: T
++    export function runOnUI<T extends SharedValueType>(worklet: () => void): () => void;
++    export function useSharedValue<T>(
++      initialValue:  T
 +    ): SharedValue<T>;
 +    export function useDerivedValue<T extends SharedValueType>(
 +      processor: () => T
 +    ): SharedValue<T>;
-+    export function useAnimatedStyle<T extends ViewStyle, TextStyle, ImageStyle>(
++    export function useAnimatedStyle<T extends AnimateStyle>(
 +      updater: () => T
 +    ): T;
 +    export function useAnimatedGestureHandler<TContext extends Context>(
@@ -146,7 +151,7 @@ index 9a6b232..866d68a 100644
    }
  
    export default Animated;
-@@ -487,7 +582,7 @@ declare module 'react-native-reanimated' {
+@@ -487,7 +594,7 @@ declare module 'react-native-reanimated' {
    export const interpolateColors: typeof Animated.interpolateColors
    export const diff: typeof Animated.diff
    export const diffClamp: typeof Animated.diffClamp
@@ -155,10 +160,11 @@ index 9a6b232..866d68a 100644
    export const Extrapolate: typeof Animated.Extrapolate
    export const max: typeof Animated.max
    export const min: typeof Animated.min
-@@ -500,4 +595,15 @@ declare module 'react-native-reanimated' {
+@@ -500,4 +607,16 @@ declare module 'react-native-reanimated' {
    export const spring: typeof Animated.spring
    export const SpringUtils: typeof Animated.SpringUtils
    export const useValue: typeof Animated.useValue
++  export const runOnUI: typeof Animated.runOnUI
 +  export const useSharedValue: typeof Animated.useSharedValue
 +  export const useAnimatedStyle: typeof Animated.useAnimatedStyle
 +  export const useDerivedValue: typeof Animated.useDerivedValue
