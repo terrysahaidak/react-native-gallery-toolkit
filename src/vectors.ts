@@ -4,7 +4,7 @@ import {
   SharedValueType,
 } from 'react-native-reanimated';
 
-type Vector<T extends SharedValueType> = {
+export type Vector<T extends SharedValueType> = {
   x: T | SharedValue<T>;
   y: T | SharedValue<T>;
 };
