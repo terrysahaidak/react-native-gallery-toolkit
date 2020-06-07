@@ -45,7 +45,7 @@ type Operation = 'divide' | 'add' | 'sub' | 'multiply';
 
 type VectorProp = 'x' | 'y';
 
-export const _reduce = (
+const _reduce = (
   operation: Operation,
   prop: VectorProp,
   vectors: VectorList,
