@@ -37,6 +37,7 @@ module.exports = {
       'error',
       { functions: false, classes: false },
     ],
+    'no-void': 0,
   },
   settings: {
     'import/resolver': {

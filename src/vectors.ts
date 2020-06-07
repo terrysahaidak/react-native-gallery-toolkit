@@ -1,15 +1,19 @@
-import {
-  useSharedValue,
-  SharedValue,
-  SharedValueType,
-} from 'react-native-reanimated';
+import { useSharedValue, SharedValue } from 'react-native-reanimated';
+
+type SharedValueType = number;
 
 export type Vector<T extends SharedValueType> = {
-  x: T | SharedValue<T>;
-  y: T | SharedValue<T>;
+  x: T;
+  y: T;
+};
+export type SharedVector<T extends SharedValueType> = {
+  x: SharedValue<T>;
+  y: SharedValue<T>;
 };
 
-type VectorList = Vector<SharedValueType>[];
+type VectorType = Vector<any> | SharedVector<any>;
+
+type VectorList = (VectorType | SharedValueType)[];
 
 const _isVector = (value: any): value is Vector<any> => {
   'worklet';
@@ -39,9 +43,11 @@ const _get = <
 
 type Operation = 'divide' | 'add' | 'sub' | 'multiply';
 
+type VectorProp = 'x' | 'y';
+
 export const _reduce = (
   operation: Operation,
-  prop: 'x' | 'y',
+  prop: VectorProp,
   vectors: VectorList,
 ) => {
   'worklet';
@@ -84,10 +90,7 @@ export const useSharedVector = <T>(x: T, y = x) => {
   };
 };
 
-export const create = <T>(
-  x: T,
-  y: T,
-) => {
+export const create = <T extends SharedValueType>(x: T, y: T) => {
   'worklet';
 
   return {
@@ -95,8 +98,6 @@ export const create = <T>(
     y,
   };
 };
-
-
 
 export const add = (vectors: VectorList) => {
   'worklet';
@@ -143,7 +144,10 @@ export const invert = <T extends Vector<any>>(vector: T) => {
   };
 };
 
-export const set = <T extends Vector<any>>(vector: T, value: SharedValueType | T) => {
+export const set = <T extends VectorType>(
+  vector: T,
+  value: VectorType | SharedValueType,
+) => {
   'worklet';
 
   const x = _get(_isVector(value) ? value.x : value);
@@ -161,11 +165,13 @@ export const set = <T extends Vector<any>>(vector: T, value: SharedValueType | T
 export const min = (vectors: VectorList) => {
   'worklet';
 
-  const getMin = (prop) => {
-    const values = vectors.map((item) =>
-      _get(_isVector(item) ? item[prop] : item),
+  const getMin = (prop: VectorProp) => {
+    return Math.min.apply(
+      void 0,
+      vectors.map((item) =>
+        _get(_isVector(item) ? item[prop] : item),
+      ),
     );
-    return Math.min.apply(void 0, values);
   };
 
   return {
@@ -177,7 +183,7 @@ export const min = (vectors: VectorList) => {
 export const max = (vectors: VectorList) => {
   'worklet';
 
-  const getMax = (prop) =>
+  const getMax = (prop: VectorProp) =>
     Math.max.apply(
       void 0,
       vectors.map((item) =>
@@ -191,13 +197,20 @@ export const max = (vectors: VectorList) => {
   };
 };
 
-export const clamp = <T extends Vector<any>>(value: T, lowerBound: T, upperBound: T) => {
+export const clamp = <T extends Vector<any>>(
+  value: T,
+  lowerBound: VectorType | SharedValueType,
+  upperBound: VectorType | SharedValueType,
+) => {
   'worklet';
 
   return min([max([lowerBound, value]), upperBound]);
 };
 
-export const eq = <T extends Vector<any>>(vector: T, value: T) => {
+export const eq = <T extends Vector<any>>(
+  vector: T,
+  value: VectorType | SharedValueType,
+) => {
   'worklet';
 
   const x = _get(_isVector(value) ? value.x : value);
