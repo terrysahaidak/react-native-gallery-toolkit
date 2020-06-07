@@ -90,9 +90,9 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     const MIN_SCALE = 0.7;
     const OVER_SCALE = 0.5;
 
-    const pinchRef = useRef();
-    const panRef = useRef();
-    const tapRef = useRef();
+    const pinchRef = useRef(null);
+    const panRef = useRef(null);
+    const tapRef = useRef(null);
 
     const panState = useSharedValue<State>(-1);
     const pinchState = useSharedValue<State>(-1);
@@ -256,10 +256,10 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     const onScaleEvent = useAnimatedGestureHandler<
       PinchGestureHandlerGestureEvent,
       {
-        origin: vec.Vector<number>,
-        adjustFocal: vec.Vector<number>,
-        gestureScale: number,
-        nextScale: number,
+        origin: vec.Vector<number>;
+        adjustFocal: vec.Vector<number>;
+        gestureScale: number;
+        nextScale: number;
       }
     >({
       onInit: (evt, ctx) => {

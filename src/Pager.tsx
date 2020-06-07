@@ -18,6 +18,7 @@ import {
   Image,
   Platform,
   ViewStyle,
+  ImageStyle,
 } from 'react-native';
 import {
   PanGestureHandler,
@@ -149,8 +150,8 @@ type IImagePager = {
 export function ImagePager({ gallery }: IImagePager) {
   fixGestureHandler();
 
-  const pagerRef = useRef();
-  const tapRef = useRef();
+  const pagerRef = useRef(null);
+  const tapRef = useRef(null);
 
   const isActive = useSharedValue(true);
 
@@ -263,7 +264,7 @@ export function ImagePager({ gallery }: IImagePager) {
 
   // S1: Styles
 
-  const imageStyles = useAnimatedStyle<ViewStyle>(() => {
+  const imageStyles = useAnimatedStyle<ImageStyle>(() => {
     const i = (range: [number, number]) =>
       interpolate(
         animationProgress.value,
