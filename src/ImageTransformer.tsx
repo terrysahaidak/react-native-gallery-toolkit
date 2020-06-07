@@ -199,7 +199,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         pan: vec.Vector<number>;
       }
     >({
-      onInit: (evt, ctx) => {
+      onInit: (_, ctx) => {
         ctx.panOffset = vec.create(0, 0);
       },
 
@@ -214,7 +214,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         return true;
       },
 
-      onStart: (evt, ctx) => {
+      onStart: (_, ctx) => {
         cancelAnimation(offset.x);
         cancelAnimation(offset.y);
         ctx.panOffset = vec.create(0, 0);
@@ -262,7 +262,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         nextScale: number;
       }
     >({
-      onInit: (evt, ctx) => {
+      onInit: (_, ctx) => {
         ctx.origin = vec.create(0, 0);
         ctx.gestureScale = 1;
       },
@@ -304,7 +304,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         scale.value = ctx.nextScale;
       },
 
-      onStart: (evt, ctx) => {
+      onStart: (_, ctx) => {
         vec.set(ctx.origin, ctx.adjustFocal);
       },
 
