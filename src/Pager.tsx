@@ -231,6 +231,7 @@ export function ImagePager({ gallery }: IImagePager) {
     try {
       gallery.activeItem!.opacity.value = value;
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log('Error changing opacity');
     }
   }
@@ -364,15 +365,14 @@ export function ImagePager({ gallery }: IImagePager) {
     return true;
   });
 
-  const getNextIndex = ({ velocity }: { velocity: number }) => {
+  const getNextIndex = (v: number) => {
     'worklet';
 
     const currentTranslate = Math.abs(getTranslate(index.value));
     const currentIndex = index.value;
     const currentOffset = Math.abs(offsetX.value);
 
-    const nextIndex =
-      velocity < 0 ? currentIndex + 1 : currentIndex - 1;
+    const nextIndex = v < 0 ? currentIndex + 1 : currentIndex - 1;
 
     if (
       nextIndex < currentIndex &&
@@ -463,9 +463,7 @@ export function ImagePager({ gallery }: IImagePager) {
         offsetX.value += pagerX.value;
         pagerX.value = 0;
 
-        const nextIndex = getNextIndex({
-          velocity: evt.velocityX,
-        });
+        const nextIndex = getNextIndex(evt.velocityX);
 
         const v = Math.abs(evt.velocityX);
 
@@ -523,7 +521,7 @@ export function ImagePager({ gallery }: IImagePager) {
       }
     },
 
-    onFinish: (evt, ctx) => {
+    onFinish: (_, ctx) => {
       ctx.pagerActive = false;
     },
   });

@@ -4,10 +4,6 @@
  *
  * @format
  */
-const path = require('path');
-const blacklist = require('metro-config/src/defaults/blacklist');
-
-const reanimatedGallery = path.resolve(__dirname, '..');
 
 module.exports = {
   transformer: {
@@ -17,31 +13,5 @@ module.exports = {
         inlineRequires: false,
       },
     }),
-  },
-  watchFolders: [reanimatedGallery],
-  resolver: {
-    extraNodeModules: {
-      'react-native': path.resolve(
-        __dirname,
-        'node_modules/react-native',
-      ),
-      'react-native-reanimated': path.resolve(
-        __dirname,
-        'node_modules/react-native',
-      ),
-      'react-native-gesture-handler': path.resolve(
-        __dirname,
-        'node_modules/react-native',
-      ),
-    },
-    blacklistRE: blacklist([
-      new RegExp(`${reanimatedGallery}/node_modules/react-native/.*`),
-      new RegExp(
-        `${reanimatedGallery}/node_modules/react-native-reanimated/.*`,
-      ),
-      new RegExp(
-        `${reanimatedGallery}/node_modules/react-native-gesture-handler/.*`,
-      ),
-    ]),
   },
 };

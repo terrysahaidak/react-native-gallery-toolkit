@@ -2,7 +2,7 @@
   "name": "reanimated-gallery",
   "version": "0.0.1",
   "private": true,
-  "main": "./src/index.js",
+  "main": "./src/index.ts",
   "peerDependencies": {
     "react-native-reanimated": "^2.0.0-alpha.1",
     "react-native": "*",

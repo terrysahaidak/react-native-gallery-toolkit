@@ -38,6 +38,7 @@ module.exports = {
       { functions: false, classes: false },
     ],
     'no-void': 0,
+    'import/extensions': 0,
   },
   settings: {
     'import/resolver': {
