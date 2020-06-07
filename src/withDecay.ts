@@ -14,7 +14,7 @@ type IAnimation = {
 export default function withDecay(
   userConfig: IUserConfig,
   callback?: () => void,
-) {
+): number {
   'worklet';
 
   // TODO: not sure what should I return here
@@ -88,10 +88,12 @@ export default function withDecay(
     animation.initialVelocity = config.velocity;
   }
 
-  return {
+  const animationObj: unknown = {
     animation: decay,
     start,
     velocity: config.velocity || 0,
     callback,
   };
+
+  return animationObj as number;
 }
