@@ -15,7 +15,7 @@
     "react-native": "0.62.2",
     "react-native-fast-image": "^8.1.5",
     "react-native-gesture-handler": "^1.6.1",
-    "react-native-reanimated": "^2.0.0-alpha.1"
+    "react-native-reanimated": "github:software-mansion/react-native-reanimated#a2e371a0dc89198f71d9734b7528fc669ecbcd35"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",

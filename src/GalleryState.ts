@@ -56,6 +56,10 @@ export class GalleryState {
   }
 
   addImage(item: IGalleryImage) {
+    if (this.images[item.index]) {
+      return;
+    }
+
     this.images[item.index] = item;
   }
 

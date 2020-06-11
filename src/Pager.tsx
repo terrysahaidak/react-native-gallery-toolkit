@@ -252,6 +252,13 @@ export function ImagePager({ gallery }: IImagePager) {
   const openAnimation = () => {
     'worklet';
 
+    // FIXME: Remove this when Reanimated get support for configs
+    // defined outside
+    const timingConfig = {
+      duration: 250,
+      easing: Easing.bezier(0.33, 0.01, 0, 1),
+    };
+
     animationProgress.value = withTiming(1, timingConfig, () => {
       setPagerVisible(true);
       afterOpen();
@@ -327,7 +334,7 @@ export function ImagePager({ gallery }: IImagePager) {
     const nextIndex = index.value;
     setCurrentImageOpacity(1);
 
-    gallery.setActiveIndex(nextIndex);
+    await gallery.setActiveIndex(nextIndex);
 
     setActiveIndex(nextIndex);
   }
