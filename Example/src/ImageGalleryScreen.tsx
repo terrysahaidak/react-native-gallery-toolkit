@@ -11,7 +11,7 @@ import {
   useGalleryItem,
   GalleryOverlay,
   GalleryProvider,
-} from '../lib';
+} from 'reanimated-gallery';
 
 const dimensions = Dimensions.get('window');
 
