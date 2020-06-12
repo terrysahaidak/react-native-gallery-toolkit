@@ -1,4 +1,4 @@
-import { useSharedValue, SharedValue } from 'react-native-reanimated';
+import Animated, { useSharedValue } from 'react-native-reanimated';
 
 type SharedValueType = number;
 
@@ -7,8 +7,8 @@ export type Vector<T extends SharedValueType> = {
   y: T;
 };
 export type SharedVector<T extends SharedValueType> = {
-  x: SharedValue<T>;
-  y: SharedValue<T>;
+  x: Animated.SharedValue<T>;
+  y: Animated.SharedValue<T>;
 };
 
 type VectorType = Vector<any> | SharedVector<any>;
@@ -21,14 +21,14 @@ const _isVector = (value: any): value is Vector<any> => {
   return typeof value.x !== 'undefined' && value.y !== 'undefined';
 };
 
-const isSharedValue = (value: any): value is SharedValue<any> => {
+const isSharedValue = (value: any): value is Animated.SharedValue<any> => {
   'worklet';
 
   return typeof value.value !== 'undefined';
 };
 
 const _get = <
-  T extends SharedValue<SharedValueType> | SharedValueType
+  T extends Animated.SharedValue<SharedValueType> | SharedValueType
 >(
   value: T,
 ) => {

@@ -1,6 +1,8 @@
 import React from 'react';
-import Animated, { SharedValue } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { normalizeDimensions } from './utils';
+
+
 
 export type IShowFunction = (value: GalleryState | null) => void;
 export type IGalleryItem = {
@@ -21,7 +23,7 @@ type IMeasurements = {
 export type IGalleryImage = {
   ref: React.RefObject<Animated.Image>;
   index: number;
-  opacity: SharedValue<number>;
+  opacity: Animated.SharedValue<number>;
   item: IGalleryItem;
   measurements?: IMeasurements;
 };
