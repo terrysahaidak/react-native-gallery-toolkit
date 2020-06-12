@@ -1,5 +1,11 @@
 import React, { useRef } from 'react';
-import { StyleSheet, Dimensions, Image } from 'react-native';
+import {
+  StyleSheet,
+  Dimensions,
+  Image,
+  ImageRequireSource,
+  ViewStyle,
+} from 'react-native';
 import Animated, {
   withSpring,
   withTiming,
@@ -13,6 +19,9 @@ import {
   PinchGestureHandler,
   PanGestureHandler,
   TapGestureHandler,
+  State,
+  PanGestureHandlerGestureEvent,
+  PinchGestureHandlerGestureEvent,
 } from 'react-native-gesture-handler';
 import * as vec from './vectors';
 import { useAnimatedGestureHandler } from './useAnimatedGestureHandler';
@@ -53,7 +62,16 @@ const timingConfig = {
   easing: Easing.bezier(0.33, 0.01, 0, 1),
 };
 
-export const ImageTransformer = React.memo(
+type IImageTransformerProps = {
+  pagerRefs: React.Ref<any>[];
+  source?: ImageRequireSource;
+  uri?: string;
+  width: number;
+  height: number;
+  onPageStateChange: (nextPagerState: boolean) => void;
+};
+
+export const ImageTransformer = React.memo<IImageTransformerProps>(
   ({
     pagerRefs = [],
     source,
@@ -72,12 +90,12 @@ export const ImageTransformer = React.memo(
     const MIN_SCALE = 0.7;
     const OVER_SCALE = 0.5;
 
-    const pinchRef = useRef();
-    const panRef = useRef();
-    const tapRef = useRef();
+    const pinchRef = useRef(null);
+    const panRef = useRef(null);
+    const tapRef = useRef(null);
 
-    const panState = useSharedValue(1);
-    const pinchState = useSharedValue(1);
+    const panState = useSharedValue<State>(-1);
+    const pinchState = useSharedValue<State>(-1);
 
     const scale = useSharedValue(1);
     const scaleOffset = useSharedValue(1);
@@ -174,8 +192,14 @@ export const ImageTransformer = React.memo(
       }
     };
 
-    const onPanEvent = useAnimatedGestureHandler({
-      onInit: (evt, ctx) => {
+    const onPanEvent = useAnimatedGestureHandler<
+      PanGestureHandlerGestureEvent,
+      {
+        panOffset: vec.Vector<number>;
+        pan: vec.Vector<number>;
+      }
+    >({
+      onInit: (_, ctx) => {
         ctx.panOffset = vec.create(0, 0);
       },
 
@@ -190,7 +214,7 @@ export const ImageTransformer = React.memo(
         return true;
       },
 
-      onStart: (evt, ctx) => {
+      onStart: (_, ctx) => {
         cancelAnimation(offset.x);
         cancelAnimation(offset.y);
         ctx.panOffset = vec.create(0, 0);
@@ -229,8 +253,16 @@ export const ImageTransformer = React.memo(
       },
     });
 
-    const onScaleEvent = useAnimatedGestureHandler({
-      onInit: (evt, ctx) => {
+    const onScaleEvent = useAnimatedGestureHandler<
+      PinchGestureHandlerGestureEvent,
+      {
+        origin: vec.Vector<number>;
+        adjustFocal: vec.Vector<number>;
+        gestureScale: number;
+        nextScale: number;
+      }
+    >({
+      onInit: (_, ctx) => {
         ctx.origin = vec.create(0, 0);
         ctx.gestureScale = 1;
       },
@@ -272,7 +304,7 @@ export const ImageTransformer = React.memo(
         scale.value = ctx.nextScale;
       },
 
-      onStart: (evt, ctx) => {
+      onStart: (_, ctx) => {
         vec.set(ctx.origin, ctx.adjustFocal);
       },
 
@@ -327,7 +359,7 @@ export const ImageTransformer = React.memo(
       },
     });
 
-    const animatedStyles = useAnimatedStyle(() => {
+    const animatedStyles = useAnimatedStyle<ViewStyle>(() => {
       const noOffset = offset.x.value === 0 && offset.y.value === 0;
       const noTranslation =
         translation.x.value === 0 && translation.y.value === 0;

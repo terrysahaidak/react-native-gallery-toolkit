@@ -1,4 +1,20 @@
-export default function withDecay(userConfig, callback) {
+type IUserConfig = {
+  deceleration?: number;
+  velocity: number;
+  clamp?: [number, number];
+};
+
+type IAnimation = {
+  current: number;
+  lastTimestamp: number;
+  initialVelocity: number;
+  velocity: number;
+};
+
+export default function withDecay(
+  userConfig: IUserConfig,
+  callback?: () => void,
+): number {
   'worklet';
 
   // TODO: not sure what should I return here
@@ -6,18 +22,18 @@ export default function withDecay(userConfig, callback) {
   //   return toValue;
   // }
 
-  const config = {
+  const config: IUserConfig = {
     deceleration: 0.998,
+    velocity: userConfig.velocity,
   };
-  if (userConfig) {
-    Object.keys(userConfig).forEach(
-      (key) => (config[key] = userConfig[key]),
-    );
+
+  if (userConfig.clamp) {
+    config.clamp = userConfig.clamp;
   }
 
   const VELOCITY_EPS = 5;
 
-  function decay(animation, now) {
+  function decay(animation: IAnimation, now: number) {
     const {
       lastTimestamp,
       initialVelocity,
@@ -28,9 +44,9 @@ export default function withDecay(userConfig, callback) {
     const deltaTime = Math.min(now - lastTimestamp, 64);
     animation.lastTimestamp = now;
 
-    const kv = Math.pow(config.deceleration, deltaTime);
+    const kv = Math.pow(config.deceleration!, deltaTime);
     const kx =
-      (config.deceleration * (1 - kv)) / (1 - config.deceleration);
+      (config.deceleration! * (1 - kv)) / (1 - config.deceleration!);
 
     const v0 = velocity / 1000;
     const v = v0 * kv * 1000;
@@ -62,18 +78,22 @@ export default function withDecay(userConfig, callback) {
 
       return true;
     }
+
+    return false;
   }
 
-  function start(animation, value, now) {
+  function start(animation: IAnimation, value: number, now: number) {
     animation.current = value;
     animation.lastTimestamp = now;
     animation.initialVelocity = config.velocity;
   }
 
-  return {
+  const animationObj: unknown = {
     animation: decay,
     start,
     velocity: config.velocity || 0,
     callback,
   };
+
+  return animationObj as number;
 }

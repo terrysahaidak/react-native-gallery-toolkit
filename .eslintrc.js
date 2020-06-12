@@ -1,61 +1,63 @@
 module.exports = {
-  parser: 'babel-eslint',
-  parserOptions: {
-    babelOptions: {
-      configFile: './babel.config.js',
-    },
-  },
-  extends: ['airbnb', 'prettier'],
-  globals: { fetch: false },
-  plugins: ['react', 'react-native', 'babel', 'prettier'],
-  env: {
-    jest: true,
-  },
-  settings: {
-    'import/resolver': {
-      node: {
-        extensions: ['js', '.android.js', '.ios.js'],
-      },
-      alias: {
-        map: [['src', './src']],
-      },
-    },
-  },
+  root: true,
+  extends: ['airbnb', 'prettier', 'prettier/react'],
+  parser: '@typescript-eslint/parser',
+  plugins: [
+    'react',
+    'react-native',
+    'import',
+    '@typescript-eslint/eslint-plugin',
+  ],
   rules: {
-    'max-len': [2, 100, 2],
     'import/no-extraneous-dependencies': [
       'error',
-      {
-        devDependencies: true,
-        optionalDependencies: false,
-        peerDependencies: false,
-      },
+      { devDependencies: true, peerDependencies: true },
     ],
-    'function-paren-newline': 0,
     'import/prefer-default-export': 0,
-    'no-trailing-spaces': ['error', { skipBlankLines: true }],
+    'react/jsx-filename-extension': [
+      'error',
+      { extensions: ['.tsx'] },
+    ],
+    // This rule doesn't play nice with Prettier
+    'react/jsx-one-expression-per-line': 'off',
+    // This rule doesn't play nice with Prettier
+    'react/jsx-wrap-multilines': 'off',
+    // Remove this rule because we only destructure props, but never state
+    'react/destructuring-assignment': 'off',
+    'react/prop-types': 'off',
+    'react/jsx-props-no-spreading': 'off',
+    'react/static-property-placement': 'off',
+    'react/state-in-constructor': 'off',
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['error'],
     'no-underscore-dangle': 0,
-    'class-methods-use-this': 'off',
-    'arrow-parens': 'off',
+    'class-methods-use-this': 0,
     'no-param-reassign': 0,
     'no-use-before-define': [
       'error',
       { functions: false, classes: false },
     ],
-    'no-restricted-syntax': 0,
-    'no-unused-expressions': 'off',
-    'prettier/prettier': 'error',
-    'react/jsx-filename-extension': [
-      1,
-      { extensions: ['.js', '.jsx'] },
-    ],
-    'react/forbid-prop-types': 0,
-    'react/require-default-props': 0,
-    'react-native/no-unused-styles': 2,
-    'react-native/split-platform-components': 2,
-    'react-native/no-inline-styles': 2,
-    'react-native/no-color-literals': 2,
-    'babel/no-unused-expressions': 'error',
-    'react/prop-types': 0,
+    'no-void': 0,
+    'import/extensions': 0,
+  },
+  settings: {
+    'import/resolver': {
+      node: {
+        extensions: [
+          '.js',
+          '.android.js',
+          '.ios.js',
+          '.jsx',
+          '.android.jsx',
+          '.ios.jsx',
+          '.tsx',
+          '.ts',
+          '.android.tsx',
+          '.android.ts',
+          '.ios.tsx',
+          '.ios.ts',
+        ],
+      },
+    },
   },
 };

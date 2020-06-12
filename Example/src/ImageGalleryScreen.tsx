@@ -5,19 +5,19 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
 } from 'react-native-gesture-handler';
-import { useInit } from './useInit';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import {
+  useGalleryInit,
   useGalleryItem,
   GalleryOverlay,
   GalleryProvider,
-} from './Provider';
-import { ImageTransformer } from './ImageTransformer';
+} from 'reanimated-gallery';
 
 const dimensions = Dimensions.get('window');
 
 const ImageComponent = Animated.createAnimatedComponent(Image);
 
-function getRandomIntInclusive(min, max) {
+function getRandomIntInclusive(min: number, max: number) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -100,7 +100,7 @@ function ListItem({ item, index }) {
 }
 
 export default function ImageGalleryScreen() {
-  useInit();
+  useGalleryInit();
 
   return (
     <GalleryOverlay>
