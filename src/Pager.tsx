@@ -38,6 +38,15 @@ import * as vec from './vectors';
 
 const dimensions = Dimensions.get('window');
 
+const GUTTER_WIDTH = dimensions.width / 14;
+const FAR_FAR_AWAY = 9999;
+
+const getPageTranslate = (i: number) => {
+  const t = i * dimensions.width;
+  const g = GUTTER_WIDTH * i;
+  return -(t + g);
+};
+
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
@@ -81,62 +90,50 @@ const Page = React.memo<IPageProps>(
     index,
     length,
   }) => {
+    if (!shouldRender) {
+      return null;
+    }
+
     const targetWidth = dimensions.width;
     const scaleFactor = page.item.width / targetWidth;
     const targetHeight = page.item.height / scaleFactor;
 
     return (
-      <>
-        {shouldRender ? (
-          <View
-            style={[
-              {
-                width: dimensions.width,
-                justifyContent: 'center',
-                alignItems: 'center',
-              },
-            ]}
-          >
-            {/* <AnimatedImage
-              source={{ uri: page.item.uri }}
-              style={{
-                width: targetWidth,
-                height: targetHeight,
-              }}
-              // pagerActive={isActive}
-              // {...page}
-            /> */}
-            <ImageTransformer
-              {...{
-                pagerRefs,
-                onPageStateChange,
-                uri: page.item.uri,
-                width: targetWidth,
-                height: targetHeight,
-              }}
-            />
-          </View>
-        ) : (
-          <View
-            style={{
+      <View
+        style={{
+          flex: 1,
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: -getPageTranslate(index),
+        }}
+      >
+        <View
+          style={[
+            {
+              flex: 1,
               width: dimensions.width,
+              justifyContent: 'center',
+              alignItems: 'center',
+            },
+          ]}
+        >
+          <ImageTransformer
+            {...{
+              pagerRefs,
+              onPageStateChange,
+              uri: page.item.uri,
+              width: targetWidth,
+              height: targetHeight,
             }}
           />
-        )}
+        </View>
+
         {index !== length - 1 && <Gutter width={gutterWidth} />}
-      </>
+      </View>
     );
   },
 );
-
-const GUTTER_WIDTH = dimensions.width / 14;
-const FAR_FAR_AWAY = 9999;
-
-const getPageTranslate = (i: number) => {
-  const t = i * dimensions.width;
-  const g = GUTTER_WIDTH * i;
-  return -(t + g);
-};
 
 const timingConfig = {
   duration: 250,
@@ -252,6 +249,12 @@ export function ImagePager({ gallery }: IImagePager) {
   const openAnimation = () => {
     'worklet';
 
+    // FIXME: Remove me after upgrading reanimated
+    const timingConfig = {
+      duration: 250,
+      easing: Easing.bezier(0.33, 0.01, 0, 1),
+    };
+
     animationProgress.value = withTiming(1, timingConfig, () => {
       setPagerVisible(true);
       afterOpen();
@@ -314,6 +317,14 @@ export function ImagePager({ gallery }: IImagePager) {
   const offsetX = useSharedValue(
     getPageTranslate(gallery.activeItem!.index),
   );
+
+  const totalWidth = useDerivedValue(() => {
+    return (
+      length.value * dimensions.width +
+      GUTTER_WIDTH * length.value -
+      2
+    );
+  });
 
   const getTranslate = (i: number) => {
     'worklet';
@@ -563,6 +574,7 @@ export function ImagePager({ gallery }: IImagePager) {
 
   const pagerStyles = useAnimatedStyle<ViewStyle>(() => {
     return {
+      width: totalWidth.value,
       transform: [
         {
           translateX: pagerX.value + offsetX.value,
