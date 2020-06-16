@@ -215,6 +215,8 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       },
 
       onStart: (_, ctx) => {
+        console.log('Transformer onStart')
+
         cancelAnimation(offset.x);
         cancelAnimation(offset.y);
         ctx.panOffset = vec.create(0, 0);

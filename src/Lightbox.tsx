@@ -159,7 +159,7 @@ export function ImagePager({ gallery }: IImagePager) {
   }
 
   const imageWrapperPosition = useSharedValue(0);
-  const pagerPosition = useSharedValue(0);
+  const pagerPosition = useSharedValue(FAR_FAR_AWAY);
 
   const setPagerVisible = (value: boolean) => {
     'worklet';
@@ -169,14 +169,28 @@ export function ImagePager({ gallery }: IImagePager) {
   };
 
   // S1: Image transition stuff
-  const { measurements } = gallery.activeItem!;
+  const { measurements, item } = gallery.activeItem!;
 
-  const animationProgress = useSharedValue(1);
+  if (!measurements) {
+    throw new Error(
+      'Gallery Pager: Active item should have measurements',
+    );
+  }
+
+  const [activeImage, setActiveImage] = useState(item.uri);
+
+  const animationProgress = useSharedValue(0);
   const scale = useSharedValue(1);
   const backdropOpacity = useSharedValue(0);
   const statusBarFix = Platform.OS === 'android' ? 12 : 0;
 
   const velocity = useSharedValue(0);
+  const x = useSharedValue(measurements.x);
+  const width = useSharedValue(measurements.width);
+  const height = useSharedValue(measurements.height);
+  const targetWidth = useSharedValue(measurements.targetWidth);
+  const targetHeight = useSharedValue(measurements.targetHeight);
+  const y = useSharedValue(measurements.y);
   const target = vec.useSharedVector(
     0,
     (dimensions.height - measurements.targetHeight) / 2 -
@@ -184,16 +198,108 @@ export function ImagePager({ gallery }: IImagePager) {
   );
   const translate = vec.useSharedVector(0, 0);
 
-  const [diffValue, setDiffValue] = useState(2);
+  const [diffValue, setDiffValue] = useState(0);
+
+  useEffect(() => {
+    const disposer = gallery.addOnChangeListener((nextItem) => {
+      if (!nextItem.measurements) {
+        throw new Error('Item should have measurements');
+      }
+
+      x.value = nextItem.measurements.x;
+      width.value = nextItem.measurements.width;
+      height.value = nextItem.measurements.height;
+      targetWidth.value = nextItem.measurements.targetWidth;
+      targetHeight.value = nextItem.measurements.targetHeight;
+      y.value = nextItem.measurements.y;
+      target.y.value =
+        (dimensions.height - nextItem.measurements.targetHeight) / 2 -
+        statusBarFix;
+
+      setActiveImage(nextItem.item.uri);
+
+      setCurrentImageOpacity(0);
+    });
+
+    return disposer;
+  }, []);
+
+  function setCurrentImageOpacity(value: 0 | 1) {
+    try {
+      gallery.activeItem!.opacity.value = value;
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log('Error changing opacity');
+    }
+  }
 
   // S1: Callbacks
   function afterOpen() {
+    setCurrentImageOpacity(0);
     setDiffValue(2);
   }
 
   function onClose() {
+    setCurrentImageOpacity(1);
+
     gallery.onClose();
   }
+
+  // S1: Animations
+  const openAnimation = () => {
+    'worklet';
+
+    // FIXME: Remove me after upgrading reanimated
+    const timingConfig = {
+      duration: 250,
+      easing: Easing.bezier(0.33, 0.01, 0, 1),
+    };
+
+    animationProgress.value = withTiming(1, timingConfig, () => {
+      setPagerVisible(true);
+      afterOpen();
+    });
+    backdropOpacity.value = withTiming(1, timingConfig);
+  };
+
+  useEffect(() => {
+    runOnUI(openAnimation)();
+  }, []);
+
+  // S1: Styles
+
+  const imageStyles = useAnimatedStyle<ImageStyle>(() => {
+    const i = (range: [number, number]) =>
+      interpolate(
+        animationProgress.value,
+        [0, 1],
+        range,
+        Extrapolate.CLAMP,
+      );
+
+    const translateY =
+      translate.y.value + i([y.value, target.y.value]);
+    const translateX =
+      translate.x.value + i([x.value, target.x.value]);
+
+    return {
+      top: translateY,
+      left: translateX,
+      width: i([width.value, targetWidth.value]),
+      height: i([height.value, targetHeight.value]),
+      transform: [
+        {
+          scale: scale.value,
+        },
+      ],
+    };
+  });
+
+  const backdropStyles = useAnimatedStyle<ViewStyle>(() => {
+    return {
+      opacity: backdropOpacity.value,
+    };
+  });
 
   // S2: Pager related stuff
   const [activeIndex, setActiveIndex] = useState(
@@ -230,7 +336,7 @@ export function ImagePager({ gallery }: IImagePager) {
 
   async function onIndexChange() {
     const nextIndex = index.value;
-    // setCurrentImageOpacity(1);
+    setCurrentImageOpacity(1);
 
     await gallery.setActiveIndex(nextIndex);
 
@@ -327,105 +433,107 @@ export function ImagePager({ gallery }: IImagePager) {
     },
 
     onStart: (evt, ctx) => {
-      // const isHorizontalSwipe =
-      //   Math.abs(evt.velocityX) > Math.abs(evt.velocityY);
-      // if (isHorizontalSwipe || isPagerInProgress.value) {
-      //   setPagerVisible(true);
-      //   ctx.pagerActive = true;
-      // } else {
-      //   setPagerVisible(false);
-      // }
+      const isHorizontalSwipe =
+        Math.abs(evt.velocityX) > Math.abs(evt.velocityY);
+
+      if (isHorizontalSwipe || isPagerInProgress.value) {
+        setPagerVisible(true);
+        ctx.pagerActive = true;
+      } else {
+        setPagerVisible(false);
+      }
     },
 
     onActive: (evt, ctx) => {
-      // if (ctx.pagerActive) {
-      pagerX.value = canSwipe.value
-        ? evt.translationX
-        : friction(evt.translationX);
-      // } else {
-      //   translate.y.value = evt.translationY;
-      //   translate.x.value = evt.translationX;
+      if (ctx.pagerActive) {
+        pagerX.value = canSwipe.value
+          ? evt.translationX
+          : friction(evt.translationX);
+      } else {
+        translate.y.value = evt.translationY;
+        translate.x.value = evt.translationX;
 
-      //   scale.value = interpolate(
-      //     translate.y.value,
-      //     [-200, 0, 200],
-      //     [0.65, 1, 0.65],
-      //     Extrapolate.CLAMP,
-      //   );
+        scale.value = interpolate(
+          translate.y.value,
+          [-200, 0, 200],
+          [0.65, 1, 0.65],
+          Extrapolate.CLAMP,
+        );
 
-      //   backdropOpacity.value = interpolate(
-      //     translate.y.value,
-      //     [-100, 0, 100],
-      //     [0, 1, 0],
-      //     Extrapolate.CLAMP,
-      //   );
-      // }
+        backdropOpacity.value = interpolate(
+          translate.y.value,
+          [-100, 0, 100],
+          [0, 1, 0],
+          Extrapolate.CLAMP,
+        );
+      }
     },
 
     onEnd: (evt, ctx) => {
-      // if (ctx.pagerActive) {
-      offsetX.value += pagerX.value;
-      pagerX.value = 0;
+      if (ctx.pagerActive) {
+        offsetX.value += pagerX.value;
+        pagerX.value = 0;
 
-      const nextIndex = getNextIndex(evt.velocityX);
+        const nextIndex = getNextIndex(evt.velocityX);
 
-      const v = Math.abs(evt.velocityX);
+        const v = Math.abs(evt.velocityX);
 
-      const shouldMoveToNextPage = v > 10 && canSwipe.value;
+        const shouldMoveToNextPage = v > 10 && canSwipe.value;
 
-      // we invert the value since the tranlationY is left to right
-      toValueAnimation.value = -(shouldMoveToNextPage
-        ? getTranslate(nextIndex)
-        : getTranslate(index.value));
+        // we invert the value since the tranlationY is left to right
+        toValueAnimation.value = -(shouldMoveToNextPage
+          ? getTranslate(nextIndex)
+          : getTranslate(index.value));
 
-      onChangePageAnimation();
+        onChangePageAnimation();
 
-      if (shouldMoveToNextPage) {
-        index.value = nextIndex;
-        onIndexChange();
+        if (shouldMoveToNextPage) {
+          index.value = nextIndex;
+          onIndexChange();
+        }
+      } else {
+        const easing = Easing.bezier(0.33, 0.01, 0, 1);
+        const config = {
+          duration: 200,
+          easing,
+        };
+
+        if (Math.abs(translate.y.value) > 40) {
+          target.x.value = translate.x.value - target.x.value * -1;
+          target.y.value = translate.y.value - target.y.value * -1;
+
+          translate.x.value = 0;
+          translate.y.value = 0;
+
+          animationProgress.value = withTiming(
+            0,
+            {
+              duration: 400,
+              easing,
+            },
+            () => {
+              onClose();
+            },
+          );
+          scale.value = withTiming(1, {
+            duration: 400,
+            easing,
+          });
+
+          backdropOpacity.value = withTiming(0, config);
+        } else {
+          translate.x.value = withTiming(0, config);
+          translate.y.value = withTiming(0, config);
+          backdropOpacity.value = withTiming(1, config);
+          scale.value = withTiming(1, config, () => {
+            setPagerVisible(true);
+          });
+        }
       }
-      // } else {
-      //   const easing = Easing.bezier(0.33, 0.01, 0, 1);
-      //   const config = {
-      //     duration: 200,
-      //     easing,
-      //   };
-
-      //   if (Math.abs(translate.y.value) > 40) {
-      //     target.x.value = translate.x.value - target.x.value * -1;
-      //     target.y.value = translate.y.value - target.y.value * -1;
-
-      //     translate.x.value = 0;
-      //     translate.y.value = 0;
-
-      //     animationProgress.value = withTiming(
-      //       0,
-      //       {
-      //         duration: 400,
-      //         easing,
-      //       },
-      //       () => {
-      //         onClose();
-      //       },
-      //     );
-      //     scale.value = withTiming(1, {
-      //       duration: 400,
-      //       easing,
-      //     });
-
-      //     backdropOpacity.value = withTiming(0, config);
-      //   } else {
-      //     translate.x.value = withTiming(0, config);
-      //     translate.y.value = withTiming(0, config);
-      //     backdropOpacity.value = withTiming(1, config);
-      //     scale.value = withTiming(1, config, () => {
-      //       setPagerVisible(true);
-      //     });
-      //   }
     },
 
     onFinish: (_, ctx) => {
-      // ctx.pagerActive = false;
+      ctx.pagerActive = false;
     },
   });
 
@@ -456,7 +564,6 @@ export function ImagePager({ gallery }: IImagePager) {
 
   const pagerWrapperStyles = useAnimatedStyle(() => {
     return {
-      backgroundColor: 'black',
       transform: [
         {
           translateY: pagerPosition.value,
@@ -476,8 +583,20 @@ export function ImagePager({ gallery }: IImagePager) {
     };
   });
 
+  const imageWrapperStyles = useAnimatedStyle<ViewStyle>(() => {
+    return {
+      transform: [
+        {
+          translateX: imageWrapperPosition.value,
+        },
+      ],
+    };
+  });
+
   return (
     <View style={StyleSheet.absoluteFillObject}>
+      <Animated.View style={[styles.backdrop, backdropStyles]} />
+
       <Animated.View style={[StyleSheet.absoluteFill]}>
         <PanGestureHandler
           ref={pagerRef}
@@ -486,6 +605,15 @@ export function ImagePager({ gallery }: IImagePager) {
           onHandlerStateChange={onPan}
         >
           <Animated.View style={StyleSheet.absoluteFill}>
+            <Animated.View
+              style={[StyleSheet.absoluteFill, imageWrapperStyles]}
+            >
+              <AnimatedImage
+                source={{ uri: activeImage }}
+                style={imageStyles}
+              />
+            </Animated.View>
+
             <Animated.View
               style={[StyleSheet.absoluteFill, pagerWrapperStyles]}
             >

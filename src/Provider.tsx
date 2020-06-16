@@ -14,10 +14,12 @@ import {
 } from './GalleryState';
 import { ImagePager } from './Pager';
 
-const GalleryOverlayContext = React.createContext<IShowFunction | null>(
+export const GalleryOverlayContext = React.createContext<IShowFunction | null>(
   null,
 );
-const GalleryContext = React.createContext<GalleryState | null>(null);
+export const GalleryContext = React.createContext<GalleryState | null>(
+  null,
+);
 
 type IUseGalleryItem = {
   index: number;
@@ -55,7 +57,10 @@ export function GalleryProvider({
 }: IGalleryProviderProps) {
   const setActiveGallery = useContext(GalleryOverlayContext)!;
   const [gallery] = useState(
-    new GalleryState(setActiveGallery, totalCount),
+    new GalleryState({
+      fn: setActiveGallery,
+      totalCount,
+    }),
   );
 
   return (
