@@ -1,12 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  useMemo,
+} from 'react';
 import Animated, {
-  runOnUI,
   useSharedValue,
   useAnimatedStyle,
-  interpolate,
-  Easing,
-  Extrapolate,
-  withTiming,
   withSpring,
   cancelAnimation,
   useDerivedValue,
@@ -15,37 +16,24 @@ import {
   Dimensions,
   StyleSheet,
   View,
-  Image,
-  Platform,
   ViewStyle,
-  ImageStyle,
 } from 'react-native';
 import {
   PanGestureHandler,
   TapGestureHandler,
   PanGestureHandlerGestureEvent,
 } from 'react-native-gesture-handler';
-import { GalleryState, IGalleryImage } from './GalleryState';
 import { useAnimatedGestureHandler } from './useAnimatedGestureHandler';
-import { ImageTransformer } from './ImageTransformer';
-
 import {
   friction,
   fixGestureHandler,
   getShouldRender,
 } from './utils';
-import * as vec from './vectors';
 
 const dimensions = Dimensions.get('window');
 
 const GUTTER_WIDTH = dimensions.width / 14;
 const FAR_FAR_AWAY = 9999;
-
-const getPageTranslate = (i: number) => {
-  const t = i * dimensions.width;
-  const g = GUTTER_WIDTH * i;
-  return -(t + g);
-};
 
 const styles = StyleSheet.create({
   backdrop: {
@@ -58,10 +46,6 @@ const styles = StyleSheet.create({
   },
 });
 
-const AnimatedImage = Animated.createAnimatedComponent(
-  Image,
-) as typeof Animated.Image;
-
 type IGutterProps = {
   width: number;
 };
@@ -70,33 +54,48 @@ function Gutter({ width }: IGutterProps) {
   return <View style={{ width }} />;
 }
 
+type PageRefs = [
+  React.Ref<TapGestureHandler>,
+  React.Ref<PanGestureHandler>,
+];
+
+export type RenderPageProps<T> = {
+  index: number;
+  pagerRefs: PageRefs;
+  onPageStateChange: (value: boolean) => void;
+  page: T;
+  width: number;
+};
+
 type IPageProps = {
-  shouldRender: boolean;
-  pagerRefs: React.Ref<any>[];
-  page: IGalleryImage;
+  page: any;
+  pagerRefs: PageRefs;
   onPageStateChange: (value: boolean) => void;
   gutterWidth: number;
   index: number;
   length: number;
+  renderPage: (props: RenderPageProps<any>) => JSX.Element;
+  shouldRenderGutter: boolean;
+  getPageTranslate: (index: number) => number;
+  width: number;
 };
 
 const Page = React.memo<IPageProps>(
   ({
-    shouldRender,
     pagerRefs,
     page,
     onPageStateChange,
     gutterWidth,
     index,
     length,
+    renderPage,
+    shouldRenderGutter,
+    getPageTranslate,
+    width,
   }) => {
-    if (!shouldRender) {
-      return null;
-    }
-
-    const targetWidth = dimensions.width;
-    const scaleFactor = page.item.width / targetWidth;
-    const targetHeight = page.item.height / scaleFactor;
+    // const targetWidth = dimensions.width;
+    // const scaleFactor = page.item.width / targetWidth;
+    // const targetHeight = page.item.height / scaleFactor;
 
     return (
       <View
@@ -118,34 +117,64 @@ const Page = React.memo<IPageProps>(
             },
           ]}
         >
-          <ImageTransformer
-            {...{
-              pagerRefs,
-              onPageStateChange,
-              uri: page.item.uri,
-              width: targetWidth,
-              height: targetHeight,
-            }}
-          />
+          {renderPage({
+            index,
+            pagerRefs,
+            onPageStateChange,
+            page,
+            width,
+          })}
         </View>
 
-        {index !== length - 1 && <Gutter width={gutterWidth} />}
+        {index !== length - 1 && shouldRenderGutter && (
+          <Gutter width={gutterWidth} />
+        )}
       </View>
     );
   },
 );
 
-const timingConfig = {
-  duration: 250,
-  easing: Easing.bezier(0.33, 0.01, 0, 1),
+type IImagePager<T> = {
+  initialIndex: number;
+  totalCount: number;
+  pages: T[];
+  numToRender: number;
+  width?: number;
+  gutterWidth?: number;
+  onIndexChangeAsync: (nextIndex: number) => Promise<void>;
+  renderPage: (props: RenderPageProps<T>) => JSX.Element;
+  shouldRenderGutter?: boolean;
+  keyExtractor: (item: T, index: number) => string;
+  // gallery: GalleryState;
 };
 
-type IImagePager = {
-  gallery: GalleryState;
-};
-
-export function ImagePager({ gallery }: IImagePager) {
+export function ImagePager<TPage>({
+  pages,
+  initialIndex,
+  totalCount,
+  numToRender,
+  onIndexChangeAsync,
+  renderPage,
+  width = dimensions.width,
+  gutterWidth = GUTTER_WIDTH,
+  shouldRenderGutter = true,
+  keyExtractor,
+}: IImagePager<TPage>) {
   fixGestureHandler();
+
+  // make sure to not calculate translate with gutter
+  // if we don't want to render it
+  if (!shouldRenderGutter) {
+    gutterWidth = 0;
+  }
+
+  const getPageTranslate = useCallback((i: number) => {
+    'worklet';
+
+    const t = i * width;
+    const g = gutterWidth * i;
+    return t + g;
+  }, []);
 
   const pagerRef = useRef(null);
   const tapRef = useRef(null);
@@ -168,49 +197,28 @@ export function ImagePager({ gallery }: IImagePager) {
     pagerPosition.value = value ? 0 : FAR_FAR_AWAY;
   };
 
-  // S1: Image transition stuff
-  const { measurements } = gallery.activeItem!;
-
   const animationProgress = useSharedValue(1);
   const scale = useSharedValue(1);
-  const backdropOpacity = useSharedValue(0);
-  const statusBarFix = Platform.OS === 'android' ? 12 : 0;
 
   const velocity = useSharedValue(0);
-  const target = vec.useSharedVector(
-    0,
-    (dimensions.height - measurements.targetHeight) / 2 -
-      statusBarFix,
-  );
-  const translate = vec.useSharedVector(0, 0);
 
-  const [diffValue, setDiffValue] = useState(2);
-
-  // S1: Callbacks
-  function afterOpen() {
-    setDiffValue(2);
-  }
-
-  function onClose() {
-    gallery.onClose();
-  }
+  const [diffValue, setDiffValue] = useState(numToRender);
+  useEffect(() => {
+    setDiffValue(numToRender);
+  }, [numToRender]);
 
   // S2: Pager related stuff
-  const [activeIndex, setActiveIndex] = useState(
-    gallery.activeItem!.index,
-  );
+  const [activeIndex, setActiveIndex] = useState(initialIndex);
 
-  const index = useSharedValue(gallery.activeItem!.index);
-  const length = useSharedValue(gallery.totalCount);
+  const index = useSharedValue(initialIndex);
+  const length = useSharedValue(totalCount);
   const pagerX = useSharedValue(0);
   const toValueAnimation = useSharedValue(
-    getPageTranslate(gallery.activeItem!.index),
+    getPageTranslate(initialIndex),
   );
   const gestureTranslationX = useSharedValue(0);
 
-  const offsetX = useSharedValue(
-    getPageTranslate(gallery.activeItem!.index),
-  );
+  const offsetX = useSharedValue(getPageTranslate(initialIndex));
 
   const totalWidth = useDerivedValue(() => {
     return (
@@ -220,22 +228,15 @@ export function ImagePager({ gallery }: IImagePager) {
     );
   });
 
-  const getTranslate = (i: number) => {
-    'worklet';
-
-    const t = i * dimensions.width;
-    const g = GUTTER_WIDTH * i;
-    return t + g;
-  };
-
-  async function onIndexChange() {
+  const onIndexChange = useCallback(async () => {
     const nextIndex = index.value;
-    // setCurrentImageOpacity(1);
 
-    await gallery.setActiveIndex(nextIndex);
+    if (onIndexChangeAsync) {
+      await onIndexChangeAsync(nextIndex);
+    }
 
     setActiveIndex(nextIndex);
-  }
+  }, []);
 
   const onChangePageAnimation = () => {
     'worklet';
@@ -273,7 +274,7 @@ export function ImagePager({ gallery }: IImagePager) {
   const getNextIndex = (v: number) => {
     'worklet';
 
-    const currentTranslate = Math.abs(getTranslate(index.value));
+    const currentTranslate = Math.abs(getPageTranslate(index.value));
     const currentIndex = index.value;
     const currentOffset = Math.abs(offsetX.value);
 
@@ -302,7 +303,7 @@ export function ImagePager({ gallery }: IImagePager) {
 
   const isPagerInProgress = useDerivedValue(() => {
     return (
-      Math.floor(getTranslate(index.value)) !==
+      Math.floor(getPageTranslate(index.value)) !==
       Math.floor(Math.abs(offsetX.value + pagerX.value))
     );
   });
@@ -326,44 +327,13 @@ export function ImagePager({ gallery }: IImagePager) {
       velocity.value = evt.velocityX;
     },
 
-    onStart: (evt, ctx) => {
-      // const isHorizontalSwipe =
-      //   Math.abs(evt.velocityX) > Math.abs(evt.velocityY);
-      // if (isHorizontalSwipe || isPagerInProgress.value) {
-      //   setPagerVisible(true);
-      //   ctx.pagerActive = true;
-      // } else {
-      //   setPagerVisible(false);
-      // }
-    },
-
-    onActive: (evt, ctx) => {
-      // if (ctx.pagerActive) {
+    onActive: (evt) => {
       pagerX.value = canSwipe.value
         ? evt.translationX
         : friction(evt.translationX);
-      // } else {
-      //   translate.y.value = evt.translationY;
-      //   translate.x.value = evt.translationX;
-
-      //   scale.value = interpolate(
-      //     translate.y.value,
-      //     [-200, 0, 200],
-      //     [0.65, 1, 0.65],
-      //     Extrapolate.CLAMP,
-      //   );
-
-      //   backdropOpacity.value = interpolate(
-      //     translate.y.value,
-      //     [-100, 0, 100],
-      //     [0, 1, 0],
-      //     Extrapolate.CLAMP,
-      //   );
-      // }
     },
 
-    onEnd: (evt, ctx) => {
-      // if (ctx.pagerActive) {
+    onEnd: (evt) => {
       offsetX.value += pagerX.value;
       pagerX.value = 0;
 
@@ -375,8 +345,8 @@ export function ImagePager({ gallery }: IImagePager) {
 
       // we invert the value since the tranlationY is left to right
       toValueAnimation.value = -(shouldMoveToNextPage
-        ? getTranslate(nextIndex)
-        : getTranslate(index.value));
+        ? getPageTranslate(nextIndex)
+        : getPageTranslate(index.value));
 
       onChangePageAnimation();
 
@@ -384,48 +354,6 @@ export function ImagePager({ gallery }: IImagePager) {
         index.value = nextIndex;
         onIndexChange();
       }
-      // } else {
-      //   const easing = Easing.bezier(0.33, 0.01, 0, 1);
-      //   const config = {
-      //     duration: 200,
-      //     easing,
-      //   };
-
-      //   if (Math.abs(translate.y.value) > 40) {
-      //     target.x.value = translate.x.value - target.x.value * -1;
-      //     target.y.value = translate.y.value - target.y.value * -1;
-
-      //     translate.x.value = 0;
-      //     translate.y.value = 0;
-
-      //     animationProgress.value = withTiming(
-      //       0,
-      //       {
-      //         duration: 400,
-      //         easing,
-      //       },
-      //       () => {
-      //         onClose();
-      //       },
-      //     );
-      //     scale.value = withTiming(1, {
-      //       duration: 400,
-      //       easing,
-      //     });
-
-      //     backdropOpacity.value = withTiming(0, config);
-      //   } else {
-      //     translate.x.value = withTiming(0, config);
-      //     translate.y.value = withTiming(0, config);
-      //     backdropOpacity.value = withTiming(1, config);
-      //     scale.value = withTiming(1, config, () => {
-      //       setPagerVisible(true);
-      //     });
-      //   }
-    },
-
-    onFinish: (_, ctx) => {
-      // ctx.pagerActive = false;
     },
   });
 
@@ -476,6 +404,32 @@ export function ImagePager({ gallery }: IImagePager) {
     };
   });
 
+  const pagerRefs = useMemo<PageRefs>(() => [pagerRef, tapRef], []);
+
+  const pagesToRender = pages.map((page, i) => {
+    const shouldRender = getShouldRender(i, activeIndex, diffValue);
+
+    if (!shouldRender) {
+      return null;
+    }
+
+    return (
+      <Page
+        key={keyExtractor(page, i)}
+        page={page}
+        pagerRefs={pagerRefs}
+        onPageStateChange={onPageStateChange}
+        index={i}
+        length={totalCount}
+        gutterWidth={GUTTER_WIDTH}
+        renderPage={renderPage}
+        getPageTranslate={getPageTranslate}
+        width={width}
+        shouldRenderGutter={shouldRenderGutter}
+      />
+    );
+  });
+
   return (
     <View style={StyleSheet.absoluteFillObject}>
       <Animated.View style={[StyleSheet.absoluteFill]}>
@@ -499,22 +453,7 @@ export function ImagePager({ gallery }: IImagePager) {
               >
                 <Animated.View style={StyleSheet.absoluteFill}>
                   <Animated.View style={[styles.pager, pagerStyles]}>
-                    {gallery.images.map((page, i) => (
-                      <Page
-                        key={i.toString()}
-                        page={page}
-                        pagerRefs={[pagerRef, tapRef]}
-                        onPageStateChange={onPageStateChange}
-                        index={i}
-                        length={gallery.totalCount}
-                        shouldRender={getShouldRender(
-                          i,
-                          activeIndex,
-                          diffValue,
-                        )}
-                        gutterWidth={GUTTER_WIDTH}
-                      />
-                    ))}
+                    {pagesToRender}
                   </Animated.View>
                 </Animated.View>
               </TapGestureHandler>
