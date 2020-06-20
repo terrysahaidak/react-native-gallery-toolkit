@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useMemo } from 'react';
 import {
   StyleSheet,
   Dimensions,
@@ -26,7 +26,7 @@ import {
 import * as vec from './vectors';
 import { useAnimatedGestureHandler } from './useAnimatedGestureHandler';
 import withDecay from './withDecay';
-import { fixGestureHandler, clamp } from './utils';
+import { fixGestureHandler, clamp, workletNoop } from './utils';
 
 const windowDimensions = {
   width: Dimensions.get('window').width,
@@ -44,7 +44,6 @@ const styles = {
   },
   container: {
     flex: 1,
-    backgroundColor: 'black',
   },
 };
 
@@ -63,12 +62,13 @@ const timingConfig = {
 };
 
 type IImageTransformerProps = {
-  pagerRefs: React.Ref<any>[];
+  pagerRefs?: React.Ref<any>[];
   source?: ImageRequireSource;
   uri?: string;
   width: number;
   height: number;
-  onPageStateChange: (nextPagerState: boolean) => void;
+  onPageStateChange?: (nextPagerState: boolean) => void;
+  ImageComponent?: React.ComponentType<any>;
 };
 
 export const ImageTransformer = React.memo<IImageTransformerProps>(
@@ -78,9 +78,16 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     uri,
     width,
     height,
-    onPageStateChange = () => {},
+    onPageStateChange = workletNoop,
+    ImageComponent = Image,
+    style = {},
   }) => {
     fixGestureHandler();
+
+    const AnimatedImageComponent = useMemo(
+      () => Animated.createAnimatedComponent(ImageComponent),
+      [],
+    );
 
     const imageSource = source ?? {
       uri,
@@ -215,8 +222,6 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       },
 
       onStart: (_, ctx) => {
-        console.log('Transformer onStart')
-
         cancelAnimation(offset.x);
         cancelAnimation(offset.y);
         ctx.panOffset = vec.create(0, 0);
@@ -397,9 +402,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     });
 
     return (
-      <Animated.View
-        style={[styles.container, { width: windowDimensions.width }]}
-      >
+      <Animated.View style={[styles.container, { width }, style]}>
         <PinchGestureHandler
           ref={pinchRef}
           // enabled={false}
@@ -431,7 +434,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
                   <Animated.View style={styles.fill}>
                     <Animated.View style={styles.wrapper}>
                       <Animated.View style={animatedStyles}>
-                        <Image
+                        <AnimatedImageComponent
                           source={imageSource}
                           // resizeMode="cover"
                           style={{

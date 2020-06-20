@@ -1,3 +1,4 @@
+import { GalleryItemType } from './GalleryState';
 import {
   useGalleryItem,
   GalleryOverlay,
@@ -14,3 +15,7 @@ export {
   GalleryOverlay,
   GalleryProvider,
 };
+
+export type {
+  GalleryItemType,
+}

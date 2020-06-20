@@ -32,13 +32,11 @@ import {
 
 const dimensions = Dimensions.get('window');
 
-const GUTTER_WIDTH = dimensions.width / 14;
-const FAR_FAR_AWAY = 9999;
+const GUTTER_WIDTH = Math.round(dimensions.width / 14);
 
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'black',
   },
   pager: {
     flex: 1,
@@ -93,10 +91,6 @@ const Page = React.memo<IPageProps>(
     getPageTranslate,
     width,
   }) => {
-    // const targetWidth = dimensions.width;
-    // const scaleFactor = page.item.width / targetWidth;
-    // const targetHeight = page.item.height / scaleFactor;
-
     return (
       <View
         style={{
@@ -111,7 +105,7 @@ const Page = React.memo<IPageProps>(
           style={[
             {
               flex: 1,
-              width: dimensions.width,
+              width,
               justifyContent: 'center',
               alignItems: 'center',
             },
@@ -138,13 +132,14 @@ type IImagePager<T> = {
   initialIndex: number;
   totalCount: number;
   pages: T[];
-  numToRender: number;
+  numToRender?: number;
   width?: number;
   gutterWidth?: number;
-  onIndexChangeAsync: (nextIndex: number) => Promise<void>;
+  onIndexChangeAsync?: (nextIndex: number) => Promise<void>;
   renderPage: (props: RenderPageProps<T>) => JSX.Element;
   shouldRenderGutter?: boolean;
   keyExtractor: (item: T, index: number) => string;
+  pagerWrapperStyles?: any;
   // gallery: GalleryState;
 };
 
@@ -152,13 +147,14 @@ export function ImagePager<TPage>({
   pages,
   initialIndex,
   totalCount,
-  numToRender,
+  numToRender = 2,
   onIndexChangeAsync,
   renderPage,
   width = dimensions.width,
   gutterWidth = GUTTER_WIDTH,
   shouldRenderGutter = true,
   keyExtractor,
+  pagerWrapperStyles = {},
 }: IImagePager<TPage>) {
   fixGestureHandler();
 
@@ -168,13 +164,13 @@ export function ImagePager<TPage>({
     gutterWidth = 0;
   }
 
-  const getPageTranslate = useCallback((i: number) => {
+  const getPageTranslate = (i: number) => {
     'worklet';
 
     const t = i * width;
     const g = gutterWidth * i;
-    return t + g;
-  }, []);
+    return -(t + g);
+  };
 
   const pagerRef = useRef(null);
   const tapRef = useRef(null);
@@ -187,19 +183,7 @@ export function ImagePager<TPage>({
     isActive.value = value;
   }
 
-  const imageWrapperPosition = useSharedValue(0);
-  const pagerPosition = useSharedValue(0);
-
-  const setPagerVisible = (value: boolean) => {
-    'worklet';
-
-    imageWrapperPosition.value = value ? FAR_FAR_AWAY : 0;
-    pagerPosition.value = value ? 0 : FAR_FAR_AWAY;
-  };
-
-  const animationProgress = useSharedValue(1);
   const scale = useSharedValue(1);
-
   const velocity = useSharedValue(0);
 
   const [diffValue, setDiffValue] = useState(numToRender);
@@ -221,11 +205,7 @@ export function ImagePager<TPage>({
   const offsetX = useSharedValue(getPageTranslate(initialIndex));
 
   const totalWidth = useDerivedValue(() => {
-    return (
-      length.value * dimensions.width +
-      GUTTER_WIDTH * length.value -
-      2
-    );
+    return length.value * width + gutterWidth * length.value - 2;
   });
 
   const onIndexChange = useCallback(async () => {
@@ -261,8 +241,7 @@ export function ImagePager<TPage>({
     }
 
     const totalTranslate =
-      dimensions.width * (length.value - 1) +
-      GUTTER_WIDTH * (length.value - 1);
+      width * (length.value - 1) + gutterWidth * (length.value - 1);
 
     if (nextTranslate <= -totalTranslate) {
       return false;
@@ -315,11 +294,7 @@ export function ImagePager<TPage>({
     }
   >({
     shouldHandleEvent: (evt) => {
-      return (
-        evt.numberOfPointers === 1 &&
-        isActive.value &&
-        animationProgress.value === 1
-      );
+      return evt.numberOfPointers === 1 && isActive.value;
     },
 
     onEvent: (evt) => {
@@ -345,8 +320,8 @@ export function ImagePager<TPage>({
 
       // we invert the value since the tranlationY is left to right
       toValueAnimation.value = -(shouldMoveToNextPage
-        ? getPageTranslate(nextIndex)
-        : getPageTranslate(index.value));
+        ? -getPageTranslate(nextIndex)
+        : -getPageTranslate(index.value));
 
       onChangePageAnimation();
 
@@ -359,11 +334,7 @@ export function ImagePager<TPage>({
 
   const onTap = useAnimatedGestureHandler({
     shouldHandleEvent: (evt) => {
-      return (
-        evt.numberOfPointers === 1 &&
-        isActive.value &&
-        animationProgress.value === 1
-      );
+      return evt.numberOfPointers === 1 && isActive.value;
     },
 
     onStart: () => {
@@ -380,17 +351,6 @@ export function ImagePager<TPage>({
 
       onChangePageAnimation();
     },
-  });
-
-  const pagerWrapperStyles = useAnimatedStyle(() => {
-    return {
-      backgroundColor: 'black',
-      transform: [
-        {
-          translateY: pagerPosition.value,
-        },
-      ],
-    };
   });
 
   const pagerStyles = useAnimatedStyle<ViewStyle>(() => {
@@ -421,7 +381,7 @@ export function ImagePager<TPage>({
         onPageStateChange={onPageStateChange}
         index={i}
         length={totalCount}
-        gutterWidth={GUTTER_WIDTH}
+        gutterWidth={gutterWidth}
         renderPage={renderPage}
         getPageTranslate={getPageTranslate}
         width={width}

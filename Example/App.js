@@ -1,3 +1,3 @@
-import ImageGalleryScreen from './src/ImageGalleryScreen';
+import ImageGalleryScreen from './src/StandaloneGalleryScreen';
 
 export default ImageGalleryScreen;

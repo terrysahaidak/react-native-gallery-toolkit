@@ -10,7 +10,7 @@ import { View, StyleSheet } from 'react-native';
 import {
   GalleryState,
   IShowFunction,
-  IGalleryItem,
+  GalleryItemType,
 } from './GalleryState';
 import { ImagePager } from './Pager';
 
@@ -23,7 +23,7 @@ export const GalleryContext = React.createContext<GalleryState | null>(
 
 type IUseGalleryItem = {
   index: number;
-  item: IGalleryItem;
+  item: GalleryItemType;
 };
 
 export function useGalleryItem({ index, item }: IUseGalleryItem) {

@@ -1,19 +1,14 @@
 import React from 'react';
-import { Dimensions, StyleSheet, Image } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-import {
-  ScrollView,
-  TouchableWithoutFeedback,
-} from 'react-native-gesture-handler';
+import { Dimensions, Image } from 'react-native';
+
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {
   useGalleryInit,
   StandaloneGallery,
+  GalleryItemType,
 } from 'reanimated-gallery';
 
 const dimensions = Dimensions.get('window');
-
-const ImageComponent = Animated.createAnimatedComponent(Image);
 
 function getRandomIntInclusive(min: number, max: number) {
   min = Math.ceil(min);
@@ -23,29 +18,29 @@ function getRandomIntInclusive(min: number, max: number) {
 
 const heights = [300, 400, 500, 540, 580, 600];
 
-const images = Array.from({ length: 300 }, (_, index) => {
-  const height =
-    heights[getRandomIntInclusive(0, heights.length - 1)];
+const images: GalleryItemType[] = Array.from(
+  { length: 300 },
+  (_, index) => {
+    const height =
+      heights[getRandomIntInclusive(0, heights.length - 1)];
 
-  return {
-    uri: `https://picsum.photos/id/${index + 200}/${height}/400`,
-    width: height,
-    height: dimensions.width,
-  };
-});
-
-const styles = StyleSheet.create({
-  scrollContainer: {
-    paddingTop: 20,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    return {
+      id: index.toString(),
+      uri: `https://picsum.photos/id/${index + 200}/${height}/400`,
+      width: height,
+      height: dimensions.width,
+    };
   },
-});
+);
 
 export default function ImageGalleryScreen() {
   useGalleryInit();
 
   return (
-    <StandaloneGallery images={images} />
+    <StandaloneGallery
+      ImageComponent={Image}
+      initialIndex={20}
+      images={images}
+    />
   );
 }

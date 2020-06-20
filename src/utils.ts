@@ -1,11 +1,11 @@
 import { Dimensions } from 'react-native';
 import { useState, useEffect } from 'react';
-import { IGalleryItem } from './GalleryState';
+import { GalleryItemType } from './GalleryState';
 
 const dimensions = Dimensions.get('window');
 
 export function normalizeDimensions(
-  item: IGalleryItem,
+  item: GalleryItemType,
   targetWidth = dimensions.width,
 ) {
   const scaleFactor = item.width / targetWidth;
@@ -72,3 +72,7 @@ export function clamp(
 
   return Math.min(Math.max(lowerBound, value), upperBound);
 }
+
+export const workletNoop = () => {
+  'worklet';
+};

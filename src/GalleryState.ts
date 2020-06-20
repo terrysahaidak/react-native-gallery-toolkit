@@ -3,7 +3,8 @@ import Animated from 'react-native-reanimated';
 import { normalizeDimensions } from './utils';
 
 export type IShowFunction = (value: GalleryState | null) => void;
-export type IGalleryItem = {
+export type GalleryItemType = {
+  id: string;
   width: number;
   height: number;
   uri: string;
@@ -22,7 +23,7 @@ export type IGalleryImage = {
   ref: React.RefObject<Animated.Image>;
   index: number;
   opacity: Animated.SharedValue<number>;
-  item: IGalleryItem;
+  item: GalleryItemType;
   measurements?: IMeasurements;
 };
 
@@ -30,7 +31,7 @@ type IOnChangeCallback = (item: IGalleryImage) => void;
 
 type GalleryStateProps = {
   fn: IShowFunction;
-  images?: IGalleryItem[];
+  images?: GalleryItemType[];
   totalCount: number;
 };
 
