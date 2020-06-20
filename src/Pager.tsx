@@ -249,12 +249,6 @@ export function ImagePager({ gallery }: IImagePager) {
   const openAnimation = () => {
     'worklet';
 
-    // FIXME: Remove me after upgrading reanimated
-    const timingConfig = {
-      duration: 250,
-      easing: Easing.bezier(0.33, 0.01, 0, 1),
-    };
-
     animationProgress.value = withTiming(1, timingConfig, () => {
       setPagerVisible(true);
       afterOpen();
