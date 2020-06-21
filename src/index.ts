@@ -1,4 +1,3 @@
-import { GalleryItemType } from './GalleryState';
 import {
   useGalleryItem,
   GalleryOverlay,
@@ -7,6 +6,7 @@ import {
 
 import { useInit } from './useInit';
 
+export * from './types';
 export * from './StandaloneGallery';
 
 export {
@@ -15,7 +15,3 @@ export {
   GalleryOverlay,
   GalleryProvider,
 };
-
-export type {
-  GalleryItemType,
-}

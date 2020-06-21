@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dimensions, Image } from 'react-native';
-import { GalleryItemType } from './GalleryState';
+import { GalleryItemType } from './types';
 
 import { ImagePager } from './Pager';
 import { ImageTransformer } from './ImageTransformer';

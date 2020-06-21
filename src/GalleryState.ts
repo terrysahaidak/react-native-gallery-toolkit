@@ -1,14 +1,9 @@
 import React from 'react';
 import Animated from 'react-native-reanimated';
 import { normalizeDimensions } from './utils';
+import { GalleryItemType } from './types';
 
 export type IShowFunction = (value: GalleryState | null) => void;
-export type GalleryItemType = {
-  id: string;
-  width: number;
-  height: number;
-  uri: string;
-};
 
 type IMeasurements = {
   width: number;
