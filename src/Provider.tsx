@@ -12,7 +12,7 @@ import {
   IShowFunction,
   GalleryItemType,
 } from './GalleryState';
-import { ImagePager } from './Pager';
+import { ImagePager } from './Lightbox';
 
 export const GalleryOverlayContext = React.createContext<IShowFunction | null>(
   null,
