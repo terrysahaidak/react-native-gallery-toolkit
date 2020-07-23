@@ -15,11 +15,6 @@ import com.facebook.react.bridge.JSIModulePackage; // <- add
 import com.swmansion.reanimated.ReanimatedJSIModulePackage; // <- add
 
 public class MainApplication extends Application implements ReactApplication {
-
-  static {
-    ReactFeatureFlags.useTurboModules = true; // <- add
-  }
-
   private final ReactNativeHost mReactNativeHost =
       new ReactNativeHost(this) {
         @Override
