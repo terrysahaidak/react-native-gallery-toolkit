@@ -3,8 +3,11 @@
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
+
 #import <React/RCTCxxBridgeDelegate.h>
 #import <ReactCommon/RCTTurboModuleManager.h>
+
+// add headers (start)
 #import <React/RCTDataRequestHandler.h>
 #import <React/RCTFileRequestHandler.h>
 #import <React/RCTHTTPRequestHandler.h>
@@ -14,8 +17,10 @@
 #import <React/RCTImageLoader.h>
 #import <React/JSCExecutorFactory.h>
 #import <RNReanimated/RETurboModuleProvider.h>
+#import <RNReanimated/REAModule.h>
+// add headers (end)
 
-#if DEBUG
+#ifdef FB_SONARKIT_ENABLED
 #import <FlipperKit/FlipperClient.h>
 #import <FlipperKitLayoutPlugin/FlipperKitLayoutPlugin.h>
 #import <FlipperKitUserDefaultsPlugin/FKUserDefaultsPlugin.h>
@@ -43,16 +48,16 @@ static void InitializeFlipper(UIApplication *application) {
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-#if DEBUG
+#ifdef FB_SONARKIT_ENABLED
   InitializeFlipper(application);
 #endif
 
   RCTEnableTurboModule(YES);
 
-  _bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
+  RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   
 
-RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:_bridge
+RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
                                                    moduleName:@"ReanimatedGalleryExample"
                                             initialProperties:nil];
 
@@ -77,17 +82,23 @@ RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:_bridge
 
 - (std::unique_ptr<facebook::react::JSExecutorFactory>)jsExecutorFactoryForBridge:(RCTBridge *)bridge
 {
-  _turboModuleManager = [[RCTTurboModuleManager alloc] initWithBridge:bridge delegate:self];
-  __weak __typeof(self) weakSelf = self;
-  return std::make_unique<facebook::react::JSCExecutorFactory>([weakSelf, bridge](facebook::jsi::Runtime &runtime) {
-    if (!bridge) {
-      return;
-    }
-    __typeof(self) strongSelf = weakSelf;
-    if (strongSelf) {
-      [strongSelf->_turboModuleManager installJSBindingWithRuntime:&runtime];
-    }
-  });
+   _bridge_reanimated = bridge;
+  _turboModuleManager = [[RCTTurboModuleManager alloc] initWithBridge:bridge
+                                                              delegate:self
+                                                             jsInvoker:bridge.jsCallInvoker];
+ #if RCT_DEV
+  [_turboModuleManager moduleForName:"RCTDevMenu"]; // <- add
+ #endif
+ __weak __typeof(self) weakSelf = self;
+ return std::make_unique<facebook::react::JSCExecutorFactory>([weakSelf, bridge](facebook::jsi::Runtime &runtime) {
+   if (!bridge) {
+     return;
+   }
+   __typeof(self) strongSelf = weakSelf;
+   if (strongSelf) {
+     [strongSelf->_turboModuleManager installJSBindingWithRuntime:&runtime];
+   }
+ });
 }
 
 - (Class)getModuleClassFromName:(const char *)name

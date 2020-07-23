@@ -15,8 +15,6 @@
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* ReanimatedGalleryExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* ReanimatedGalleryExampleTests.m */; };
-		402E8AEA827229BD99186A0A /* libPods-ReanimatedGalleryExample-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C20C657C8D283C958307DC14 /* libPods-ReanimatedGalleryExample-tvOS.a */; };
-		64C5D0E205A5CDB87166B22D /* libPods-ReanimatedGalleryExample-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E722B5894F2288E8A102669D /* libPods-ReanimatedGalleryExample-tvOSTests.a */; };
 		7DAF48432B880D2BEC10890F /* libPods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 01E4227EDC703ECEE15843A1 /* libPods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.a */; };
 		BB1A075BA3BBEEB123B7C19D /* libPods-ReanimatedGalleryExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A23A5D0F211E6D600B9D8C2 /* libPods-ReanimatedGalleryExample.a */; };
 		DE7F0DC32480358800CE35E4 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = DE7F0DC22480358800CE35E4 /* AppDelegate.mm */; };
@@ -57,17 +55,11 @@
 		445E134E1B353E55A3B815B2 /* Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.release.xcconfig"; path = "Target Support Files/Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests/Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.release.xcconfig"; sourceTree = "<group>"; };
 		6852286950EE2139E287C85F /* Pods-ReanimatedGalleryExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReanimatedGalleryExample.release.xcconfig"; path = "Target Support Files/Pods-ReanimatedGalleryExample/Pods-ReanimatedGalleryExample.release.xcconfig"; sourceTree = "<group>"; };
 		6F4E2D10CFA6260D2E52D7FE /* Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests/Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
-		79CFF00E0C48751BEAF4DE48 /* Pods-ReanimatedGalleryExample-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReanimatedGalleryExample-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-ReanimatedGalleryExample-tvOSTests/Pods-ReanimatedGalleryExample-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		8A23A5D0F211E6D600B9D8C2 /* libPods-ReanimatedGalleryExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ReanimatedGalleryExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A5DF31A3A0A481ECC63B1B93 /* Pods-ReanimatedGalleryExample-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReanimatedGalleryExample-tvOS.release.xcconfig"; path = "Target Support Files/Pods-ReanimatedGalleryExample-tvOS/Pods-ReanimatedGalleryExample-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		B97D791C69B7490024245F97 /* Pods-ReanimatedGalleryExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReanimatedGalleryExample.debug.xcconfig"; path = "Target Support Files/Pods-ReanimatedGalleryExample/Pods-ReanimatedGalleryExample.debug.xcconfig"; sourceTree = "<group>"; };
-		C20C657C8D283C958307DC14 /* libPods-ReanimatedGalleryExample-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ReanimatedGalleryExample-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE7F0DC22480358800CE35E4 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = ReanimatedGalleryExample/AppDelegate.mm; sourceTree = "<group>"; };
-		E722B5894F2288E8A102669D /* libPods-ReanimatedGalleryExample-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ReanimatedGalleryExample-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
-		EF901C9ED113853E4A16DFE5 /* Pods-ReanimatedGalleryExample-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReanimatedGalleryExample-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-ReanimatedGalleryExample-tvOSTests/Pods-ReanimatedGalleryExample-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
-		F2196BF69A367028FB9205C1 /* Pods-ReanimatedGalleryExample-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReanimatedGalleryExample-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-ReanimatedGalleryExample-tvOS/Pods-ReanimatedGalleryExample-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,7 +83,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				402E8AEA827229BD99186A0A /* libPods-ReanimatedGalleryExample-tvOS.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,7 +90,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				64C5D0E205A5CDB87166B22D /* libPods-ReanimatedGalleryExample-tvOSTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -144,8 +134,6 @@
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				8A23A5D0F211E6D600B9D8C2 /* libPods-ReanimatedGalleryExample.a */,
 				01E4227EDC703ECEE15843A1 /* libPods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.a */,
-				C20C657C8D283C958307DC14 /* libPods-ReanimatedGalleryExample-tvOS.a */,
-				E722B5894F2288E8A102669D /* libPods-ReanimatedGalleryExample-tvOSTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -191,10 +179,6 @@
 				6852286950EE2139E287C85F /* Pods-ReanimatedGalleryExample.release.xcconfig */,
 				6F4E2D10CFA6260D2E52D7FE /* Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.debug.xcconfig */,
 				445E134E1B353E55A3B815B2 /* Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.release.xcconfig */,
-				F2196BF69A367028FB9205C1 /* Pods-ReanimatedGalleryExample-tvOS.debug.xcconfig */,
-				A5DF31A3A0A481ECC63B1B93 /* Pods-ReanimatedGalleryExample-tvOS.release.xcconfig */,
-				EF901C9ED113853E4A16DFE5 /* Pods-ReanimatedGalleryExample-tvOSTests.debug.xcconfig */,
-				79CFF00E0C48751BEAF4DE48 /* Pods-ReanimatedGalleryExample-tvOSTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -210,6 +194,7 @@
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
+				355BFB57AC7414B73B544BF1 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -231,6 +216,7 @@
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
+				4AD2C5508790C76CFD507DD5 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -245,7 +231,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2D02E4BA1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "ReanimatedGalleryExample-tvOS" */;
 			buildPhases = (
-				5A86A8DA19ECA2FDC1F65A0B /* [CP] Check Pods Manifest.lock */,
 				FD10A7F122414F3F0027D42C /* Start Packager */,
 				2D02E4771E0B4A5D006451C7 /* Sources */,
 				2D02E4781E0B4A5D006451C7 /* Frameworks */,
@@ -265,7 +250,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2D02E4BB1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "ReanimatedGalleryExample-tvOSTests" */;
 			buildPhases = (
-				FB032E91FBFF4E3618D7B9D5 /* [CP] Check Pods Manifest.lock */,
 				2D02E48C1E0B4A5D006451C7 /* Sources */,
 				2D02E48D1E0B4A5D006451C7 /* Frameworks */,
 				2D02E48E1E0B4A5D006451C7 /* Resources */,
@@ -390,26 +374,40 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
-		5A86A8DA19ECA2FDC1F65A0B /* [CP] Check Pods Manifest.lock */ = {
+		355BFB57AC7414B73B544BF1 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
 			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
+				"${PODS_ROOT}/Target Support Files/Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests/Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
 			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-ReanimatedGalleryExample-tvOS-checkManifestLockResult.txt",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests/Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		4AD2C5508790C76CFD507DD5 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ReanimatedGalleryExample/Pods-ReanimatedGalleryExample-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ReanimatedGalleryExample/Pods-ReanimatedGalleryExample-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		5F90E3645A5B324A114D0BBC /* [CP] Check Pods Manifest.lock */ = {
@@ -450,28 +448,6 @@
 			);
 			outputPaths = (
 				"$(DERIVED_FILE_DIR)/Pods-ReanimatedGalleryExample-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		FB032E91FBFF4E3618D7B9D5 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-ReanimatedGalleryExample-tvOSTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -674,7 +650,6 @@
 		};
 		2D02E4971E0B4A5E006451C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F2196BF69A367028FB9205C1 /* Pods-ReanimatedGalleryExample-tvOS.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -702,7 +677,6 @@
 		};
 		2D02E4981E0B4A5E006451C7 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A5DF31A3A0A481ECC63B1B93 /* Pods-ReanimatedGalleryExample-tvOS.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -730,7 +704,6 @@
 		};
 		2D02E4991E0B4A5E006451C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = EF901C9ED113853E4A16DFE5 /* Pods-ReanimatedGalleryExample-tvOSTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
@@ -757,7 +730,6 @@
 		};
 		2D02E49A1E0B4A5E006451C7 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 79CFF00E0C48751BEAF4DE48 /* Pods-ReanimatedGalleryExample-tvOSTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
