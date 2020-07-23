@@ -1,10 +1,10 @@
 import React, { useRef, useMemo } from 'react';
 import {
   StyleSheet,
-  Dimensions,
   Image,
   ImageRequireSource,
   ViewStyle,
+  Dimensions,
 } from 'react-native';
 import Animated, {
   withSpring,
@@ -27,11 +27,6 @@ import * as vec from './vectors';
 import { useAnimatedGestureHandler } from './useAnimatedGestureHandler';
 import withDecay from './withDecay';
 import { fixGestureHandler, clamp, workletNoop } from './utils';
-
-const windowDimensions = {
-  width: Dimensions.get('window').width,
-  height: Dimensions.get('window').height,
-};
 
 const styles = {
   fill: {
@@ -67,8 +62,13 @@ type IImageTransformerProps = {
   uri?: string;
   width: number;
   height: number;
+  windowDimensions: {
+    width: number;
+    height: number;
+  };
   onPageStateChange?: (nextPagerState: boolean) => void;
   ImageComponent?: React.ComponentType<any>;
+  isActive?: Animated.SharedValue<boolean>;
 };
 
 export const ImageTransformer = React.memo<IImageTransformerProps>(
@@ -80,6 +80,8 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     height,
     onPageStateChange = workletNoop,
     ImageComponent = Image,
+    windowDimensions = Dimensions.get('window'),
+    isActive,
     style = {},
   }) => {
     fixGestureHandler();
@@ -123,6 +125,16 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     const canPanVertically = useDerivedValue(() => {
       return windowDimensions.height < targetHeight * scale.value;
     });
+
+    const resetSharedState = () => {
+      'worklet';
+
+      scale.value = 1;
+      scaleOffset.value = 1;
+      vec.set(translation, 0);
+      vec.set(scaleTranslation, 0);
+      vec.set(offset, 0);
+    };
 
     const maybeRunOnEnd = () => {
       'worklet';
@@ -169,33 +181,38 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
 
       const deceleration = 0.991;
 
-      if (
-        target.x === offset.x.value &&
-        Math.abs(panVelocity.x.value) > 0 &&
-        scale.value <= MAX_SCALE
-      ) {
-        offset.x.value = withDecay({
-          velocity: panVelocity.x.value,
-          clamp: [minVector.x, maxVector.x],
-          deceleration,
-        });
+      const isInBoundaryX = target.x === offset.x.value;
+      const isInBoundaryY = target.y === offset.y.value;
+
+      if (isInBoundaryX) {
+        if (
+          Math.abs(panVelocity.x.value) > 0 &&
+          scale.value <= MAX_SCALE
+        ) {
+          offset.x.value = withDecay({
+            velocity: panVelocity.x.value,
+            clamp: [minVector.x, maxVector.x],
+            deceleration,
+          });
+        }
       } else {
-        // run animation
         offset.x.value = withSpring(target.x, springConfig);
       }
 
-      if (
-        target.y === offset.y.value &&
-        Math.abs(panVelocity.y.value) > 0 &&
-        scale.value <= MAX_SCALE
-      ) {
-        offset.y.value = withDecay({
-          velocity: panVelocity.y.value,
-          clamp: [minVector.y, maxVector.y],
-          deceleration,
-        });
-      } else {
-        offset.y.value = withSpring(target.y, springConfig);
+      if (isInBoundaryY) {
+        if (
+          target.y === offset.y.value &&
+          Math.abs(panVelocity.y.value) > 0 &&
+          scale.value <= MAX_SCALE
+        ) {
+          offset.y.value = withDecay({
+            velocity: panVelocity.y.value,
+            clamp: [minVector.y, maxVector.y],
+            deceleration,
+          });
+        } else if (target.y !== offset.y.value) {
+          offset.y.value = withSpring(target.y, springConfig);
+        }
       }
     };
 
@@ -257,7 +274,17 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         vec.set(translation, 0);
 
         maybeRunOnEnd();
+
+        vec.set(panVelocity, 0);
       },
+    });
+
+    useDerivedValue(() => {
+      if (!isActive.value) {
+        scale.value = 1;
+      }
+
+      return 0;
     });
 
     const onScaleEvent = useAnimatedGestureHandler<
@@ -312,6 +339,8 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       },
 
       onStart: (_, ctx) => {
+        cancelAnimation(offset.x);
+        cancelAnimation(offset.y);
         vec.set(ctx.origin, ctx.adjustFocal);
       },
 
@@ -432,7 +461,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
                   onHandlerStateChange={onTapEvent}
                 >
                   <Animated.View style={styles.fill}>
-                    <Animated.View style={styles.wrapper}>
+                    <Animated.View style={[styles.wrapper]}>
                       <Animated.View style={animatedStyles}>
                         <AnimatedImageComponent
                           source={imageSource}

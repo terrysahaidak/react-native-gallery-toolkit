@@ -63,6 +63,7 @@ export type RenderPageProps<T> = {
   onPageStateChange: (value: boolean) => void;
   page: T;
   width: number;
+  isActive: Animated.SharedValue<boolean>;
 };
 
 type IPageProps = {
@@ -76,6 +77,7 @@ type IPageProps = {
   shouldRenderGutter: boolean;
   getPageTranslate: (index: number) => number;
   width: number;
+  currentIndex: Animated.SharedValue<number>;
 };
 
 const Page = React.memo<IPageProps>(
@@ -90,7 +92,12 @@ const Page = React.memo<IPageProps>(
     shouldRenderGutter,
     getPageTranslate,
     width,
+    currentIndex,
   }) => {
+    const isActive = useDerivedValue(() => {
+      return currentIndex.value === index;
+    });
+
     return (
       <View
         style={{
@@ -117,6 +124,7 @@ const Page = React.memo<IPageProps>(
             onPageStateChange,
             page,
             width,
+            isActive,
           })}
         </View>
 
@@ -217,6 +225,13 @@ export function ImagePager<TPage>({
 
     setActiveIndex(nextIndex);
   }, []);
+
+  useEffect(() => {
+    offsetX.value = getPageTranslate(initialIndex);
+    index.value = initialIndex;
+
+    setTimeout(() => onIndexChange(), 1);
+  }, [initialIndex]);
 
   const onChangePageAnimation = () => {
     'worklet';
@@ -377,6 +392,7 @@ export function ImagePager<TPage>({
       <Page
         key={keyExtractor(page, i)}
         page={page}
+        currentIndex={index}
         pagerRefs={pagerRefs}
         onPageStateChange={onPageStateChange}
         index={i}

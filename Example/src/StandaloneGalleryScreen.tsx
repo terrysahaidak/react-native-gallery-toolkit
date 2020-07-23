@@ -1,5 +1,5 @@
-import React from 'react';
-import { Dimensions, Image } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { Dimensions, Image, View, Text, Button } from 'react-native';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {
@@ -36,11 +36,50 @@ const images: GalleryItemType[] = Array.from(
 export default function ImageGalleryScreen() {
   useGalleryInit();
 
+  const [index, setIndex] = useState(20);
+
+  const galleryRef = useRef<StandaloneGallery>(null);
+
+  function onIndexChange(nextIndex: number) {
+    setIndex(nextIndex);
+  }
+
+  function onNext() {
+    galleryRef.current!.goNext();
+  }
+
+  function onBack() {
+    galleryRef.current!.goBack();
+  }
+
   return (
-    <StandaloneGallery
-      ImageComponent={Image}
-      initialIndex={20}
-      images={images}
-    />
+    <View style={{ backgroundColor: 'black', flex: 1 }}>
+      <StandaloneGallery
+        ref={galleryRef}
+        ImageComponent={Image}
+        initialIndex={20}
+        images={images}
+        gutterWidth={100}
+        onIndexChange={onIndexChange}
+      />
+
+      <View
+        style={{
+          flexDirection: 'row',
+          position: 'absolute',
+          bottom: 20,
+          left: 0,
+          right: 0,
+          flex: 1,
+          justifyContent: 'space-around',
+        }}
+      >
+        <Button title="Back" onPress={onBack} />
+
+        <Text style={{ color: 'white' }}>{index}</Text>
+
+        <Button title="Next" onPress={onNext} />
+      </View>
+    </View>
   );
 }
