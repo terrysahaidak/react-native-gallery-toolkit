@@ -37,19 +37,14 @@ cd ios && pod install && cd ..
 Now, you can start the app:
 
 ```
-react-native run-ios
+npm run ios
 ```
 
 ### Running on Android
 
-Run the react native's cli command:
-
 ```
-react-native run-android
+npm run android
 ```
-
-**Important:** You will need to have an Android or iOS device or emulator connected as well as react-native-cli package installed globally.
-
 
 ## LICENSE
 
