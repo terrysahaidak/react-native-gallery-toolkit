@@ -291,6 +291,8 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         return isActive!.value;
       },
       (currentActive) => {
+        'worklet';
+
         if (!currentActive) {
           resetSharedState();
         }

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Dimensions, Image, View, Text, Button } from 'react-native';
+import { Dimensions, Image, View, Text } from 'react-native';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {
@@ -8,6 +8,8 @@ import {
   GalleryItemType,
   StandaloneGalleryHandler,
 } from 'reanimated-gallery';
+
+import { RectButton } from 'react-native-gesture-handler';
 
 const dimensions = Dimensions.get('window');
 
@@ -75,7 +77,7 @@ export default function ImageGalleryScreen() {
         ImageComponent={Image}
         initialIndex={1}
         images={images}
-        gutterWidth={100}
+        gutterWidth={24}
         onIndexChange={onIndexChange}
       />
 
@@ -90,11 +92,15 @@ export default function ImageGalleryScreen() {
           justifyContent: 'space-around',
         }}
       >
-        <Button title="Back" onPress={onBack} />
+        <RectButton onPress={onBack}>
+          <Text style={{ color: 'white' }}>Back</Text>
+        </RectButton>
 
         <Text style={{ color: 'white' }}>{index}</Text>
 
-        <Button title="Next" onPress={onNext} />
+        <RectButton onPress={onNext}>
+          <Text style={{ color: 'white' }}>Next</Text>
+        </RectButton>
       </View>
     </View>
   );
