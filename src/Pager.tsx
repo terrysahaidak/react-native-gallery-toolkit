@@ -236,15 +236,23 @@ export function ImagePager<TPage>({
   const onChangePageAnimation = () => {
     'worklet';
 
-    offsetX.value = withSpring(toValueAnimation.value, {
-      stiffness: 1000,
-      damping: 500,
-      mass: 3,
-      overshootClamping: true,
-      restDisplacementThreshold: 0.01,
-      restSpeedThreshold: 0.01,
-      velocity: velocity.value,
-    });
+    offsetX.value = withSpring(
+      toValueAnimation.value,
+      {
+        stiffness: 1000,
+        damping: 500,
+        mass: 3,
+        overshootClamping: true,
+        restDisplacementThreshold: 0.01,
+        restSpeedThreshold: 0.01,
+        velocity: velocity.value,
+      },
+      (isCanceled) => {
+        if (!isCanceled) {
+          velocity.value = 0;
+        }
+      },
+    );
   };
 
   // S3 Pager
@@ -295,12 +303,12 @@ export function ImagePager<TPage>({
     return nextIndex;
   };
 
-  const isPagerInProgress = useDerivedValue(() => {
-    return (
-      Math.floor(getPageTranslate(index.value)) !==
-      Math.floor(Math.abs(offsetX.value + pagerX.value))
-    );
-  });
+  // const isPagerInProgress = useDerivedValue(() => {
+  //   return (
+  //     Math.floor(getPageTranslate(index.value)) !==
+  //     Math.floor(Math.abs(offsetX.value + pagerX.value))
+  //   );
+  // });
 
   const onPan = useAnimatedGestureHandler<
     PanGestureHandlerGestureEvent,
@@ -422,7 +430,7 @@ export function ImagePager<TPage>({
               <TapGestureHandler
                 ref={tapRef}
                 // TODO: Fix tap gesture handler
-                enabled={false}
+                // enabled={false}
                 simultaneousHandlers={[pagerRef]}
                 onGestureEvent={onTap}
                 onHandlerStateChange={onTap}
