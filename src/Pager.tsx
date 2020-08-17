@@ -188,6 +188,8 @@ export function ImagePager<TPage>({
   function onPageStateChange(value: boolean) {
     'worklet';
 
+    console.log('Pager next sstate', value);
+
     isActive.value = value;
   }
 

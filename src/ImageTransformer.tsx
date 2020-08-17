@@ -26,7 +26,12 @@ import {
 import * as vec from './vectors';
 import { useAnimatedGestureHandler } from './useAnimatedGestureHandler';
 import withDecay from './withDecay';
-import { fixGestureHandler, clamp, workletNoop } from './utils';
+import {
+  fixGestureHandler,
+  clamp,
+  workletNoop,
+  useAnimatedReaction,
+} from './utils';
 
 const styles = {
   fill: {
@@ -279,13 +284,18 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       },
     });
 
-    useDerivedValue(() => {
-      if (!isActive.value) {
-        scale.value = 1;
-      }
+    useAnimatedReaction(
+      () => {
+        'worklet';
 
-      return 0;
-    });
+        return isActive!.value;
+      },
+      (currentActive) => {
+        if (!currentActive) {
+          resetSharedState();
+        }
+      },
+    );
 
     const onScaleEvent = useAnimatedGestureHandler<
       PinchGestureHandlerGestureEvent,
