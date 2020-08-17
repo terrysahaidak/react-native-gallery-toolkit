@@ -6,6 +6,7 @@ import {
   useGalleryInit,
   StandaloneGallery,
   GalleryItemType,
+  StandaloneGalleryHandler,
 } from 'reanimated-gallery';
 
 const dimensions = Dimensions.get('window');
@@ -19,7 +20,7 @@ function getRandomIntInclusive(min: number, max: number) {
 const heights = [300, 400, 500, 540, 580, 600];
 
 const images: GalleryItemType[] = Array.from(
-  { length: 300 },
+  { length: 2 },
   (_, index) => {
     const height =
       heights[getRandomIntInclusive(0, heights.length - 1)];
@@ -33,12 +34,27 @@ const images: GalleryItemType[] = Array.from(
   },
 );
 
+// const images: GalleryItemType[] = [
+//   {
+//     id: '1',
+//     source: require('./assets/magenta_1.jpg'),
+//     width: 3072,
+//     height: 4608,
+//   },
+//   {
+//     id: '2',
+//     source: require('./assets/magenta_2.jpg'),
+//     width: 2316,
+//     height: 3088,
+//   },
+// ];
+
 export default function ImageGalleryScreen() {
   useGalleryInit();
 
   const [index, setIndex] = useState(20);
 
-  const galleryRef = useRef<StandaloneGallery>(null);
+  const galleryRef = useRef<StandaloneGalleryHandler>(null);
 
   function onIndexChange(nextIndex: number) {
     setIndex(nextIndex);
@@ -57,7 +73,7 @@ export default function ImageGalleryScreen() {
       <StandaloneGallery
         ref={galleryRef}
         ImageComponent={Image}
-        initialIndex={20}
+        initialIndex={1}
         images={images}
         gutterWidth={100}
         onIndexChange={onIndexChange}

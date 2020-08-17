@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Dimensions, Image } from 'react-native';
 import { GalleryItemType } from './types';
 
@@ -39,6 +39,7 @@ export const StandaloneGallery = React.forwardRef<
     },
     ref,
   ) => {
+    const tempIndex = useRef(initialIndex);
     const [localIndex, setLocalIndex] = useState(initialIndex);
 
     React.useImperativeHandle(ref, () => ({
@@ -47,16 +48,24 @@ export const StandaloneGallery = React.forwardRef<
       },
 
       goNext() {
-        this.setIndex(localIndex + 1);
+        this.setIndex(tempIndex.current + 1);
       },
 
       goBack() {
-        this.setIndex(localIndex - 1);
+        const nextIndex = tempIndex.current - 1;
+
+        if (nextIndex < 0) {
+          throw new Error(
+            'StandaloneGallery: Index cannot be negative',
+          );
+        }
+
+        this.setIndex(nextIndex);
       },
     }));
 
     async function _onIndexChange(nextIndex: number) {
-      setLocalIndex(nextIndex);
+      tempIndex.current = nextIndex;
 
       if (onIndexChange) {
         onIndexChange(nextIndex);
