@@ -21,7 +21,9 @@ const _isVector = (value: any): value is Vector<any> => {
   return typeof value.x !== 'undefined' && value.y !== 'undefined';
 };
 
-const isSharedValue = (value: any): value is Animated.SharedValue<any> => {
+const isSharedValue = (
+  value: any,
+): value is Animated.SharedValue<any> => {
   'worklet';
 
   return typeof value.value !== 'undefined';
@@ -144,11 +146,19 @@ export const invert = <T extends Vector<any>>(vector: T) => {
   };
 };
 
+type Callback = () => any;
+
 export const set = <T extends VectorType>(
   vector: T,
-  value: VectorType | SharedValueType,
+  value: VectorType | SharedValueType | Callback,
 ) => {
   'worklet';
+
+  // handle animation
+  if (typeof value === 'function') {
+    vector.x.value = value();
+    vector.y.value = value();
+  }
 
   const x = _get(_isVector(value) ? value.x : value);
   const y = _get(_isVector(value) ? value.y : value);

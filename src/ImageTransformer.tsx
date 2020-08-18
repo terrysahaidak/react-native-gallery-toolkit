@@ -22,6 +22,7 @@ import {
   State,
   PanGestureHandlerGestureEvent,
   PinchGestureHandlerGestureEvent,
+  TapGestureHandlerGestureEvent,
 } from 'react-native-gesture-handler';
 import * as vec from './vectors';
 import { useAnimatedGestureHandler } from './useAnimatedGestureHandler';
@@ -138,15 +139,22 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       return windowDimensions.height < targetHeight * scale.value;
     });
 
-    const resetSharedState = () => {
+    function resetSharedState(animated: boolean) {
       'worklet';
 
-      scale.value = 1;
-      scaleOffset.value = 1;
-      vec.set(translation, 0);
-      vec.set(scaleTranslation, 0);
-      vec.set(offset, 0);
-    };
+      if (animated) {
+        scale.value = withTiming(1, timingConfig);
+        scaleOffset.value = 1;
+
+        vec.set(offset, () => withTiming(0, timingConfig));
+      } else {
+        scale.value = 1;
+        scaleOffset.value = 1;
+        vec.set(translation, 0);
+        vec.set(scaleTranslation, 0);
+        vec.set(offset, 0);
+      }
+    }
 
     const maybeRunOnEnd = () => {
       'worklet';
@@ -414,7 +422,6 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
 
       onActive: () => {
         onTap();
-        // console.log('Tap');
       },
 
       onEnd: () => {
@@ -422,10 +429,39 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       },
     });
 
-    const onDoubleTapEvent = useAnimatedGestureHandler({
-      onActive: () => {
+    function handleScaleTo(x: number, y: number) {
+      'worklet';
+
+      const FUTURE_SCALE = 3;
+
+      scale.value = withTiming(FUTURE_SCALE, timingConfig);
+
+      const targetImageSize = vec.multiply([image, FUTURE_SCALE]);
+
+      const CENTER = vec.divide([canvas, 2]);
+
+      const origin = vec.multiply([
+        -1,
+        vec.sub([vec.divide([targetImageSize, 2]), CENTER]),
+      ]);
+
+      // TODO: Find koef
+      offset.x.value = withTiming(origin.x, timingConfig);
+      offset.y.value = withTiming(origin.y, timingConfig);
+    }
+
+    const onDoubleTapEvent = useAnimatedGestureHandler<
+      TapGestureHandlerGestureEvent,
+      {}
+    >({
+      onActive: ({ x, y }) => {
         onDoubleTap();
-        // console.log('double tap');
+
+        if (scale.value > 1) {
+          resetSharedState(true);
+        } else {
+          handleScaleTo(x, y);
+        }
       },
     });
 
@@ -493,17 +529,17 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
                 >
                   <Animated.View style={[styles.fill]}>
                     <Animated.View style={styles.fill}>
-                      <TapGestureHandler
-                        ref={doubleTapRef}
-                        numberOfTaps={2}
-                        simultaneousHandlers={[
-                          pinchRef,
-                          panRef,
-                          ...pagerRefs,
-                        ]}
-                        onGestureEvent={onDoubleTapEvent}
-                      >
-                        <Animated.View style={styles.wrapper}>
+                      <Animated.View style={styles.wrapper}>
+                        <TapGestureHandler
+                          ref={doubleTapRef}
+                          numberOfTaps={2}
+                          simultaneousHandlers={[
+                            pinchRef,
+                            panRef,
+                            ...pagerRefs,
+                          ]}
+                          onGestureEvent={onDoubleTapEvent}
+                        >
                           <Animated.View style={animatedStyles}>
                             <AnimatedImageComponent
                               source={imageSource}
@@ -513,8 +549,8 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
                               }}
                             />
                           </Animated.View>
-                        </Animated.View>
-                      </TapGestureHandler>
+                        </TapGestureHandler>
+                      </Animated.View>
                     </Animated.View>
                   </Animated.View>
                 </TapGestureHandler>
@@ -526,3 +562,13 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     );
   },
 );
+
+// prettier-ignore
+const d = {
+  CENTER: { x: 187.5, y: 333.5 },
+  canvas: { x: 375,   y: 667 },
+  focal:  { x: 0,     y: 0 },
+  image:  { x: 375,   y: 351.5625 },
+  offset: { x: 375,   y: 194.5 },
+  target: { x: 1125,  y: 1054.6875 },
+};
