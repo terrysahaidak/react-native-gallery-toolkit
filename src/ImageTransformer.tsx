@@ -117,7 +117,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     const doubleTapRef = useRef(null);
 
     const panState = useSharedValue<State>(-1);
-    const pinchState = useSharedValue<State>(-1);
+    const pinchState = useSharedValue<State>(5);
 
     const scale = useSharedValue(1);
     const scaleOffset = useSharedValue(1);
@@ -139,7 +139,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       return windowDimensions.height < targetHeight * scale.value;
     });
 
-    function resetSharedState(animated: boolean) {
+    function resetSharedState(animated?: boolean) {
       'worklet';
 
       if (animated) {
@@ -435,6 +435,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       const FUTURE_SCALE = 3;
 
       scale.value = withTiming(FUTURE_SCALE, timingConfig);
+      scaleOffset.value = FUTURE_SCALE;
 
       const targetImageSize = vec.multiply([image, FUTURE_SCALE]);
 
@@ -542,6 +543,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
                         <TapGestureHandler
                           ref={doubleTapRef}
                           numberOfTaps={2}
+                          maxDurationMs={200}
                           simultaneousHandlers={[
                             pinchRef,
                             panRef,
