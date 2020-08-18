@@ -14,6 +14,7 @@ import Animated, {
   cancelAnimation,
   useDerivedValue,
   Easing,
+  withDecay,
 } from 'react-native-reanimated';
 import {
   PinchGestureHandler,
@@ -26,7 +27,6 @@ import {
 } from 'react-native-gesture-handler';
 import * as vec from './vectors';
 import { useAnimatedGestureHandler } from './useAnimatedGestureHandler';
-import withDecay from './withDecay';
 import {
   fixGestureHandler,
   clamp,
@@ -199,7 +199,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         vec.set(target, vec.clamp(offset, minVector, maxVector));
       }
 
-      const deceleration = 0.991;
+      const deceleration = 0.9915;
 
       const isInBoundaryX = target.x === offset.x.value;
       const isInBoundaryY = target.y === offset.y.value;
@@ -330,8 +330,8 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         ctx.gestureScale = 1;
       },
 
-      shouldHandleEvent: () => {
-        return true;
+      shouldHandleEvent: (evt) => {
+        return evt.numberOfPointers === 2;
       },
 
       beforeEach: (evt, ctx) => {
@@ -413,7 +413,6 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       },
     });
 
-    // FIXME: Tap gesture handler is not working
     const onTapEvent = useAnimatedGestureHandler({
       onStart: () => {
         cancelAnimation(offset.x);
@@ -520,7 +519,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
           <Animated.View style={styles.fill}>
             <PanGestureHandler
               ref={panRef}
-              minDist={5}
+              minDist={20}
               avgTouches
               simultaneousHandlers={[pinchRef, tapRef, ...pagerRefs]}
               onGestureEvent={onPanEvent}
@@ -543,7 +542,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
                         <TapGestureHandler
                           ref={doubleTapRef}
                           numberOfTaps={2}
-                          maxDurationMs={200}
+                          maxDelayMs={100}
                           simultaneousHandlers={[
                             pinchRef,
                             panRef,
@@ -573,13 +572,3 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     );
   },
 );
-
-// prettier-ignore
-const d = {
-  CENTER: { x: 187.5, y: 333.5 },
-  canvas: { x: 375,   y: 667 },
-  focal:  { x: 0,     y: 0 },
-  image:  { x: 375,   y: 351.5625 },
-  offset: { x: 375,   y: 194.5 },
-  target: { x: 1125,  y: 1054.6875 },
-};
