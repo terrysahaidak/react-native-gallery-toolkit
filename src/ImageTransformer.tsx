@@ -439,15 +439,24 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       const targetImageSize = vec.multiply([image, FUTURE_SCALE]);
 
       const CENTER = vec.divide([canvas, 2]);
+      const imageCenter = vec.divide([image, 2]);
+
+      const focal = vec.create(x, y);
 
       const origin = vec.multiply([
         -1,
         vec.sub([vec.divide([targetImageSize, 2]), CENTER]),
       ]);
 
-      // TODO: Find koef
-      offset.x.value = withTiming(origin.x, timingConfig);
-      offset.y.value = withTiming(origin.y, timingConfig);
+      const koef = vec.sub([
+        vec.multiply([vec.divide([1, imageCenter]), focal]),
+        1,
+      ]);
+
+      const target = vec.multiply([origin, koef]);
+
+      offset.x.value = withTiming(target.x, timingConfig);
+      offset.y.value = withTiming(target.y, timingConfig);
     }
 
     const onDoubleTapEvent = useAnimatedGestureHandler<
