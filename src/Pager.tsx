@@ -147,6 +147,7 @@ type IImagePager<T> = {
   renderPage: (props: RenderPageProps<T>) => JSX.Element;
   shouldRenderGutter?: boolean;
   keyExtractor: (item: T, index: number) => string;
+  getItem?: (data: T[], index: number) => T;
   pagerWrapperStyles?: any;
   // gallery: GalleryState;
 };
@@ -163,6 +164,7 @@ export function ImagePager<TPage>({
   shouldRenderGutter = true,
   keyExtractor,
   pagerWrapperStyles = {},
+  getItem,
 }: IImagePager<TPage>) {
   fixGestureHandler();
 
@@ -187,8 +189,6 @@ export function ImagePager<TPage>({
 
   function onPageStateChange(value: boolean) {
     'worklet';
-
-    console.log('Pager next sstate', value);
 
     isActive.value = value;
   }
@@ -398,10 +398,13 @@ export function ImagePager<TPage>({
       return null;
     }
 
+    const pageToUse =
+      typeof getItem === 'undefined' ? page : getItem(pages, i);
+
     return (
       <Page
         key={keyExtractor(page, i)}
-        page={page}
+        page={pageToUse}
         currentIndex={index}
         pagerRefs={pagerRefs}
         onPageStateChange={onPageStateChange}
@@ -423,7 +426,6 @@ export function ImagePager<TPage>({
           ref={pagerRef}
           simultaneousHandlers={[tapRef]}
           onGestureEvent={onPan}
-          onHandlerStateChange={onPan}
         >
           <Animated.View style={StyleSheet.absoluteFill}>
             <Animated.View
@@ -431,11 +433,8 @@ export function ImagePager<TPage>({
             >
               <TapGestureHandler
                 ref={tapRef}
-                // TODO: Fix tap gesture handler
-                // enabled={false}
                 simultaneousHandlers={[pagerRef]}
                 onGestureEvent={onTap}
-                onHandlerStateChange={onTap}
               >
                 <Animated.View style={StyleSheet.absoluteFill}>
                   <Animated.View style={[styles.pager, pagerStyles]}>

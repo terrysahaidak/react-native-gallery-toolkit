@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Dimensions, Image } from 'react-native';
 import { GalleryItemType } from './types';
 
-import { ImagePager } from './Pager';
+import { ImagePager, RenderPageProps } from './Pager';
 import { ImageTransformer } from './ImageTransformer';
 
 const dimensions = Dimensions.get('window');
@@ -15,6 +15,10 @@ type StandaloneGalleryProps = {
   ImageComponent: React.ComponentType<any>;
   gutterWidth?: number;
   onIndexChange?: (nextIndex: number) => void;
+  getItem?: (
+    data: GalleryItemType[],
+    index: number,
+  ) => GalleryItemType;
 };
 
 export type StandaloneGalleryHandler = {
@@ -22,6 +26,38 @@ export type StandaloneGalleryHandler = {
   goBack: () => void;
   setIndex: (nextIndex: number) => void;
 };
+
+type PageRenderer = {
+  pagerProps: RenderPageProps<GalleryItemType>;
+  width: number;
+  height: number;
+  ImageComponent: React.ComponentType<any>;
+};
+
+function PageRenderer({
+  pagerProps,
+  width,
+  height,
+  ImageComponent,
+}: PageRenderer) {
+  // TODO: Handle case when pagerProps.page is a promise
+
+  const scaleFactor = pagerProps.page.width / width;
+  const targetHeight = pagerProps.page.height / scaleFactor;
+
+  return (
+    <ImageTransformer
+      isActive={pagerProps.isActive}
+      windowDimensions={{ width, height }}
+      height={targetHeight}
+      onPageStateChange={pagerProps.onPageStateChange}
+      width={width}
+      pagerRefs={pagerProps.pagerRefs}
+      uri={pagerProps.page.uri}
+      ImageComponent={ImageComponent}
+    />
+  );
+}
 
 export const StandaloneGallery = React.forwardRef<
   StandaloneGalleryHandler,
@@ -36,6 +72,7 @@ export const StandaloneGallery = React.forwardRef<
       gutterWidth,
       initialIndex,
       onIndexChange,
+      getItem,
     },
     ref,
   ) => {
@@ -75,29 +112,22 @@ export const StandaloneGallery = React.forwardRef<
     return (
       <ImagePager
         totalCount={images.length}
+        getItem={getItem}
         keyExtractor={(item) => item.id}
         initialIndex={localIndex}
         pages={images}
         width={width}
         gutterWidth={gutterWidth}
         onIndexChangeAsync={_onIndexChange}
-        renderPage={(props) => {
-          const scaleFactor = props.page.width / width;
-          const targetHeight = props.page.height / scaleFactor;
-
-          return (
-            <ImageTransformer
-              isActive={props.isActive}
-              windowDimensions={{ width, height }}
-              height={targetHeight}
-              onPageStateChange={props.onPageStateChange}
-              width={width}
-              pagerRefs={props.pagerRefs}
-              uri={props.page.uri}
-              ImageComponent={ImageComponent}
-            />
-          );
-        }}
+        renderPage={(props) => (
+          <PageRenderer
+            width={width}
+            height={height}
+            key={props.page.id}
+            pagerProps={props}
+            ImageComponent={ImageComponent}
+          />
+        )}
       />
     );
   },
