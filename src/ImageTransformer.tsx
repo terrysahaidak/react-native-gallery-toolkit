@@ -107,6 +107,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     const pinchRef = useRef(null);
     const panRef = useRef(null);
     const tapRef = useRef(null);
+    const doubleTapRef = useRef(null);
 
     const panState = useSharedValue<State>(-1);
     const pinchState = useSharedValue<State>(-1);
@@ -206,18 +207,19 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
 
       if (isInBoundaryY) {
         if (
-          target.y === offset.y.value &&
           Math.abs(panVelocity.y.value) > 0 &&
-          scale.value <= MAX_SCALE
+          scale.value <= MAX_SCALE &&
+          offset.y.value !== minVector.y &&
+          offset.y.value !== maxVector.y
         ) {
           offset.y.value = withDecay({
             velocity: panVelocity.y.value,
             clamp: [minVector.y, maxVector.y],
             deceleration,
           });
-        } else if (target.y !== offset.y.value) {
-          offset.y.value = withSpring(target.y, springConfig);
         }
+      } else {
+        offset.y.value = withSpring(target.y, springConfig);
       }
     };
 
@@ -402,8 +404,18 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         cancelAnimation(offset.y);
       },
 
+      onActive: () => {
+        console.log('Tap');
+      },
+
       onEnd: () => {
         maybeRunOnEnd();
+      },
+    });
+
+    const onDoubleTapEvent = useAnimatedGestureHandler({
+      onActive: () => {
+        console.log('double tap');
       },
     });
 
@@ -446,10 +458,8 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       <Animated.View style={[styles.container, { width }, style]}>
         <PinchGestureHandler
           ref={pinchRef}
-          // enabled={false}
           onGestureEvent={onScaleEvent}
           simultaneousHandlers={[panRef, tapRef, ...pagerRefs]}
-          onHandlerStateChange={onScaleEvent}
         >
           <Animated.View style={styles.fill}>
             <PanGestureHandler
@@ -458,7 +468,6 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
               avgTouches
               simultaneousHandlers={[pinchRef, tapRef, ...pagerRefs]}
               onGestureEvent={onPanEvent}
-              onHandlerStateChange={onPanEvent}
             >
               <Animated.View style={styles.fill}>
                 <TapGestureHandler
@@ -469,21 +478,33 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
                     panRef,
                     ...pagerRefs,
                   ]}
+                  waitFor={doubleTapRef}
                   onGestureEvent={onTapEvent}
-                  onHandlerStateChange={onTapEvent}
                 >
-                  <Animated.View style={styles.fill}>
-                    <Animated.View style={[styles.wrapper]}>
-                      <Animated.View style={animatedStyles}>
-                        <AnimatedImageComponent
-                          source={imageSource}
-                          // resizeMode="cover"
-                          style={{
-                            width: targetWidth,
-                            height: targetHeight,
-                          }}
-                        />
-                      </Animated.View>
+                  <Animated.View style={[styles.fill]}>
+                    <Animated.View style={styles.fill}>
+                      <TapGestureHandler
+                        ref={doubleTapRef}
+                        numberOfTaps={2}
+                        simultaneousHandlers={[
+                          pinchRef,
+                          panRef,
+                          ...pagerRefs,
+                        ]}
+                        onGestureEvent={onDoubleTapEvent}
+                      >
+                        <Animated.View style={styles.wrapper}>
+                          <Animated.View style={animatedStyles}>
+                            <AnimatedImageComponent
+                              source={imageSource}
+                              style={{
+                                width: targetWidth,
+                                height: targetHeight,
+                              }}
+                            />
+                          </Animated.View>
+                        </Animated.View>
+                      </TapGestureHandler>
                     </Animated.View>
                   </Animated.View>
                 </TapGestureHandler>
