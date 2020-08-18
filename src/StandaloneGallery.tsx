@@ -7,6 +7,12 @@ import { ImageTransformer } from './ImageTransformer';
 
 const dimensions = Dimensions.get('window');
 
+type Handlers = {
+  onTap?: () => void;
+  onDoubleTap?: () => void;
+  onInteraction?: () => void;
+};
+
 type StandaloneGalleryProps = {
   images: GalleryItemType[];
   initialIndex: number;
@@ -19,7 +25,7 @@ type StandaloneGalleryProps = {
     data: GalleryItemType[],
     index: number,
   ) => GalleryItemType;
-};
+} & Handlers;
 
 export type StandaloneGalleryHandler = {
   goNext: () => void;
@@ -32,13 +38,16 @@ type PageRenderer = {
   width: number;
   height: number;
   ImageComponent: React.ComponentType<any>;
-};
+} & Handlers;
 
 function PageRenderer({
   pagerProps,
   width,
   height,
   ImageComponent,
+  onDoubleTap,
+  onTap,
+  onInteraction,
 }: PageRenderer) {
   // TODO: Handle case when pagerProps.page is a promise
 
@@ -55,6 +64,9 @@ function PageRenderer({
       pagerRefs={pagerProps.pagerRefs}
       uri={pagerProps.page.uri}
       ImageComponent={ImageComponent}
+      onDoubleTap={onDoubleTap}
+      onTap={onTap}
+      onInteraction={onInteraction}
     />
   );
 }
@@ -73,6 +85,9 @@ export const StandaloneGallery = React.forwardRef<
       initialIndex,
       onIndexChange,
       getItem,
+      onDoubleTap,
+      onTap,
+      onInteraction,
     },
     ref,
   ) => {
@@ -126,6 +141,9 @@ export const StandaloneGallery = React.forwardRef<
             key={props.page.id}
             pagerProps={props}
             ImageComponent={ImageComponent}
+            onDoubleTap={onDoubleTap}
+            onTap={onTap}
+            onInteraction={onInteraction}
           />
         )}
       />

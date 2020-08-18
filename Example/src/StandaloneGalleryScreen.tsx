@@ -79,6 +79,25 @@ export default function ImageGalleryScreen() {
         images={images}
         gutterWidth={24}
         onIndexChange={onIndexChange}
+        getItem={(data, i) => {
+          return data[i];
+        }}
+        onInteraction={() => {
+          'worklet';
+
+          console.log('Interaction');
+        }}
+        onTap={() => {
+          'worklet';
+
+          console.log('tap');
+        }}
+        onDoubleTap={() => {
+          'worklet';
+
+          console.log('double tap');
+        }}
+        // onPagerTranslateChange={() => {}}
       />
 
       <View

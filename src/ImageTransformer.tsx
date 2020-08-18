@@ -74,6 +74,9 @@ type IImageTransformerProps = {
   onPageStateChange?: (nextPagerState: boolean) => void;
   ImageComponent?: React.ComponentType<any>;
   isActive?: Animated.SharedValue<boolean>;
+  onTap?: () => void;
+  onDoubleTap?: () => void;
+  onInteraction?: () => void;
 };
 
 export const ImageTransformer = React.memo<IImageTransformerProps>(
@@ -88,6 +91,9 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     windowDimensions = Dimensions.get('window'),
     isActive,
     style = {},
+    onTap = workletNoop,
+    onDoubleTap = workletNoop,
+    onInteraction = workletNoop,
   }) => {
     fixGestureHandler();
 
@@ -249,6 +255,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         cancelAnimation(offset.x);
         cancelAnimation(offset.y);
         ctx.panOffset = vec.create(0, 0);
+        onInteraction();
       },
 
       onActive: (evt, ctx) => {
@@ -353,6 +360,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       },
 
       onStart: (_, ctx) => {
+        onInteraction();
         cancelAnimation(offset.x);
         cancelAnimation(offset.y);
         vec.set(ctx.origin, ctx.adjustFocal);
@@ -405,7 +413,8 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       },
 
       onActive: () => {
-        console.log('Tap');
+        onTap();
+        // console.log('Tap');
       },
 
       onEnd: () => {
@@ -415,7 +424,8 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
 
     const onDoubleTapEvent = useAnimatedGestureHandler({
       onActive: () => {
-        console.log('double tap');
+        onDoubleTap();
+        // console.log('double tap');
       },
     });
 
