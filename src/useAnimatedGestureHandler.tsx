@@ -190,5 +190,6 @@ export function useAnimatedGestureHandler<
         handlers.afterEach(event, context);
       }
     },
+    ['onGestureHandlerStateChange', 'onGestureHandlerEvent']
   );
 }

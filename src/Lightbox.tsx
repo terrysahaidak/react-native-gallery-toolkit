@@ -602,7 +602,6 @@ export function ImagePager({ gallery }: IImagePager) {
           ref={pagerRef}
           simultaneousHandlers={[tapRef]}
           onGestureEvent={onPan}
-          onHandlerStateChange={onPan}
         >
           <Animated.View style={StyleSheet.absoluteFill}>
             <Animated.View
@@ -623,7 +622,6 @@ export function ImagePager({ gallery }: IImagePager) {
                 enabled={false}
                 simultaneousHandlers={[pagerRef]}
                 onGestureEvent={onTap}
-                onHandlerStateChange={onTap}
               >
                 <Animated.View style={StyleSheet.absoluteFill}>
                   <Animated.View style={[styles.pager, pagerStyles]}>
