@@ -248,15 +248,15 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         ctx.panOffset = vec.create(0, 0);
       },
 
+      shouldHandleEvent: () => {
+        return scale.value > 1;
+      },
+
       beforeEach: (evt, ctx) => {
         ctx.pan = vec.create(evt.translationX, evt.translationY);
         const velocity = vec.create(evt.velocityX, evt.velocityY);
 
         vec.set(panVelocity, velocity);
-      },
-
-      shouldHandleEvent: () => {
-        return true;
       },
 
       onStart: (_, ctx) => {
@@ -528,6 +528,8 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
                 <TapGestureHandler
                   ref={tapRef}
                   numberOfTaps={1}
+                  maxDeltaX={10}
+                  maxDeltaY={10}
                   simultaneousHandlers={[
                     pinchRef,
                     panRef,
