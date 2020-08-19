@@ -432,17 +432,17 @@ export function ImagePager<TPage>({
       <Animated.View style={[StyleSheet.absoluteFill]}>
         <PanGestureHandler
           ref={pagerRef}
-          simultaneousHandlers={[tapRef]}
+          simultaneousHandlers={tapRef}
           onGestureEvent={onPan}
-          minDeltaX={10}
-          minDeltaY={10}
+          minDeltaX={11}
+          minDeltaY={11}
         >
           <Animated.View style={StyleSheet.absoluteFill}>
             <TapGestureHandler
               ref={tapRef}
               maxDeltaX={10}
               maxDeltaY={10}
-              simultaneousHandlers={[pagerRef]}
+              simultaneousHandlers={pagerRef}
               onGestureEvent={onTap}
             >
               <Animated.View

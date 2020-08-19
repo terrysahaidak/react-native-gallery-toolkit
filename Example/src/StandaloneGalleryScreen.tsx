@@ -3,13 +3,13 @@ import { Dimensions, Image, View, Text } from 'react-native';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {
-  useGalleryInit,
   StandaloneGallery,
   GalleryItemType,
   StandaloneGalleryHandler,
 } from 'reanimated-gallery';
 
 import { RectButton } from 'react-native-gesture-handler';
+import { useNavigation } from '@react-navigation/native';
 
 const dimensions = Dimensions.get('window');
 
@@ -58,9 +58,10 @@ function Button({
 }
 
 export default function ImageGalleryScreen() {
-  useGalleryInit();
+  const nav = useNavigation();
 
   const [index, setIndex] = useState(20);
+  const [headerShown, setHeaderShown] = useState(true);
 
   const galleryRef = useRef<StandaloneGalleryHandler>(null);
 
@@ -74,6 +75,18 @@ export default function ImageGalleryScreen() {
 
   function onBack() {
     galleryRef.current!.goBack();
+  }
+
+  function toggleHeaderShown() {
+    setHeaderShown((v) => {
+      nav.setOptions({ headerShown: !v });
+      return !v;
+    });
+  }
+
+  function hide() {
+    nav.setOptions({ headerShown: false });
+    setHeaderShown(false);
   }
 
   return (
@@ -91,39 +104,43 @@ export default function ImageGalleryScreen() {
         onInteraction={() => {
           'worklet';
 
-          console.log('Interaction');
+          hide();
         }}
         onTap={() => {
           'worklet';
 
-          console.log('tap');
+          console.log('Tap');
+
+          toggleHeaderShown();
         }}
         onDoubleTap={() => {
           'worklet';
 
-          console.log('double tap');
+          hide();
         }}
         // onPagerTranslateChange={() => {}}
       />
 
-      <View
-        style={{
-          flexDirection: 'row',
-          position: 'absolute',
-          bottom: 20,
-          left: 0,
-          right: 0,
-          flex: 1,
-          justifyContent: 'space-around',
-          alignItems: 'center',
-        }}
-      >
-        <Button onPress={onBack} text="Back" />
+      {headerShown && (
+        <View
+          style={{
+            flexDirection: 'row',
+            position: 'absolute',
+            bottom: 20,
+            left: 0,
+            right: 0,
+            flex: 1,
+            justifyContent: 'space-around',
+            alignItems: 'center',
+          }}
+        >
+          <Button onPress={onBack} text="Back" />
 
-        <Text style={{ color: 'white' }}>{index}</Text>
+          <Text style={{ color: 'white' }}>{index}</Text>
 
-        <Button onPress={onNext} text="Next" />
-      </View>
+          <Button onPress={onNext} text="Next" />
+        </View>
+      )}
     </View>
   );
 }
