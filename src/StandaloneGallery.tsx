@@ -125,7 +125,7 @@ export const StandaloneGallery = React.forwardRef<
       },
     }));
 
-    async function _onIndexChange(nextIndex: number) {
+    function _onIndexChange(nextIndex: number) {
       tempIndex.current = nextIndex;
 
       if (onIndexChange) {
@@ -142,7 +142,7 @@ export const StandaloneGallery = React.forwardRef<
         pages={images}
         width={width}
         gutterWidth={gutterWidth}
-        onIndexChangeAsync={_onIndexChange}
+        onIndexChange={_onIndexChange}
         renderPage={(props) => (
           <PageRenderer
             width={width}

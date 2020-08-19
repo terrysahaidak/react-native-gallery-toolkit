@@ -312,20 +312,26 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       },
     });
 
-    useAnimatedReaction(
-      () => {
-        'worklet';
+    useDerivedValue(() => {
+      if (!isActive!.value) {
+        resetSharedState();
+      }
+    });
 
-        return isActive!.value;
-      },
-      (currentActive) => {
-        'worklet';
+    // useAnimatedReaction(
+    //   () => {
+    //     'worklet';
 
-        if (!currentActive) {
-          resetSharedState();
-        }
-      },
-    );
+    //     return isActive!.value;
+    //   },
+    //   (currentActive) => {
+    //     'worklet';
+
+    //     if (!currentActive) {
+    //       resetSharedState();
+    //     }
+    //   },
+    // );
 
     const onScaleEvent = useAnimatedGestureHandler<
       PinchGestureHandlerGestureEvent,

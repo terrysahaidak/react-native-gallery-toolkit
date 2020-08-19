@@ -11,6 +11,7 @@ import Animated, {
   withSpring,
   cancelAnimation,
   useDerivedValue,
+  runOnUI,
 } from 'react-native-reanimated';
 import {
   Dimensions,
@@ -143,7 +144,7 @@ type IImagePager<T> = {
   numToRender?: number;
   width?: number;
   gutterWidth?: number;
-  onIndexChangeAsync?: (nextIndex: number) => Promise<void>;
+  onIndexChange?: (nextIndex: number) => void;
   renderPage: (props: RenderPageProps<T>) => JSX.Element;
   shouldRenderGutter?: boolean;
   keyExtractor: (item: T, index: number) => string;
@@ -157,7 +158,7 @@ export function ImagePager<TPage>({
   initialIndex,
   totalCount,
   numToRender = 2,
-  onIndexChangeAsync,
+  onIndexChange,
   renderPage,
   width = dimensions.width,
   gutterWidth = GUTTER_WIDTH,
@@ -218,21 +219,22 @@ export function ImagePager<TPage>({
     return length.value * width + gutterWidth * length.value - 2;
   });
 
-  const onIndexChange = useCallback(async () => {
-    const nextIndex = index.value;
+  const onIndexChangeCb = useCallback((nextIndex) => {
+    'worklet';
 
-    if (onIndexChangeAsync) {
-      await onIndexChangeAsync(nextIndex);
+    if (onIndexChange) {
+      onIndexChange(nextIndex);
     }
 
     setActiveIndex(nextIndex);
   }, []);
 
   useEffect(() => {
-    offsetX.value = getPageTranslate(initialIndex);
-    index.value = initialIndex;
-
-    setTimeout(() => onIndexChange(), 1);
+    runOnUI(() => {
+      offsetX.value = getPageTranslate(initialIndex);
+      index.value = initialIndex;
+      onIndexChangeCb(initialIndex);
+    })();
   }, [initialIndex]);
 
   const onChangePageAnimation = (noVelocity?: boolean) => {
@@ -352,7 +354,7 @@ export function ImagePager<TPage>({
 
       if (shouldMoveToNextPage) {
         index.value = nextIndex;
-        onIndexChange();
+        onIndexChangeCb(nextIndex);
       }
     },
   });
