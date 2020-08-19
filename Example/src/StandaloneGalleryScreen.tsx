@@ -22,34 +22,40 @@ function getRandomIntInclusive(min: number, max: number) {
 const heights = [300, 400, 500, 540, 580, 600];
 
 const images: GalleryItemType[] = Array.from(
-  { length: 2 },
+  { length: 5 },
   (_, index) => {
     const height =
       heights[getRandomIntInclusive(0, heights.length - 1)];
 
     return {
       id: index.toString(),
-      uri: `https://picsum.photos/id/${index + 200}/${height}/400`,
+      uri: `https://picsum.photos/id/${index + 100}/${height}/400`,
       width: height,
       height: dimensions.width,
     };
   },
 );
 
-// const images: GalleryItemType[] = [
-//   {
-//     id: '1',
-//     source: require('./assets/magenta_1.jpg'),
-//     width: 3072,
-//     height: 4608,
-//   },
-//   {
-//     id: '2',
-//     source: require('./assets/magenta_2.jpg'),
-//     width: 2316,
-//     height: 3088,
-//   },
-// ];
+function Button({
+  onPress,
+  text,
+}: {
+  onPress: () => void;
+  text: string;
+}) {
+  return (
+    <RectButton
+      onPress={onPress}
+      style={{
+        backgroundColor: 'white',
+        padding: 16,
+        borderRadius: 8,
+      }}
+    >
+      <Text>{text}</Text>
+    </RectButton>
+  );
+}
 
 export default function ImageGalleryScreen() {
   useGalleryInit();
@@ -109,17 +115,14 @@ export default function ImageGalleryScreen() {
           right: 0,
           flex: 1,
           justifyContent: 'space-around',
+          alignItems: 'center',
         }}
       >
-        <RectButton onPress={onBack}>
-          <Text style={{ color: 'white' }}>Back</Text>
-        </RectButton>
+        <Button onPress={onBack} text="Back" />
 
         <Text style={{ color: 'white' }}>{index}</Text>
 
-        <RectButton onPress={onNext}>
-          <Text style={{ color: 'white' }}>Next</Text>
-        </RectButton>
+        <Button onPress={onNext} text="Next" />
       </View>
     </View>
   );
