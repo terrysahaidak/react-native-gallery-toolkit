@@ -80,6 +80,15 @@ type IImageTransformerProps = {
   onInteraction?: () => void;
 };
 
+function checkIsNotUsed(handlerState: Animated.SharedValue<State>) {
+  'worklet';
+
+  return (
+    handlerState.value !== State.UNDETERMINED &&
+    handlerState.value !== State.END
+  );
+}
+
 export const ImageTransformer = React.memo<IImageTransformerProps>(
   ({
     pagerRefs = [],
@@ -116,8 +125,8 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     const tapRef = useRef(null);
     const doubleTapRef = useRef(null);
 
-    const panState = useSharedValue<State>(-1);
-    const pinchState = useSharedValue<State>(5);
+    const panState = useSharedValue<State>(State.UNDETERMINED);
+    const pinchState = useSharedValue<State>(State.UNDETERMINED);
 
     const scale = useSharedValue(1);
     const scaleOffset = useSharedValue(1);
@@ -178,7 +187,8 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         offset.y.value = withSpring(target.y, springConfig);
       }
 
-      if (panState.value !== 5 || pinchState.value !== 5) {
+      // we should handle this only if pan or pinch handlers has been used already
+      if (checkIsNotUsed(panState) || checkIsNotUsed(pinchState)) {
         return;
       }
 
@@ -194,10 +204,11 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
 
       if (scale.value <= 1) {
         // just center it
-        vec.set(target, 0);
-      } else {
-        vec.set(target, vec.clamp(offset, minVector, maxVector));
+        vec.set(offset, () => withTiming(0, timingConfig));
+        return;
       }
+
+      vec.set(target, vec.clamp(offset, minVector, maxVector));
 
       const deceleration = 0.9915;
 
@@ -414,6 +425,10 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     });
 
     const onTapEvent = useAnimatedGestureHandler({
+      shouldHandleEvent: (evt) => {
+        return evt.numberOfPointers === 1;
+      },
+
       onStart: () => {
         cancelAnimation(offset.x);
         cancelAnimation(offset.y);
@@ -482,6 +497,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         scaleTranslation.x.value === 0 &&
         scaleTranslation.y.value === 0;
 
+      // FIXME: We should not stick to pager with naming
       const pagerNextState =
         scale.value === 1 &&
         noOffset &&
@@ -519,7 +535,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
           <Animated.View style={styles.fill}>
             <PanGestureHandler
               ref={panRef}
-              minDist={20}
+              minDist={10}
               avgTouches
               simultaneousHandlers={[pinchRef, tapRef, ...pagerRefs]}
               onGestureEvent={onPanEvent}
