@@ -94,22 +94,31 @@ export const StandaloneGallery = React.forwardRef<
     const tempIndex = useRef(initialIndex);
     const [localIndex, setLocalIndex] = useState(initialIndex);
 
+    const totalCount = images.length;
+
     React.useImperativeHandle(ref, () => ({
       setIndex(nextIndex: number) {
         setLocalIndex(nextIndex);
       },
 
       goNext() {
-        this.setIndex(tempIndex.current + 1);
+        const nextIndex = tempIndex.current + 1;
+        if (nextIndex > totalCount - 1) {
+          console.warn(
+            'StandaloneGallery: Index cannot be bigger than pages count',
+          );
+          return;
+        }
+
+        this.setIndex(nextIndex);
       },
 
       goBack() {
         const nextIndex = tempIndex.current - 1;
 
         if (nextIndex < 0) {
-          throw new Error(
-            'StandaloneGallery: Index cannot be negative',
-          );
+          console.warn('StandaloneGallery: Index cannot be negative');
+          return;
         }
 
         this.setIndex(nextIndex);
@@ -126,7 +135,7 @@ export const StandaloneGallery = React.forwardRef<
 
     return (
       <ImagePager
-        totalCount={images.length}
+        totalCount={totalCount}
         getItem={getItem}
         keyExtractor={(item) => item.id}
         initialIndex={localIndex}
