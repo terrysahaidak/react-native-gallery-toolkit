@@ -235,7 +235,7 @@ export function ImagePager<TPage>({
     setTimeout(() => onIndexChange(), 1);
   }, [initialIndex]);
 
-  const onChangePageAnimation = () => {
+  const onChangePageAnimation = (noVelocity?: boolean) => {
     'worklet';
 
     offsetX.value = withSpring(
@@ -247,7 +247,7 @@ export function ImagePager<TPage>({
         overshootClamping: true,
         restDisplacementThreshold: 0.01,
         restSpeedThreshold: 0.01,
-        velocity: velocity.value,
+        velocity: noVelocity ? 0 : velocity.value,
       },
       (isCanceled) => {
         if (!isCanceled) {
@@ -348,7 +348,7 @@ export function ImagePager<TPage>({
         ? -getPageTranslate(nextIndex)
         : -getPageTranslate(index.value));
 
-      onChangePageAnimation();
+      onChangePageAnimation(!shouldMoveToNextPage);
 
       if (shouldMoveToNextPage) {
         index.value = nextIndex;
@@ -433,6 +433,8 @@ export function ImagePager<TPage>({
             >
               <TapGestureHandler
                 ref={tapRef}
+                maxDeltaX={10}
+                maxDeltaY={10}
                 simultaneousHandlers={[pagerRef]}
                 onGestureEvent={onTap}
               >
