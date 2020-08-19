@@ -65,6 +65,7 @@ export type RenderPageProps<T> = {
   page: T;
   width: number;
   isActive: Animated.SharedValue<boolean>;
+  isPagerInProgress: Animated.SharedValue<boolean>;
 };
 
 type IPageProps = {
@@ -79,6 +80,7 @@ type IPageProps = {
   getPageTranslate: (index: number) => number;
   width: number;
   currentIndex: Animated.SharedValue<number>;
+  isPagerInProgress: Animated.SharedValue<boolean>;
 };
 
 const Page = React.memo<IPageProps>(
@@ -94,9 +96,11 @@ const Page = React.memo<IPageProps>(
     getPageTranslate,
     width,
     currentIndex,
+    isPagerInProgress,
   }) => {
     const isActive = useDerivedValue(() => {
-      return currentIndex.value === index;
+      // return currentIndex.value === index;
+      return false;
     });
 
     return (
@@ -126,6 +130,7 @@ const Page = React.memo<IPageProps>(
             page,
             width,
             isActive,
+            isPagerInProgress,
           })}
         </View>
 
@@ -307,12 +312,12 @@ export function ImagePager<TPage>({
     return nextIndex;
   };
 
-  // const isPagerInProgress = useDerivedValue(() => {
-  //   return (
-  //     Math.floor(getPageTranslate(index.value)) !==
-  //     Math.floor(Math.abs(offsetX.value + pagerX.value))
-  //   );
-  // });
+  const isPagerInProgress = useDerivedValue(() => {
+    return (
+      Math.floor(Math.abs(getPageTranslate(index.value))) !==
+      Math.floor(Math.abs(offsetX.value + pagerX.value))
+    );
+  });
 
   const onPan = useAnimatedGestureHandler<
     PanGestureHandlerGestureEvent,
@@ -416,6 +421,7 @@ export function ImagePager<TPage>({
         renderPage={renderPage}
         getPageTranslate={getPageTranslate}
         width={width}
+        isPagerInProgress={isPagerInProgress}
         shouldRenderGutter={shouldRenderGutter}
       />
     );
@@ -428,25 +434,27 @@ export function ImagePager<TPage>({
           ref={pagerRef}
           simultaneousHandlers={[tapRef]}
           onGestureEvent={onPan}
+          minDeltaX={10}
+          minDeltaY={10}
         >
           <Animated.View style={StyleSheet.absoluteFill}>
-            <Animated.View
-              style={[StyleSheet.absoluteFill, pagerWrapperStyles]}
+            <TapGestureHandler
+              ref={tapRef}
+              maxDeltaX={10}
+              maxDeltaY={10}
+              simultaneousHandlers={[pagerRef]}
+              onGestureEvent={onTap}
             >
-              <TapGestureHandler
-                ref={tapRef}
-                maxDeltaX={10}
-                maxDeltaY={10}
-                simultaneousHandlers={[pagerRef]}
-                onGestureEvent={onTap}
+              <Animated.View
+                style={[StyleSheet.absoluteFill, pagerWrapperStyles]}
               >
                 <Animated.View style={StyleSheet.absoluteFill}>
                   <Animated.View style={[styles.pager, pagerStyles]}>
                     {pagesToRender}
                   </Animated.View>
                 </Animated.View>
-              </TapGestureHandler>
-            </Animated.View>
+              </Animated.View>
+            </TapGestureHandler>
           </Animated.View>
         </PanGestureHandler>
       </Animated.View>

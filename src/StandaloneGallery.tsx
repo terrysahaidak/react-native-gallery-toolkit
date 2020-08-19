@@ -56,6 +56,7 @@ function PageRenderer({
 
   return (
     <ImageTransformer
+      outerGestureHandlerActive={pagerProps.isPagerInProgress}
       isActive={pagerProps.isActive}
       windowDimensions={{ width, height }}
       height={targetHeight}

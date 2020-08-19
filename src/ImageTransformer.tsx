@@ -75,6 +75,7 @@ type IImageTransformerProps = {
   onPageStateChange?: (nextPagerState: boolean) => void;
   ImageComponent?: React.ComponentType<any>;
   isActive?: Animated.SharedValue<boolean>;
+  outerGestureHandlerActive?: Animated.SharedValue<boolean>;
   onTap?: () => void;
   onDoubleTap?: () => void;
   onInteraction?: () => void;
@@ -100,6 +101,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     ImageComponent = Image,
     windowDimensions = Dimensions.get('window'),
     isActive,
+    outerGestureHandlerActive,
     style = {},
     onTap = workletNoop,
     onDoubleTap = workletNoop,
@@ -260,7 +262,11 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       },
 
       shouldHandleEvent: () => {
-        return scale.value > 1;
+        return (
+          scale.value > 1 &&
+          typeof outerGestureHandlerActive !== 'undefined' &&
+          !outerGestureHandlerActive.value
+        );
       },
 
       beforeEach: (evt, ctx) => {
@@ -312,26 +318,20 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       },
     });
 
-    useDerivedValue(() => {
-      if (!isActive!.value) {
-        resetSharedState();
-      }
-    });
+    useAnimatedReaction(
+      () => {
+        'worklet';
 
-    // useAnimatedReaction(
-    //   () => {
-    //     'worklet';
+        return isActive!.value;
+      },
+      (currentActive) => {
+        'worklet';
 
-    //     return isActive!.value;
-    //   },
-    //   (currentActive) => {
-    //     'worklet';
-
-    //     if (!currentActive) {
-    //       resetSharedState();
-    //     }
-    //   },
-    // );
+        if (!currentActive) {
+          resetSharedState();
+        }
+      },
+    );
 
     const onScaleEvent = useAnimatedGestureHandler<
       PinchGestureHandlerGestureEvent,
@@ -348,7 +348,11 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       },
 
       shouldHandleEvent: (evt) => {
-        return evt.numberOfPointers === 2;
+        return (
+          evt.numberOfPointers === 2 &&
+          typeof outerGestureHandlerActive !== 'undefined' &&
+          !outerGestureHandlerActive.value
+        );
       },
 
       beforeEach: (evt, ctx) => {
@@ -432,7 +436,11 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
 
     const onTapEvent = useAnimatedGestureHandler({
       shouldHandleEvent: (evt) => {
-        return evt.numberOfPointers === 1;
+        return (
+          evt.numberOfPointers === 1 &&
+          typeof outerGestureHandlerActive !== 'undefined' &&
+          !outerGestureHandlerActive.value
+        );
       },
 
       onStart: () => {
@@ -484,6 +492,14 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       TapGestureHandlerGestureEvent,
       {}
     >({
+      shouldHandleEvent: (evt) => {
+        return (
+          evt.numberOfPointers === 1 &&
+          typeof outerGestureHandlerActive !== 'undefined' &&
+          !outerGestureHandlerActive.value
+        );
+      },
+
       onActive: ({ x, y }) => {
         onDoubleTap();
 
