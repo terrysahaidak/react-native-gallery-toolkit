@@ -94,6 +94,7 @@ export default function App() {
               headerBackground: () => (
                 <View style={{ backgroundColor: 'white', flex: 1 }} />
               ),
+              gestureEnabled: false,
               header: (headerProps) => (
                 <CustomHeader
                   headerShown={route?.params?.headerShown ?? true}
