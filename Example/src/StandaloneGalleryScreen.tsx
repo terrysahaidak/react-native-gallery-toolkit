@@ -158,7 +158,6 @@ export default function ImageGalleryScreen() {
 
       <StandaloneGallery
         ref={galleryRef}
-        ImageComponent={Image}
         initialIndex={1}
         images={images}
         gutterWidth={24}
@@ -172,8 +171,10 @@ export default function ImageGalleryScreen() {
         onTap={() => {
           toggleHeaderShown();
         }}
-        onDoubleTap={() => {
-          hide();
+        onDoubleTap={(isScaled) => {
+          if (!isScaled) {
+            hide();
+          }
         }}
         // onPagerTranslateChange={() => {}}
       />

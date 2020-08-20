@@ -62,7 +62,7 @@ const defaultTimingConfig = {
   easing: Easing.bezier(0.33, 0.01, 0, 1),
 };
 
-type IImageTransformerProps = {
+export type IImageTransformerProps = {
   outerGestureHandlerRefs?: React.Ref<any>[];
   source?: ImageRequireSource;
   uri?: string;
@@ -80,9 +80,9 @@ type IImageTransformerProps = {
   }) => React.ComponentType<any>;
   isActive?: Animated.SharedValue<boolean>;
   outerGestureHandlerActive?: Animated.SharedValue<boolean>;
-  onTap?: () => void;
-  onDoubleTap?: () => void;
-  onInteraction?: () => void;
+  onTap?: (isScaled: boolean) => void;
+  onDoubleTap?: (isScaled: boolean) => void;
+  onInteraction?: (type: 'scale' | 'pan') => void;
   springConfig?: Animated.WithSpringConfig;
   timingConfig?: Animated.TimingConfig;
   style?: ViewStyle;
@@ -298,7 +298,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         cancelAnimation(offset.x);
         cancelAnimation(offset.y);
         ctx.panOffset = vec.create(0, 0);
-        onInteraction();
+        onInteraction('pan');
       },
 
       onActive: (evt, ctx) => {
@@ -411,7 +411,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       },
 
       onStart: (_, ctx) => {
-        onInteraction();
+        onInteraction('scale');
         cancelAnimation(offset.x);
         cancelAnimation(offset.y);
         vec.set(ctx.origin, ctx.adjustFocal);
@@ -471,7 +471,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       },
 
       onActive: () => {
-        onTap();
+        onTap(scale.value > 1);
       },
 
       onEnd: () => {
@@ -521,7 +521,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       },
 
       onActive: ({ x, y }) => {
-        onDoubleTap();
+        onDoubleTap(scale.value > 1);
 
         if (scale.value > 1) {
           resetSharedState(true);

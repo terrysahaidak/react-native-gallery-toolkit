@@ -1,24 +1,27 @@
 import React, { useState, useRef } from 'react';
-import { Dimensions, Image } from 'react-native';
+import { Dimensions } from 'react-native';
 import { GalleryItemType } from './types';
 
 import { ImagePager, RenderPageProps } from './Pager';
-import { ImageTransformer } from './ImageTransformer';
+import {
+  ImageTransformer,
+  IImageTransformerProps,
+} from './ImageTransformer';
 
 const dimensions = Dimensions.get('window');
 
 type Handlers = {
-  onTap?: () => void;
-  onDoubleTap?: () => void;
-  onInteraction?: () => void;
+  onTap?: IImageTransformerProps['onTap'];
+  onDoubleTap?: IImageTransformerProps['onDoubleTap'];
+  onInteraction?: IImageTransformerProps['onInteraction'];
 };
 
 type StandaloneGalleryProps = {
   images: GalleryItemType[];
+  renderImage?: IImageTransformerProps['renderImage'];
   initialIndex: number;
   width?: number;
   height?: number;
-  ImageComponent: React.ComponentType<any>;
   gutterWidth?: number;
   onIndexChange?: (nextIndex: number) => void;
   getItem?: (
@@ -37,17 +40,17 @@ type PageRenderer = {
   pagerProps: RenderPageProps<GalleryItemType>;
   width: number;
   height: number;
-  ImageComponent: React.ComponentType<any>;
+  renderImage?: IImageTransformerProps['renderImage'];
 } & Handlers;
 
 function PageRenderer({
   pagerProps,
   width,
   height,
-  ImageComponent,
   onDoubleTap,
   onTap,
   onInteraction,
+  renderImage,
 }: PageRenderer) {
   // TODO: Handle case when pagerProps.page is a promise
 
@@ -60,11 +63,11 @@ function PageRenderer({
       isActive={pagerProps.isActive}
       windowDimensions={{ width, height }}
       height={targetHeight}
+      renderImage={renderImage}
       onStateChange={pagerProps.onPageStateChange}
       width={width}
       outerGestureHandlerRefs={pagerProps.pagerRefs}
       uri={pagerProps.page.uri}
-      ImageComponent={ImageComponent}
       onDoubleTap={onDoubleTap}
       onTap={onTap}
       onInteraction={onInteraction}
@@ -81,7 +84,6 @@ export const StandaloneGallery = React.forwardRef<
       images,
       width = dimensions.width,
       height = dimensions.height,
-      ImageComponent = Image,
       gutterWidth,
       initialIndex,
       onIndexChange,
@@ -150,7 +152,6 @@ export const StandaloneGallery = React.forwardRef<
             height={height}
             key={props.page.id}
             pagerProps={props}
-            ImageComponent={ImageComponent}
             onDoubleTap={onDoubleTap}
             onTap={onTap}
             onInteraction={onInteraction}
