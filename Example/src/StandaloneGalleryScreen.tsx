@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Dimensions, Image, View, Text } from 'react-native';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -10,6 +10,11 @@ import {
 
 import { RectButton } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 
 const dimensions = Dimensions.get('window');
 
@@ -57,11 +62,33 @@ function Button({
   );
 }
 
+export function useToggleOpacity(prop: boolean) {
+  const opacity = useSharedValue(1);
+  const translateY = useSharedValue(1);
+  const styles = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateY: translateY.value }],
+  }));
+
+  useEffect(() => {
+    if (prop) {
+      translateY.value = 0;
+      opacity.value = withTiming(1);
+    } else {
+      opacity.value = withTiming(0, undefined, () => {
+        translateY.value = -99999;
+      });
+    }
+  }, [prop]);
+
+  return styles;
+}
+
 export default function ImageGalleryScreen() {
   const nav = useNavigation();
 
   const [index, setIndex] = useState(20);
-  const [headerShown, setHeaderShown] = useState(true);
+  const headerShown = useSharedValue(true);
 
   const galleryRef = useRef<StandaloneGalleryHandler>(null);
 
@@ -78,16 +105,17 @@ export default function ImageGalleryScreen() {
   }
 
   function toggleHeaderShown() {
-    setHeaderShown((v) => {
-      nav.setOptions({ headerShown: !v });
-      return !v;
-    });
+    const nextValue = !headerShown.value;
+    headerShown.value = nextValue;
+    nav.setParams({ headerShown: nextValue });
   }
 
   function hide() {
-    nav.setOptions({ headerShown: false });
-    setHeaderShown(false);
+    headerShown.value = false;
+    nav.setParams({ headerShown: false });
   }
+
+  const aStyles = useToggleOpacity(headerShown.value);
 
   return (
     <View style={{ backgroundColor: 'black', flex: 1 }}>
@@ -102,28 +130,20 @@ export default function ImageGalleryScreen() {
           return data[i];
         }}
         onInteraction={() => {
-          'worklet';
-
           hide();
         }}
         onTap={() => {
-          'worklet';
-
-          console.log('Tap');
-
           toggleHeaderShown();
         }}
         onDoubleTap={() => {
-          'worklet';
-
           hide();
         }}
         // onPagerTranslateChange={() => {}}
       />
 
-      {headerShown && (
-        <View
-          style={{
+      <Animated.View
+        style={[
+          {
             flexDirection: 'row',
             position: 'absolute',
             bottom: 20,
@@ -132,15 +152,16 @@ export default function ImageGalleryScreen() {
             flex: 1,
             justifyContent: 'space-around',
             alignItems: 'center',
-          }}
-        >
-          <Button onPress={onBack} text="Back" />
+          },
+          aStyles,
+        ]}
+      >
+        <Button onPress={onBack} text="Back" />
 
-          <Text style={{ color: 'white' }}>{index}</Text>
+        <Text style={{ color: 'white' }}>{index}</Text>
 
-          <Button onPress={onNext} text="Next" />
-        </View>
-      )}
+        <Button onPress={onNext} text="Next" />
+      </Animated.View>
     </View>
   );
 }

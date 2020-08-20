@@ -1,13 +1,21 @@
 import { RectButton } from 'react-native-gesture-handler';
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   NavigationContainer,
   useNavigation,
 } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { View, Text } from 'react-native';
+import {
+  createStackNavigator,
+  TransitionPresets,
+  Header,
+  StackHeaderProps,
+} from '@react-navigation/stack';
+import { View, Text, Platform } from 'react-native';
 import { useGalleryInit } from 'reanimated-gallery';
-import StandaloneGalleryScreen from './StandaloneGalleryScreen';
+import Animated from 'react-native-reanimated';
+import StandaloneGalleryScreen, {
+  useToggleOpacity,
+} from './StandaloneGalleryScreen';
 
 const Stack = createStackNavigator();
 
@@ -38,20 +46,51 @@ function Home() {
   );
 }
 
+function CustomHeader({
+  headerProps,
+  headerShown,
+}: {
+  headerProps: StackHeaderProps;
+  route: any;
+  headerShown: boolean;
+}) {
+  const styles = useToggleOpacity(headerShown);
+
+  return (
+    <Animated.View style={styles}>
+      <Header {...headerProps} />
+    </Animated.View>
+  );
+}
+
 export default function App() {
   useGalleryInit();
 
   return (
     <NavigationContainer>
-      <Stack.Navigator headerMode="screen">
+      <Stack.Navigator
+        screenOptions={{
+          ...(Platform.OS === 'android'
+            ? TransitionPresets.ScaleFromCenterAndroid
+            : TransitionPresets.DefaultTransition),
+        }}
+        headerMode="screen"
+      >
         <Stack.Screen component={Home} name="Home" />
         <Stack.Screen
           name="Standalone"
           component={StandaloneGalleryScreen}
-          options={() => ({
+          options={({ route }) => ({
             headerTransparent: true,
             headerBackground: () => (
               <View style={{ backgroundColor: 'white', flex: 1 }} />
+            ),
+            header: (headerProps) => (
+              <CustomHeader
+                headerShown={route?.params?.headerShown ?? true}
+                headerProps={headerProps}
+                route={route}
+              />
             ),
           })}
         />
