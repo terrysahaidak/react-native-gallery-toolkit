@@ -1,15 +1,9 @@
 import React from 'react';
 import Animated from 'react-native-reanimated';
 import { normalizeDimensions } from './utils';
-
-
+import { GalleryItemType } from './types';
 
 export type IShowFunction = (value: GalleryState | null) => void;
-export type IGalleryItem = {
-  width: number;
-  height: number;
-  uri: string;
-};
 
 type IMeasurements = {
   width: number;
@@ -24,11 +18,17 @@ export type IGalleryImage = {
   ref: React.RefObject<Animated.Image>;
   index: number;
   opacity: Animated.SharedValue<number>;
-  item: IGalleryItem;
+  item: GalleryItemType;
   measurements?: IMeasurements;
 };
 
 type IOnChangeCallback = (item: IGalleryImage) => void;
+
+type GalleryStateProps = {
+  fn: IShowFunction;
+  images?: GalleryItemType[];
+  totalCount: number;
+};
 
 export class GalleryState {
   private _showFunction: IShowFunction;
@@ -41,7 +41,7 @@ export class GalleryState {
 
   public totalCount: number;
 
-  constructor(fn: IShowFunction, totalCount: number) {
+  constructor({ images = [], fn, totalCount }: GalleryStateProps) {
     this._showFunction = fn;
     this.images = [];
     this.currentIndex = null;

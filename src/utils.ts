@@ -1,11 +1,13 @@
 import { Dimensions } from 'react-native';
-import { useState, useEffect } from 'react';
-import { IGalleryItem } from './GalleryState';
+// @ts-ignore
+import { useMapper } from 'react-native-reanimated';
+import { useState, useEffect, useRef } from 'react';
+import { GalleryItemType } from './GalleryState';
 
 const dimensions = Dimensions.get('window');
 
 export function normalizeDimensions(
-  item: IGalleryItem,
+  item: GalleryItemType,
   targetWidth = dimensions.width,
 ) {
   const scaleFactor = item.width / targetWidth;
@@ -71,4 +73,31 @@ export function clamp(
   'worklet';
 
   return Math.min(Math.max(lowerBound, value), upperBound);
+}
+
+export const workletNoop = () => {
+  'worklet';
+};
+
+export function useAnimatedReaction<R>(
+  prepare: () => R,
+  react: (params: R) => void,
+) {
+  const inputsRef = useRef<{
+    inputs: any;
+  }>(null);
+  if (inputsRef.current === null) {
+    // @ts-ignore
+    inputsRef.current = {
+      // @ts-ignore
+      inputs: Object.values(prepare._closure),
+    };
+  }
+  const { inputs } = inputsRef.current;
+  useMapper(() => {
+    'worklet';
+
+    const input = prepare();
+    react(input);
+  }, inputs);
 }

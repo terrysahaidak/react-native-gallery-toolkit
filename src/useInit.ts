@@ -3,13 +3,12 @@ import {
   withTiming,
   withSpring,
   Easing,
+  withDecay,
   interpolate,
 } from 'react-native-reanimated';
 import { useRef } from 'react';
-import withDecay from './withDecay';
 import { useAnimatedGestureHandler } from './useAnimatedGestureHandler';
 import * as vec from './vectors';
-
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { useSharedVector, ...usedVectors } = vec;

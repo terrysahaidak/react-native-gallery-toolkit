@@ -119,14 +119,6 @@ export function useAnimatedGestureHandler<
         handlers.onInit(event, context);
       }
 
-      if (handlers.onEvent) {
-        handlers.onEvent(event, context);
-      }
-
-      if (handlers.beforeEach) {
-        handlers.beforeEach(event, context);
-      }
-
       const stateDiff = diff(context, 'pinchState', event.state);
 
       const pinchBeganAndroid =
@@ -136,14 +128,28 @@ export function useAnimatedGestureHandler<
         ? pinchBeganAndroid
         : event.state === BEGAN;
 
-      if (isBegan && handlers.shouldHandleEvent) {
-        context._shouldSkip = !handlers.shouldHandleEvent(
-          event,
-          context,
-        );
+      if (isBegan) {
+        if (handlers.shouldHandleEvent) {
+          context._shouldSkip = !handlers.shouldHandleEvent(
+            event,
+            context,
+          );
+        } else {
+          context._shouldSkip = false;
+        }
+      } else if (typeof context._shouldSkip === 'undefined') {
+        return;
       }
 
       if (!context._shouldSkip) {
+        if (handlers.onEvent) {
+          handlers.onEvent(event, context);
+        }
+
+        if (handlers.beforeEach) {
+          handlers.beforeEach(event, context);
+        }
+
         if (isBegan && handlers.onStart) {
           handlers.onStart(event, context);
         }
@@ -172,23 +178,26 @@ export function useAnimatedGestureHandler<
         ) {
           handlers.onCancel(event, context);
         }
+
+        if (event.oldState === ACTIVE) {
+          if (handlers.onFinish) {
+            handlers.onFinish(
+              event,
+              context,
+              event.state === CANCELLED || event.state === FAILED,
+            );
+          }
+        }
+
+        if (handlers.afterEach) {
+          handlers.afterEach(event, context);
+        }
       }
 
       if (event.oldState === ACTIVE) {
         context._shouldSkip = undefined;
-
-        if (handlers.onFinish) {
-          handlers.onFinish(
-            event,
-            context,
-            event.state === CANCELLED || event.state === FAILED,
-          );
-        }
-      }
-
-      if (handlers.afterEach) {
-        handlers.afterEach(event, context);
       }
     },
+    ['onGestureHandlerStateChange', 'onGestureHandlerEvent'],
   );
 }

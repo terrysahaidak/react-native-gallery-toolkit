@@ -10,18 +10,20 @@ import { View, StyleSheet } from 'react-native';
 import {
   GalleryState,
   IShowFunction,
-  IGalleryItem,
+  GalleryItemType,
 } from './GalleryState';
-import { ImagePager } from './Pager';
+import { ImagePager } from './Lightbox';
 
-const GalleryOverlayContext = React.createContext<IShowFunction | null>(
+export const GalleryOverlayContext = React.createContext<IShowFunction | null>(
   null,
 );
-const GalleryContext = React.createContext<GalleryState | null>(null);
+export const GalleryContext = React.createContext<GalleryState | null>(
+  null,
+);
 
 type IUseGalleryItem = {
   index: number;
-  item: IGalleryItem;
+  item: GalleryItemType;
 };
 
 export function useGalleryItem({ index, item }: IUseGalleryItem) {
@@ -55,7 +57,10 @@ export function GalleryProvider({
 }: IGalleryProviderProps) {
   const setActiveGallery = useContext(GalleryOverlayContext)!;
   const [gallery] = useState(
-    new GalleryState(setActiveGallery, totalCount),
+    new GalleryState({
+      fn: setActiveGallery,
+      totalCount,
+    }),
   );
 
   return (

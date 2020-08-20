@@ -6,6 +6,9 @@ import {
 
 import { useInit } from './useInit';
 
+export * from './types';
+export * from './StandaloneGallery';
+
 export {
   useInit as useGalleryInit,
   useGalleryItem,

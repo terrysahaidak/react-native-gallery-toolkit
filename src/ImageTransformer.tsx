@@ -1,10 +1,10 @@
-import React, { useRef } from 'react';
+import React, { useRef, useMemo } from 'react';
 import {
   StyleSheet,
-  Dimensions,
   Image,
   ImageRequireSource,
   ViewStyle,
+  Dimensions,
 } from 'react-native';
 import Animated, {
   withSpring,
@@ -14,6 +14,7 @@ import Animated, {
   cancelAnimation,
   useDerivedValue,
   Easing,
+  withDecay,
 } from 'react-native-reanimated';
 import {
   PinchGestureHandler,
@@ -22,16 +23,16 @@ import {
   State,
   PanGestureHandlerGestureEvent,
   PinchGestureHandlerGestureEvent,
+  TapGestureHandlerGestureEvent,
 } from 'react-native-gesture-handler';
 import * as vec from './vectors';
 import { useAnimatedGestureHandler } from './useAnimatedGestureHandler';
-import withDecay from './withDecay';
-import { fixGestureHandler, clamp } from './utils';
-
-const windowDimensions = {
-  width: Dimensions.get('window').width,
-  height: Dimensions.get('window').height,
-};
+import {
+  fixGestureHandler,
+  clamp,
+  workletNoop,
+  useAnimatedReaction,
+} from './utils';
 
 const styles = {
   fill: {
@@ -44,7 +45,6 @@ const styles = {
   },
   container: {
     flex: 1,
-    backgroundColor: 'black',
   },
 };
 
@@ -63,27 +63,70 @@ const timingConfig = {
 };
 
 type IImageTransformerProps = {
-  pagerRefs: React.Ref<any>[];
+  outerGestureHandlerRefs?: React.Ref<any>[];
   source?: ImageRequireSource;
   uri?: string;
   width: number;
   height: number;
-  onPageStateChange: (nextPagerState: boolean) => void;
+  windowDimensions: {
+    width: number;
+    height: number;
+  };
+  onStateChange?: (isActive: boolean) => void;
+  ImageComponent?: React.ComponentType<any>;
+  renderImage?: (props: {
+    width: number;
+    height: number;
+    source: { uri: string } | ImageRequireSource;
+  }) => React.ComponentType<any>;
+  isActive?: Animated.SharedValue<boolean>;
+  outerGestureHandlerActive?: Animated.SharedValue<boolean>;
+  onTap?: () => void;
+  onDoubleTap?: () => void;
+  onInteraction?: () => void;
+  style?: ViewStyle;
 };
+
+function checkIsNotUsed(handlerState: Animated.SharedValue<State>) {
+  'worklet';
+
+  return (
+    handlerState.value !== State.UNDETERMINED &&
+    handlerState.value !== State.END
+  );
+}
+
+const AnimatedImageComponent = Animated.createAnimatedComponent(
+  Image,
+);
 
 export const ImageTransformer = React.memo<IImageTransformerProps>(
   ({
-    pagerRefs = [],
+    outerGestureHandlerRefs = [],
     source,
     uri,
     width,
     height,
-    onPageStateChange = () => {},
+    onStateChange = workletNoop,
+    renderImage,
+    windowDimensions = Dimensions.get('window'),
+    isActive,
+    outerGestureHandlerActive,
+    style,
+    onTap = workletNoop,
+    onDoubleTap = workletNoop,
+    onInteraction = workletNoop,
   }) => {
     fixGestureHandler();
 
+    if (typeof source === 'undefined' && typeof uri === 'undefined') {
+      throw new Error(
+        'ImageTransformer: either source or uri should be passed to display an image',
+      );
+    }
+
     const imageSource = source ?? {
-      uri,
+      uri: uri!,
     };
 
     const MAX_SCALE = 3;
@@ -93,9 +136,10 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     const pinchRef = useRef(null);
     const panRef = useRef(null);
     const tapRef = useRef(null);
+    const doubleTapRef = useRef(null);
 
-    const panState = useSharedValue<State>(-1);
-    const pinchState = useSharedValue<State>(-1);
+    const panState = useSharedValue<State>(State.UNDETERMINED);
+    const pinchState = useSharedValue<State>(State.UNDETERMINED);
 
     const scale = useSharedValue(1);
     const scaleOffset = useSharedValue(1);
@@ -116,6 +160,23 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     const canPanVertically = useDerivedValue(() => {
       return windowDimensions.height < targetHeight * scale.value;
     });
+
+    function resetSharedState(animated?: boolean) {
+      'worklet';
+
+      if (animated) {
+        scale.value = withTiming(1, timingConfig);
+        scaleOffset.value = 1;
+
+        vec.set(offset, () => withTiming(0, timingConfig));
+      } else {
+        scale.value = 1;
+        scaleOffset.value = 1;
+        vec.set(translation, 0);
+        vec.set(scaleTranslation, 0);
+        vec.set(offset, 0);
+      }
+    }
 
     const maybeRunOnEnd = () => {
       'worklet';
@@ -139,7 +200,8 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         offset.y.value = withSpring(target.y, springConfig);
       }
 
-      if (panState.value !== 5 || pinchState.value !== 5) {
+      // we should handle this only if pan or pinch handlers has been used already
+      if (checkIsNotUsed(panState) || checkIsNotUsed(pinchState)) {
         return;
       }
 
@@ -155,38 +217,45 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
 
       if (scale.value <= 1) {
         // just center it
-        vec.set(target, 0);
-      } else {
-        vec.set(target, vec.clamp(offset, minVector, maxVector));
+        vec.set(offset, () => withTiming(0, timingConfig));
+        return;
       }
 
-      const deceleration = 0.991;
+      vec.set(target, vec.clamp(offset, minVector, maxVector));
 
-      if (
-        target.x === offset.x.value &&
-        Math.abs(panVelocity.x.value) > 0 &&
-        scale.value <= MAX_SCALE
-      ) {
-        offset.x.value = withDecay({
-          velocity: panVelocity.x.value,
-          clamp: [minVector.x, maxVector.x],
-          deceleration,
-        });
+      const deceleration = 0.9915;
+
+      const isInBoundaryX = target.x === offset.x.value;
+      const isInBoundaryY = target.y === offset.y.value;
+
+      if (isInBoundaryX) {
+        if (
+          Math.abs(panVelocity.x.value) > 0 &&
+          scale.value <= MAX_SCALE
+        ) {
+          offset.x.value = withDecay({
+            velocity: panVelocity.x.value,
+            clamp: [minVector.x, maxVector.x],
+            deceleration,
+          });
+        }
       } else {
-        // run animation
         offset.x.value = withSpring(target.x, springConfig);
       }
 
-      if (
-        target.y === offset.y.value &&
-        Math.abs(panVelocity.y.value) > 0 &&
-        scale.value <= MAX_SCALE
-      ) {
-        offset.y.value = withDecay({
-          velocity: panVelocity.y.value,
-          clamp: [minVector.y, maxVector.y],
-          deceleration,
-        });
+      if (isInBoundaryY) {
+        if (
+          Math.abs(panVelocity.y.value) > 0 &&
+          scale.value <= MAX_SCALE &&
+          offset.y.value !== minVector.y &&
+          offset.y.value !== maxVector.y
+        ) {
+          offset.y.value = withDecay({
+            velocity: panVelocity.y.value,
+            clamp: [minVector.y, maxVector.y],
+            deceleration,
+          });
+        }
       } else {
         offset.y.value = withSpring(target.y, springConfig);
       }
@@ -203,6 +272,14 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         ctx.panOffset = vec.create(0, 0);
       },
 
+      shouldHandleEvent: () => {
+        return (
+          scale.value > 1 &&
+          typeof outerGestureHandlerActive !== 'undefined' &&
+          !outerGestureHandlerActive.value
+        );
+      },
+
       beforeEach: (evt, ctx) => {
         ctx.pan = vec.create(evt.translationX, evt.translationY);
         const velocity = vec.create(evt.velocityX, evt.velocityY);
@@ -210,14 +287,11 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         vec.set(panVelocity, velocity);
       },
 
-      shouldHandleEvent: () => {
-        return true;
-      },
-
       onStart: (_, ctx) => {
         cancelAnimation(offset.x);
         cancelAnimation(offset.y);
         ctx.panOffset = vec.create(0, 0);
+        onInteraction();
       },
 
       onActive: (evt, ctx) => {
@@ -250,8 +324,29 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         vec.set(translation, 0);
 
         maybeRunOnEnd();
+
+        vec.set(panVelocity, 0);
       },
     });
+
+    useAnimatedReaction(
+      () => {
+        'worklet';
+
+        if (typeof isActive === 'undefined') {
+          return true;
+        }
+
+        return isActive.value;
+      },
+      (currentActive) => {
+        'worklet';
+
+        if (!currentActive) {
+          resetSharedState();
+        }
+      },
+    );
 
     const onScaleEvent = useAnimatedGestureHandler<
       PinchGestureHandlerGestureEvent,
@@ -267,8 +362,12 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         ctx.gestureScale = 1;
       },
 
-      shouldHandleEvent: () => {
-        return true;
+      shouldHandleEvent: (evt) => {
+        return (
+          evt.numberOfPointers === 2 &&
+          typeof outerGestureHandlerActive !== 'undefined' &&
+          !outerGestureHandlerActive.value
+        );
       },
 
       beforeEach: (evt, ctx) => {
@@ -305,6 +404,9 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       },
 
       onStart: (_, ctx) => {
+        onInteraction();
+        cancelAnimation(offset.x);
+        cancelAnimation(offset.y);
         vec.set(ctx.origin, ctx.adjustFocal);
       },
 
@@ -347,15 +449,80 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       },
     });
 
-    // FIXME: Tap gesture handler is not working
     const onTapEvent = useAnimatedGestureHandler({
+      shouldHandleEvent: (evt) => {
+        return (
+          evt.numberOfPointers === 1 &&
+          typeof outerGestureHandlerActive !== 'undefined' &&
+          !outerGestureHandlerActive.value
+        );
+      },
+
       onStart: () => {
         cancelAnimation(offset.x);
         cancelAnimation(offset.y);
       },
 
+      onActive: () => {
+        onTap();
+      },
+
       onEnd: () => {
         maybeRunOnEnd();
+      },
+    });
+
+    function handleScaleTo(x: number, y: number) {
+      'worklet';
+
+      const FUTURE_SCALE = 3;
+
+      scale.value = withTiming(FUTURE_SCALE, timingConfig);
+      scaleOffset.value = FUTURE_SCALE;
+
+      const targetImageSize = vec.multiply([image, FUTURE_SCALE]);
+
+      const CENTER = vec.divide([canvas, 2]);
+      const imageCenter = vec.divide([image, 2]);
+
+      const focal = vec.create(x, y);
+
+      const origin = vec.multiply([
+        -1,
+        vec.sub([vec.divide([targetImageSize, 2]), CENTER]),
+      ]);
+
+      const koef = vec.sub([
+        vec.multiply([vec.divide([1, imageCenter]), focal]),
+        1,
+      ]);
+
+      const target = vec.multiply([origin, koef]);
+
+      offset.x.value = withTiming(target.x, timingConfig);
+      offset.y.value = withTiming(target.y, timingConfig);
+    }
+
+    const onDoubleTapEvent = useAnimatedGestureHandler<
+      TapGestureHandlerGestureEvent,
+      {}
+    >({
+      shouldHandleEvent: (evt) => {
+        return (
+          evt.numberOfPointers === 1 &&
+          typeof outerGestureHandlerActive !== 'undefined' &&
+          !outerGestureHandlerActive.value
+        );
+      },
+
+      onActive: ({ x, y }) => {
+        onDoubleTap();
+
+        if (scale.value > 1) {
+          resetSharedState(true);
+        } else {
+          handleScaleTo(x, y);
+        }
       },
     });
 
@@ -367,13 +534,14 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         scaleTranslation.x.value === 0 &&
         scaleTranslation.y.value === 0;
 
-      const pagerNextState =
+      // FIXME: We should not stick to pager with naming
+      const isInactive =
         scale.value === 1 &&
         noOffset &&
         noTranslation &&
         noScaleTranslation;
 
-      onPageStateChange(pagerNextState);
+      onStateChange(isInactive);
 
       return {
         transform: [
@@ -395,48 +563,76 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     });
 
     return (
-      <Animated.View
-        style={[styles.container, { width: windowDimensions.width }]}
-      >
+      <Animated.View style={[styles.container, { width }, style]}>
         <PinchGestureHandler
           ref={pinchRef}
-          // enabled={false}
           onGestureEvent={onScaleEvent}
-          simultaneousHandlers={[panRef, tapRef, ...pagerRefs]}
-          onHandlerStateChange={onScaleEvent}
+          simultaneousHandlers={[
+            panRef,
+            tapRef,
+            ...outerGestureHandlerRefs,
+          ]}
         >
           <Animated.View style={styles.fill}>
             <PanGestureHandler
               ref={panRef}
-              minDist={5}
+              minDist={10}
               avgTouches
-              simultaneousHandlers={[pinchRef, tapRef, ...pagerRefs]}
+              simultaneousHandlers={[
+                pinchRef,
+                tapRef,
+                ...outerGestureHandlerRefs,
+              ]}
               onGestureEvent={onPanEvent}
-              onHandlerStateChange={onPanEvent}
             >
               <Animated.View style={styles.fill}>
                 <TapGestureHandler
                   ref={tapRef}
                   numberOfTaps={1}
+                  maxDeltaX={8}
+                  maxDeltaY={8}
                   simultaneousHandlers={[
                     pinchRef,
                     panRef,
-                    ...pagerRefs,
+                    ...outerGestureHandlerRefs,
                   ]}
+                  waitFor={doubleTapRef}
                   onGestureEvent={onTapEvent}
-                  onHandlerStateChange={onTapEvent}
                 >
-                  <Animated.View style={styles.fill}>
-                    <Animated.View style={styles.wrapper}>
-                      <Animated.View style={animatedStyles}>
-                        <Image
-                          source={imageSource}
-                          // resizeMode="cover"
-                          style={{
-                            width: targetWidth,
-                            height: targetHeight,
-                          }}
-                        />
+                  <Animated.View style={[styles.fill]}>
+                    <Animated.View style={styles.fill}>
+                      <Animated.View style={styles.wrapper}>
+                        <TapGestureHandler
+                          ref={doubleTapRef}
+                          numberOfTaps={2}
+                          maxDelayMs={140}
+                          maxDeltaX={16}
+                          maxDeltaY={16}
+                          simultaneousHandlers={[
+                            pinchRef,
+                            panRef,
+                            ...outerGestureHandlerRefs,
+                          ]}
+                          onGestureEvent={onDoubleTapEvent}
+                        >
+                          <Animated.View style={animatedStyles}>
+                            {typeof renderImage === 'function' ? (
+                              renderImage({
+                                imageSource,
+                                width: targetWidth,
+                                height: targetHeight,
+                              })
+                            ) : (
+                              <AnimatedImageComponent
+                                source={imageSource}
+                                style={{
+                                  width: targetWidth,
+                                  height: targetHeight,
+                                }}
+                              />
+                            )}
+                          </Animated.View>
+                        </TapGestureHandler>
                       </Animated.View>
                     </Animated.View>
                   </Animated.View>
