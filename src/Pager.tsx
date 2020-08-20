@@ -327,7 +327,11 @@ export function ImagePager<TPage>({
     }
   >({
     shouldHandleEvent: (evt) => {
-      return evt.numberOfPointers === 1 && isActive.value;
+      return (
+        evt.numberOfPointers === 1 &&
+        isActive.value &&
+        Math.abs(evt.velocityX) > Math.abs(evt.velocityY)
+      );
     },
 
     onEvent: (evt) => {
@@ -347,9 +351,9 @@ export function ImagePager<TPage>({
 
       const nextIndex = getNextIndex(evt.velocityX);
 
-      const v = Math.abs(evt.velocityX);
+      const vx = Math.abs(evt.velocityX);
 
-      const shouldMoveToNextPage = v > 10 && canSwipe.value;
+      const shouldMoveToNextPage = vx > 10 && canSwipe.value;
 
       // we invert the value since the tranlationY is left to right
       toValueAnimation.value = -(shouldMoveToNextPage
@@ -435,8 +439,7 @@ export function ImagePager<TPage>({
           ref={pagerRef}
           simultaneousHandlers={tapRef}
           onGestureEvent={onPan}
-          minDeltaX={11}
-          minDeltaY={11}
+          activeOffsetX={[-10, 10]}
         >
           <Animated.View style={StyleSheet.absoluteFill}>
             <TapGestureHandler
