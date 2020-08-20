@@ -99,6 +99,7 @@ const Page = React.memo<IPageProps>(
     isPagerInProgress,
   }) => {
     const isActive = useDerivedValue(() => {
+      // FIXME: This causes crashe
       // return currentIndex.value === index;
       return false;
     });
