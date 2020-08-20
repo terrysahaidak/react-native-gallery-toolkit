@@ -566,8 +566,8 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
                 <TapGestureHandler
                   ref={tapRef}
                   numberOfTaps={1}
-                  maxDeltaX={10}
-                  maxDeltaY={10}
+                  maxDeltaX={8}
+                  maxDeltaY={8}
                   simultaneousHandlers={[
                     pinchRef,
                     panRef,
@@ -582,7 +582,9 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
                         <TapGestureHandler
                           ref={doubleTapRef}
                           numberOfTaps={2}
-                          maxDelayMs={100}
+                          maxDelayMs={140}
+                          maxDeltaX={16}
+                          maxDeltaY={16}
                           simultaneousHandlers={[
                             pinchRef,
                             panRef,
