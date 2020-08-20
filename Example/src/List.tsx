@@ -25,15 +25,18 @@ function ListItem({ title }) {
     <RectButton
       onPress={() => nav.navigate(title)}
       style={{
-        height: 80,
-        justifyContent: 'center',
+        height: 64,
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         padding: 16,
         backgroundColor: 'white',
         borderBottomColor: '#ccc',
         borderBottomWidth: 1,
       }}
     >
-      <Text>{title}</Text>
+      <Text style={{ fontSize: 18 }}>{title}</Text>
+      <Text style={{ fontSize: 24, color: '#4D4D4D' }}>➡</Text>
     </RectButton>
   );
 }
