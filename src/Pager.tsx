@@ -266,7 +266,9 @@ export function ImagePager<TPage>({
   };
 
   // S3 Pager
-  const canSwipe = useDerivedValue(() => {
+  function getCanSwipe() {
+    'worklet';
+
     const nextTranslate = offsetX.value + gestureTranslationX.value;
 
     if (nextTranslate > 0) {
@@ -281,7 +283,7 @@ export function ImagePager<TPage>({
     }
 
     return true;
-  });
+  }
 
   const getNextIndex = (v: number) => {
     'worklet';
@@ -340,7 +342,7 @@ export function ImagePager<TPage>({
     },
 
     onActive: (evt) => {
-      pagerX.value = canSwipe.value
+      pagerX.value = getCanSwipe()
         ? evt.translationX
         : friction(evt.translationX);
     },
@@ -353,7 +355,7 @@ export function ImagePager<TPage>({
 
       const vx = Math.abs(evt.velocityX);
 
-      const shouldMoveToNextPage = vx > 10 && canSwipe.value;
+      const shouldMoveToNextPage = vx > 10 && getCanSwipe();
 
       // we invert the value since the tranlationY is left to right
       toValueAnimation.value = -(shouldMoveToNextPage
@@ -383,10 +385,9 @@ export function ImagePager<TPage>({
 
     onEnd: () => {
       if (scale.value !== 1) {
-        return;
       }
 
-      onChangePageAnimation();
+      // onChangePageAnimation();
     },
   });
 
