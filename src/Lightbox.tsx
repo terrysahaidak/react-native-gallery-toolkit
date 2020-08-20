@@ -120,7 +120,7 @@ const Page = React.memo<IPageProps>(
         >
           <ImageTransformer
             {...{
-              pagerRefs,
+              outerGestureHandlerRefs: pagerRefs,
               onPageStateChange,
               uri: page.item.uri,
               width: targetWidth,

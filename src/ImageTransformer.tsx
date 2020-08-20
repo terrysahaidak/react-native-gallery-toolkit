@@ -63,7 +63,7 @@ const timingConfig = {
 };
 
 type IImageTransformerProps = {
-  pagerRefs?: React.Ref<any>[];
+  outerGestureHandlerRefs?: React.Ref<any>[];
   source?: ImageRequireSource;
   uri?: string;
   width: number;
@@ -72,13 +72,19 @@ type IImageTransformerProps = {
     width: number;
     height: number;
   };
-  onPageStateChange?: (nextPagerState: boolean) => void;
+  onStateChange?: (isActive: boolean) => void;
   ImageComponent?: React.ComponentType<any>;
+  renderImage?: (props: {
+    width: number;
+    height: number;
+    source: { uri: string } | ImageRequireSource;
+  }) => React.ComponentType<any>;
   isActive?: Animated.SharedValue<boolean>;
   outerGestureHandlerActive?: Animated.SharedValue<boolean>;
   onTap?: () => void;
   onDoubleTap?: () => void;
   onInteraction?: () => void;
+  style?: ViewStyle;
 };
 
 function checkIsNotUsed(handlerState: Animated.SharedValue<State>) {
@@ -90,32 +96,37 @@ function checkIsNotUsed(handlerState: Animated.SharedValue<State>) {
   );
 }
 
+const AnimatedImageComponent = Animated.createAnimatedComponent(
+  Image,
+);
+
 export const ImageTransformer = React.memo<IImageTransformerProps>(
   ({
-    pagerRefs = [],
+    outerGestureHandlerRefs = [],
     source,
     uri,
     width,
     height,
-    onPageStateChange = workletNoop,
-    ImageComponent = Image,
+    onStateChange = workletNoop,
+    renderImage,
     windowDimensions = Dimensions.get('window'),
     isActive,
     outerGestureHandlerActive,
-    style = {},
+    style,
     onTap = workletNoop,
     onDoubleTap = workletNoop,
     onInteraction = workletNoop,
   }) => {
     fixGestureHandler();
 
-    const AnimatedImageComponent = useMemo(
-      () => Animated.createAnimatedComponent(ImageComponent),
-      [],
-    );
+    if (typeof source === 'undefined' && typeof uri === 'undefined') {
+      throw new Error(
+        'ImageTransformer: either source or uri should be passed to display an image',
+      );
+    }
 
     const imageSource = source ?? {
-      uri,
+      uri: uri!,
     };
 
     const MAX_SCALE = 3;
@@ -322,7 +333,11 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
       () => {
         'worklet';
 
-        return isActive!.value;
+        if (typeof isActive === 'undefined') {
+          return true;
+        }
+
+        return isActive.value;
       },
       (currentActive) => {
         'worklet';
@@ -520,13 +535,13 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         scaleTranslation.y.value === 0;
 
       // FIXME: We should not stick to pager with naming
-      const pagerNextState =
+      const isInactive =
         scale.value === 1 &&
         noOffset &&
         noTranslation &&
         noScaleTranslation;
 
-      onPageStateChange(pagerNextState);
+      onStateChange(isInactive);
 
       return {
         transform: [
@@ -552,14 +567,22 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         <PinchGestureHandler
           ref={pinchRef}
           onGestureEvent={onScaleEvent}
-          simultaneousHandlers={[panRef, tapRef, ...pagerRefs]}
+          simultaneousHandlers={[
+            panRef,
+            tapRef,
+            ...outerGestureHandlerRefs,
+          ]}
         >
           <Animated.View style={styles.fill}>
             <PanGestureHandler
               ref={panRef}
               minDist={10}
               avgTouches
-              simultaneousHandlers={[pinchRef, tapRef, ...pagerRefs]}
+              simultaneousHandlers={[
+                pinchRef,
+                tapRef,
+                ...outerGestureHandlerRefs,
+              ]}
               onGestureEvent={onPanEvent}
             >
               <Animated.View style={styles.fill}>
@@ -571,7 +594,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
                   simultaneousHandlers={[
                     pinchRef,
                     panRef,
-                    ...pagerRefs,
+                    ...outerGestureHandlerRefs,
                   ]}
                   waitFor={doubleTapRef}
                   onGestureEvent={onTapEvent}
@@ -588,18 +611,26 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
                           simultaneousHandlers={[
                             pinchRef,
                             panRef,
-                            ...pagerRefs,
+                            ...outerGestureHandlerRefs,
                           ]}
                           onGestureEvent={onDoubleTapEvent}
                         >
                           <Animated.View style={animatedStyles}>
-                            <AnimatedImageComponent
-                              source={imageSource}
-                              style={{
+                            {typeof renderImage === 'function' ? (
+                              renderImage({
+                                imageSource,
                                 width: targetWidth,
                                 height: targetHeight,
-                              }}
-                            />
+                              })
+                            ) : (
+                              <AnimatedImageComponent
+                                source={imageSource}
+                                style={{
+                                  width: targetWidth,
+                                  height: targetHeight,
+                                }}
+                              />
+                            )}
                           </Animated.View>
                         </TapGestureHandler>
                       </Animated.View>

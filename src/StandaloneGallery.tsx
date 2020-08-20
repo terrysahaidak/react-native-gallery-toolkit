@@ -60,9 +60,9 @@ function PageRenderer({
       isActive={pagerProps.isActive}
       windowDimensions={{ width, height }}
       height={targetHeight}
-      onPageStateChange={pagerProps.onPageStateChange}
+      onStateChange={pagerProps.onPageStateChange}
       width={width}
-      pagerRefs={pagerProps.pagerRefs}
+      outerGestureHandlerRefs={pagerProps.pagerRefs}
       uri={pagerProps.page.uri}
       ImageComponent={ImageComponent}
       onDoubleTap={onDoubleTap}
