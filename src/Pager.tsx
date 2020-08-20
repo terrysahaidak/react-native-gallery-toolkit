@@ -250,8 +250,8 @@ export function ImagePager<TPage>({
       toValueAnimation.value,
       {
         stiffness: 1000,
-        damping: 500,
-        mass: 3,
+        damping: 300,
+        mass: 5,
         overshootClamping: true,
         restDisplacementThreshold: 0.01,
         restSpeedThreshold: 0.01,
@@ -385,9 +385,10 @@ export function ImagePager<TPage>({
 
     onEnd: () => {
       if (scale.value !== 1) {
+        return;
       }
 
-      // onChangePageAnimation();
+      onChangePageAnimation();
     },
   });
 

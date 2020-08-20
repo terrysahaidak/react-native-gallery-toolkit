@@ -23,6 +23,10 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { useScreens } from 'react-native-screens';
+
+useScreens(true);
+
 const dimensions = Dimensions.get('window');
 
 function getRandomIntInclusive(min: number, max: number) {
@@ -128,15 +132,25 @@ export default function ImageGalleryScreen() {
   }
 
   const aStyles = useToggleOpacity(headerShown.value);
-  const aStyles2 = useToggleOpacity(headerShown.value);
+  const aStyles2 = useAnimatedStyle(() => {
+    if (headerShown.value) {
+      return {
+        opacity: withTiming(0),
+      };
+    }
+
+    return {
+      opacity: withTiming(1),
+    };
+  });
 
   return (
-    <View style={{ backgroundColor: 'black', flex: 1 }}>
+    <View style={{ flex: 1 }}>
       <Animated.View
         style={[
           StyleSheet.absoluteFill,
           {
-            backgroundColor: '#c8c8c8',
+            backgroundColor: 'black',
           },
           aStyles2,
         ]}
