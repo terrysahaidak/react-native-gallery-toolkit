@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import {
   NavigationContainer,
   useNavigation,
+  useFocusEffect,
 } from '@react-navigation/native';
 import {
   createStackNavigator,
@@ -42,6 +43,10 @@ function ListItem({ title }: { title: string }) {
 }
 
 function Home() {
+  useFocusEffect(() => {
+    StatusBar.setHidden(false);
+  });
+
   return (
     <>
       <ListItem title="Standalone" />
@@ -68,7 +73,6 @@ function CustomHeader({
 
 export default function App() {
   useGalleryInit();
-
   return (
     <>
       <StatusBar translucent showHideTransition="fade" />
