@@ -48,7 +48,7 @@ const styles = {
   },
 };
 
-const springConfig = {
+const defaultSpringConfig = {
   stiffness: 1000,
   damping: 500,
   mass: 3,
@@ -57,7 +57,7 @@ const springConfig = {
   restSpeedThreshold: 0.01,
 };
 
-const timingConfig = {
+const defaultTimingConfig = {
   duration: 250,
   easing: Easing.bezier(0.33, 0.01, 0, 1),
 };
@@ -73,7 +73,6 @@ type IImageTransformerProps = {
     height: number;
   };
   onStateChange?: (isActive: boolean) => void;
-  ImageComponent?: React.ComponentType<any>;
   renderImage?: (props: {
     width: number;
     height: number;
@@ -84,7 +83,13 @@ type IImageTransformerProps = {
   onTap?: () => void;
   onDoubleTap?: () => void;
   onInteraction?: () => void;
+  springConfig?: Animated.WithSpringConfig;
+  timingConfig?: Animated.TimingConfig;
   style?: ViewStyle;
+  DOUBLE_TAP_SCALE?: number;
+  MAX_SCALE?: number;
+  MIN_SCALE?: number;
+  OVER_SCALE?: number;
 };
 
 function checkIsNotUsed(handlerState: Animated.SharedValue<State>) {
@@ -116,6 +121,12 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     onTap = workletNoop,
     onDoubleTap = workletNoop,
     onInteraction = workletNoop,
+    DOUBLE_TAP_SCALE = 3,
+    MAX_SCALE = 3,
+    MIN_SCALE = 0.7,
+    OVER_SCALE = 0.5,
+    timingConfig = defaultTimingConfig,
+    springConfig = defaultSpringConfig,
   }) => {
     fixGestureHandler();
 
@@ -128,10 +139,6 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     const imageSource = source ?? {
       uri: uri!,
     };
-
-    const MAX_SCALE = 3;
-    const MIN_SCALE = 0.7;
-    const OVER_SCALE = 0.5;
 
     const pinchRef = useRef(null);
     const panRef = useRef(null);
@@ -475,12 +482,10 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     function handleScaleTo(x: number, y: number) {
       'worklet';
 
-      const FUTURE_SCALE = 3;
+      scale.value = withTiming(DOUBLE_TAP_SCALE, timingConfig);
+      scaleOffset.value = DOUBLE_TAP_SCALE;
 
-      scale.value = withTiming(FUTURE_SCALE, timingConfig);
-      scaleOffset.value = FUTURE_SCALE;
-
-      const targetImageSize = vec.multiply([image, FUTURE_SCALE]);
+      const targetImageSize = vec.multiply([image, DOUBLE_TAP_SCALE]);
 
       const CENTER = vec.divide([canvas, 2]);
       const imageCenter = vec.divide([image, 2]);
@@ -534,7 +539,6 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         scaleTranslation.x.value === 0 &&
         scaleTranslation.y.value === 0;
 
-      // FIXME: We should not stick to pager with naming
       const isInactive =
         scale.value === 1 &&
         noOffset &&

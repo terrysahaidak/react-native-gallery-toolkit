@@ -156,7 +156,7 @@ type IImagePager<T> = {
   keyExtractor: (item: T, index: number) => string;
   getItem?: (data: T[], index: number) => T;
   pagerWrapperStyles?: any;
-  // gallery: GalleryState;
+  springConfig?: Omit<Animated.WithSpringConfig, 'velocity'>;
 };
 
 export function ImagePager<TPage>({
@@ -172,6 +172,7 @@ export function ImagePager<TPage>({
   keyExtractor,
   pagerWrapperStyles = {},
   getItem,
+  springConfig,
 }: IImagePager<TPage>) {
   fixGestureHandler();
 
@@ -246,17 +247,25 @@ export function ImagePager<TPage>({
   const onChangePageAnimation = (noVelocity?: boolean) => {
     'worklet';
 
+    const configToUse =
+      typeof springConfig !== 'undefined'
+        ? springConfig
+        : {
+            stiffness: 1000,
+            damping: 100,
+            mass: 1.5,
+            overshootClamping: true,
+            restDisplacementThreshold: 0.01,
+            restSpeedThreshold: 0.01,
+          };
+
+    // @ts-ignore
+    // cannot use merge and spread here :(
+    configToUse.velocity = noVelocity ? 0 : velocity.value;
+
     offsetX.value = withSpring(
       toValueAnimation.value,
-      {
-        stiffness: 1000,
-        damping: 300,
-        mass: 5,
-        overshootClamping: true,
-        restDisplacementThreshold: 0.01,
-        restSpeedThreshold: 0.01,
-        velocity: noVelocity ? 0 : velocity.value,
-      },
+      configToUse as Animated.WithSpringConfig,
       (isCanceled) => {
         if (!isCanceled) {
           velocity.value = 0;
