@@ -5,6 +5,7 @@ import {
   View,
   Text,
   StatusBar,
+  StyleSheet,
 } from 'react-native';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -58,12 +59,12 @@ function Button({
     <RectButton
       onPress={onPress}
       style={{
-        backgroundColor: 'white',
+        backgroundColor: 'black',
         padding: 16,
         borderRadius: 8,
       }}
     >
-      <Text>{text}</Text>
+      <Text style={{ color: 'white' }}>{text}</Text>
     </RectButton>
   );
 }
@@ -127,9 +128,20 @@ export default function ImageGalleryScreen() {
   }
 
   const aStyles = useToggleOpacity(headerShown.value);
+  const aStyles2 = useToggleOpacity(headerShown.value);
 
   return (
     <View style={{ backgroundColor: 'black', flex: 1 }}>
+      <Animated.View
+        style={[
+          StyleSheet.absoluteFill,
+          {
+            backgroundColor: '#c8c8c8',
+          },
+          aStyles2,
+        ]}
+      />
+
       <StandaloneGallery
         ref={galleryRef}
         ImageComponent={Image}
@@ -157,19 +169,21 @@ export default function ImageGalleryScreen() {
           {
             flexDirection: 'row',
             position: 'absolute',
-            bottom: 20,
+            padding: 20,
+            bottom: 0,
             left: 0,
             right: 0,
             flex: 1,
             justifyContent: 'space-around',
             alignItems: 'center',
+            backgroundColor: 'white',
           },
           aStyles,
         ]}
       >
         <Button onPress={onBack} text="Back" />
 
-        <Text style={{ color: 'white' }}>{index}</Text>
+        <Text>Index: {index}</Text>
 
         <Button onPress={onNext} text="Next" />
       </Animated.View>
