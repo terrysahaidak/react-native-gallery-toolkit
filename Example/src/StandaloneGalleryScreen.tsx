@@ -130,7 +130,6 @@ export default function ImageGalleryScreen() {
 
   return (
     <View style={{ backgroundColor: 'black', flex: 1 }}>
-      <StatusBar translucent />
       <StandaloneGallery
         ref={galleryRef}
         ImageComponent={Image}

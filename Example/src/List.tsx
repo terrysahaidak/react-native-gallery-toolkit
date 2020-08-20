@@ -10,7 +10,7 @@ import {
   Header,
   StackHeaderProps,
 } from '@react-navigation/stack';
-import { View, Text, Platform } from 'react-native';
+import { View, Text, Platform, StatusBar } from 'react-native';
 import { useGalleryInit } from 'reanimated-gallery';
 import Animated from 'react-native-reanimated';
 import StandaloneGalleryScreen, {
@@ -70,34 +70,37 @@ export default function App() {
   useGalleryInit();
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          ...(Platform.OS === 'android'
-            ? TransitionPresets.ScaleFromCenterAndroid
-            : TransitionPresets.DefaultTransition),
-        }}
-        headerMode="screen"
-      >
-        <Stack.Screen component={Home} name="Home" />
-        <Stack.Screen
-          name="Standalone"
-          component={StandaloneGalleryScreen}
-          options={({ route }) => ({
-            headerTransparent: true,
-            headerBackground: () => (
-              <View style={{ backgroundColor: 'white', flex: 1 }} />
-            ),
-            header: (headerProps) => (
-              <CustomHeader
-                headerShown={route?.params?.headerShown ?? true}
-                headerProps={headerProps}
-                route={route}
-              />
-            ),
-          })}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <>
+      <StatusBar translucent showHideTransition="fade" />
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            ...(Platform.OS === 'android'
+              ? TransitionPresets.ScaleFromCenterAndroid
+              : TransitionPresets.DefaultTransition),
+          }}
+          headerMode="screen"
+        >
+          <Stack.Screen component={Home} name="Home" />
+          <Stack.Screen
+            name="Standalone"
+            component={StandaloneGalleryScreen}
+            options={({ route }) => ({
+              headerTransparent: true,
+              headerBackground: () => (
+                <View style={{ backgroundColor: 'white', flex: 1 }} />
+              ),
+              header: (headerProps) => (
+                <CustomHeader
+                  headerShown={route?.params?.headerShown ?? true}
+                  headerProps={headerProps}
+                  route={route}
+                />
+              ),
+            })}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </>
   );
 }
