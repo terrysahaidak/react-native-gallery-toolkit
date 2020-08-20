@@ -1,5 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Dimensions, Image, View, Text } from 'react-native';
+import {
+  Dimensions,
+  Image,
+  View,
+  Text,
+  StatusBar,
+} from 'react-native';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {
@@ -104,21 +110,27 @@ export default function ImageGalleryScreen() {
     galleryRef.current!.goBack();
   }
 
+  function setHeaderShown(value: boolean) {
+    headerShown.value = value;
+    nav.setParams({ headerShown: value });
+
+    StatusBar.setHidden(!value);
+  }
+
   function toggleHeaderShown() {
     const nextValue = !headerShown.value;
-    headerShown.value = nextValue;
-    nav.setParams({ headerShown: nextValue });
+    setHeaderShown(nextValue);
   }
 
   function hide() {
-    headerShown.value = false;
-    nav.setParams({ headerShown: false });
+    setHeaderShown(false);
   }
 
   const aStyles = useToggleOpacity(headerShown.value);
 
   return (
     <View style={{ backgroundColor: 'black', flex: 1 }}>
+      <StatusBar translucent />
       <StandaloneGallery
         ref={galleryRef}
         ImageComponent={Image}

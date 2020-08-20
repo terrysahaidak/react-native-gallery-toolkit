@@ -19,7 +19,7 @@ import StandaloneGalleryScreen, {
 
 const Stack = createStackNavigator();
 
-function ListItem({ title }) {
+function ListItem({ title }: { title: string }) {
   const nav = useNavigation();
   return (
     <RectButton
