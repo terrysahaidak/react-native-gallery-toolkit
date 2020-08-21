@@ -130,8 +130,14 @@ export const StandaloneGallery = React.forwardRef<
       },
     }));
 
-    function _onIndexChange(nextIndex: number) {
-      tempIndex.current = nextIndex;
+    function setTempIndex(index: number) {
+      tempIndex.current = index;
+    }
+
+    function onIndexChangeWorklet(nextIndex: number) {
+      'worklet';
+
+      setTempIndex(nextIndex);
 
       if (onIndexChange) {
         onIndexChange(nextIndex);
@@ -147,7 +153,7 @@ export const StandaloneGallery = React.forwardRef<
         pages={images}
         width={width}
         gutterWidth={gutterWidth}
-        onIndexChange={_onIndexChange}
+        onIndexChange={onIndexChangeWorklet}
         onPagerTranslateChange={onPagerTranslateChange}
         renderPage={(props) => (
           <PageRenderer
