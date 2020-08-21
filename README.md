@@ -3,26 +3,78 @@
   <h3 align="center"> Reanimated 2 powered Gallery implementation</h3>
 </p>
 
-
 # Development status
 
-Currently, I'm refactoring Pager and Lightbox components in order to enable galleries without lightbox as well as an ability to change some of params of both pager and lightbox
-
-The library will have few options:
-
-- StandaloneGallery - ability to show pager with images as a new screen. Without lightbox transition.
-- Gallery - regular list of photos with transition to and from pager.
-- Lightbox - single photo with/without transform abilities.
-- ImageTransformer - standalone component with abilities to transform image (pinch to zoom, pan).
+Currently, only standalone gallery (which you can render on a separate screen) is available. I'm preparing documentation for Pager and ImageTransformer components. For more info see Roadmap.
 
 ![Gallery in action gif](gifs/promo.gif)
+
+## Installation
+
+Use npm or yarn to install the library
+
+```bash
+npm i --save reanimated-gallery
+```
+
+> Also, you need to install latest [react-native-reanimated](https://github.com/software-mansion/react-native-reanimated) (then new 2 version) and [react-native-gesture-handler](https://github.com/software-mansion/react-native-gesture-handler), and follow their installation instructions.
+
+Expo is not currently supported because it doesn't support Reanimated 2.
+
+## Usage
+
+### Standalone gallery
+
+Standalone gallery renders Pager which supports thousands of images thanks to virtualization. Each page renders ImageTransformer component which gives ability to pinch-to-zoom, double tap to zoom, also you can run custom callbacks and worklets on on tab, double tap, pan.
+
+```tsx
+import {
+  StandaloneGallery,
+  GalleryItemType,
+  StandaloneGalleryHandler,
+} from 'reanimated-gallery';
+
+const images: GalleryItemType[] = [
+  {
+    id: '1',
+    width: 300,
+    height: 300,
+    uri: 'https://placekitten.com/300/300',
+  },
+  {
+    id: '2',
+    width: 400,
+    height: 200,
+    uri: 'https://placekitten.com/400/200',
+  },
+];
+
+export default function App() {
+  return <StandaloneGallery images={images} />;
+}
+
+```
+
+For full example see [Examples](#examples).
+
+### ImagePager
+
+WIP
+
+### ImageTransformer
+
+WIP
+
+## Props
+
+
 
 ## Examples
 
 The source code for the example (showcase) app is under the [`Example/`](https://github.com/terrysahaidak/reanimated-gallery/blob/master/Example/) directory.
 Clone the repo, go to the Example/ folder and run:
 
-```
+```bash
 npm install
 ```
 
@@ -30,19 +82,19 @@ npm install
 
 Before running the app, install the cocoapods dependencies:
 
-```
-cd ios && pod install && cd ..
+```bash
+npx pod-install
 ```
 
 Now, you can start the app:
 
-```
+```bash
 npm run ios
 ```
 
 ### Running on Android
 
-```
+```bash
 npm run android
 ```
 

@@ -17,10 +17,10 @@ type Handlers = {
   onPagerTranslateChange?: (translateX: number) => void;
 };
 
-type StandaloneGalleryProps = {
+export type StandaloneGalleryProps = {
   images: GalleryItemType[];
   renderImage?: IImageTransformerProps['renderImage'];
-  initialIndex: number;
+  initialIndex?: number;
   width?: number;
   height?: number;
   gutterWidth?: number;
@@ -86,7 +86,7 @@ export const StandaloneGallery = React.forwardRef<
       width = dimensions.width,
       height = dimensions.height,
       gutterWidth,
-      initialIndex,
+      initialIndex = 0,
       onIndexChange,
       getItem,
       onDoubleTap,
