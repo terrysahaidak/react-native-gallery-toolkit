@@ -4,7 +4,7 @@
   "private": true,
   "main": "./src/index.ts",
   "peerDependencies": {
-    "react-native-reanimated": "^2.0.0-alpha.1",
+    "react-native-reanimated": "^2.0.0-alpha.5",
     "react-native": "*",
     "react": "*",
     "react-native-gesture-handler": "*"
