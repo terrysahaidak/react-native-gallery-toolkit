@@ -14,6 +14,7 @@ type Handlers = {
   onTap?: IImageTransformerProps['onTap'];
   onDoubleTap?: IImageTransformerProps['onDoubleTap'];
   onInteraction?: IImageTransformerProps['onInteraction'];
+  onPagerTranslateChange?: (translateX: number) => void;
 };
 
 type StandaloneGalleryProps = {
@@ -91,6 +92,7 @@ export const StandaloneGallery = React.forwardRef<
       onDoubleTap,
       onTap,
       onInteraction,
+      onPagerTranslateChange,
     },
     ref,
   ) => {
@@ -146,6 +148,7 @@ export const StandaloneGallery = React.forwardRef<
         width={width}
         gutterWidth={gutterWidth}
         onIndexChange={_onIndexChange}
+        onPagerTranslateChange={onPagerTranslateChange}
         renderPage={(props) => (
           <PageRenderer
             width={width}

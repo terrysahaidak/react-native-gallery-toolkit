@@ -176,7 +176,9 @@ export default function ImageGalleryScreen() {
             hide();
           }
         }}
-        // onPagerTranslateChange={() => {}}
+        // onPagerTranslateChange={(translateX) => {
+        //   console.log(translateX);
+        // }}
       />
 
       <Animated.View

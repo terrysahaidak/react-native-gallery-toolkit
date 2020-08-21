@@ -29,6 +29,7 @@ import {
   friction,
   fixGestureHandler,
   getShouldRender,
+  workletNoop,
 } from './utils';
 
 const dimensions = Dimensions.get('window');
@@ -157,6 +158,7 @@ type IImagePager<T> = {
   getItem?: (data: T[], index: number) => T;
   pagerWrapperStyles?: any;
   springConfig?: Omit<Animated.WithSpringConfig, 'velocity'>;
+  onPagerTranslateChange?: (translateX: number) => void;
 };
 
 export function ImagePager<TPage>({
@@ -173,6 +175,7 @@ export function ImagePager<TPage>({
   pagerWrapperStyles = {},
   getItem,
   springConfig,
+  onPagerTranslateChange = workletNoop,
 }: IImagePager<TPage>) {
   fixGestureHandler();
 
@@ -402,11 +405,15 @@ export function ImagePager<TPage>({
   });
 
   const pagerStyles = useAnimatedStyle<ViewStyle>(() => {
+    const translateX = pagerX.value + offsetX.value;
+
+    onPagerTranslateChange(translateX);
+
     return {
       width: totalWidth.value,
       transform: [
         {
-          translateX: pagerX.value + offsetX.value,
+          translateX,
         },
       ],
     };
