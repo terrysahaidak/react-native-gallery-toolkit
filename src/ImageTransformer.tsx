@@ -622,7 +622,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
                           <Animated.View style={animatedStyles}>
                             {typeof renderImage === 'function' ? (
                               renderImage({
-                                imageSource,
+                                source: imageSource,
                                 width: targetWidth,
                                 height: targetHeight,
                               })
