@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { Platform } from 'react-native';
-import {
+import Animated, {
   makeRemote,
   useEvent,
   useDerivedValue,
@@ -22,7 +22,7 @@ function useRemoteContext<T extends object>(initialValue: T) {
   return context;
 }
 
-export function useDiff(sharedValue) {
+export function useDiff(sharedValue: Animated.SharedValue<any>) {
   const context = useRemoteContext({
     stash: 0,
     prev: null,
@@ -30,7 +30,9 @@ export function useDiff(sharedValue) {
 
   return useDerivedValue(() => {
     context.stash =
-      context.prev !== null ? sharedValue.value - context.prev : 0;
+      context.prev !== null
+        ? sharedValue.value - (context.prev ?? 0)
+        : 0;
     context.prev = sharedValue.value;
 
     return context.stash;
@@ -71,8 +73,9 @@ type ReturnHandler<T, TContext extends Context, R> = (
 
 interface GestureHandlers<T, TContext extends Context> {
   onInit?: Handler<T, TContext>;
-  shouldHandleEvent?: ReturnHandler<T, TContext, boolean>;
   onEvent?: Handler<T, TContext>;
+  shouldHandleEvent?: ReturnHandler<T, TContext, boolean>;
+  onGesture?: Handler<T, TContext>;
   beforeEach?: Handler<T, TContext>;
   afterEach?: Handler<T, TContext>;
   onStart?: Handler<T, TContext>;
@@ -117,6 +120,10 @@ export function useAnimatedGestureHandler<
       if (handlers.onInit && !context.__initialized) {
         context.__initialized = true;
         handlers.onInit(event, context);
+      }
+
+      if (handlers.onGesture) {
+        handlers.onGesture(event, context);
       }
 
       const stateDiff = diff(context, 'pinchState', event.state);
