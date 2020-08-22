@@ -6,13 +6,10 @@ import {
   StatusBar,
   StyleSheet,
 } from 'react-native';
+import Video from 'react-native-video';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-import {
-  StandaloneGallery,
-  GalleryItemType,
-  StandaloneGalleryHandler,
-} from 'reanimated-gallery';
+import { StandaloneGallery } from 'reanimated-gallery';
 
 import { RectButton } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
@@ -36,6 +33,20 @@ function getRandomIntInclusive(min: number, max: number) {
 
 const heights = [300, 400, 500, 540, 580, 600];
 
+type GalleryItemType =
+  | {
+      type: 'image';
+      id: string;
+      width: number;
+      height: number;
+      uri: string;
+    }
+  | {
+      type: 'video';
+      id: string;
+      uri: string;
+    };
+
 const images: GalleryItemType[] = Array.from(
   { length: 5 },
   (_, index) => {
@@ -43,6 +54,7 @@ const images: GalleryItemType[] = Array.from(
       heights[getRandomIntInclusive(0, heights.length - 1)];
 
     return {
+      type: 'image',
       id: index.toString(),
       uri: `https://picsum.photos/id/${index + 100}/${height}/400`,
       width: height,
@@ -50,6 +62,13 @@ const images: GalleryItemType[] = Array.from(
     };
   },
 );
+
+images.push({
+  type: 'video',
+  id: '8',
+  uri:
+    'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+});
 
 function Button({
   onPress,
@@ -100,7 +119,7 @@ export default function ImageGalleryScreen() {
   const [index, setIndex] = useState(20);
   const headerShown = useSharedValue(true);
 
-  const galleryRef = useRef<StandaloneGalleryHandler>(null);
+  const galleryRef = useRef<StandaloneGallery<GalleryItemType>>(null);
 
   function onIndexChange(nextIndex: number) {
     setIndex(nextIndex);
@@ -158,11 +177,37 @@ export default function ImageGalleryScreen() {
       <StandaloneGallery
         ref={galleryRef}
         initialIndex={1}
-        images={images}
+        items={images}
+        keyExtractor={(item) => item.id}
         gutterWidth={24}
         onIndexChange={onIndexChange}
         getItem={(data, i) => {
           return data[i];
+        }}
+        renderPage={({ item, ...rest }) => {
+          if (item.type === 'image') {
+            return (
+              <StandaloneGallery.ImageRenderer
+                item={item}
+                {...rest}
+              />
+            );
+          }
+
+          return null;
+
+          // return (
+          //   <Video
+          //     // controls
+          //     // paused
+          //     style={{
+          //       ...StyleSheet.absoluteFillObject,
+          //       top: 120,
+          //       bottom: 120,
+          //     }}
+          //     source={{ uri: item.uri }}
+          //   />
+          // );
         }}
         onInteraction={() => {
           hide();
@@ -175,6 +220,7 @@ export default function ImageGalleryScreen() {
             hide();
           }
         }}
+        numToRender={2}
         // onPagerTranslateChange={(translateX) => {
         //   console.log(translateX);
         // }}

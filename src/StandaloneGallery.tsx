@@ -1,8 +1,12 @@
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import { Dimensions } from 'react-native';
 import { GalleryItemType } from './types';
 
-import { ImagePager, RenderPageProps } from './Pager';
+import {
+  ImagePager,
+  RenderPageProps,
+  ImagePagerProps,
+} from './Pager';
 import {
   ImageTransformer,
   IImageTransformerProps,
@@ -10,26 +14,13 @@ import {
 
 const dimensions = Dimensions.get('window');
 
-type Handlers = {
+type Handlers<T> = {
   onTap?: IImageTransformerProps['onTap'];
   onDoubleTap?: IImageTransformerProps['onDoubleTap'];
   onInteraction?: IImageTransformerProps['onInteraction'];
   onPagerTranslateChange?: (translateX: number) => void;
+  onGesture?: ImagePagerProps<T>['onGesture'];
 };
-
-export type StandaloneGalleryProps = {
-  images: GalleryItemType[];
-  renderImage?: IImageTransformerProps['renderImage'];
-  initialIndex?: number;
-  width?: number;
-  height?: number;
-  gutterWidth?: number;
-  onIndexChange?: (nextIndex: number) => void;
-  getItem?: (
-    data: GalleryItemType[],
-    index: number,
-  ) => GalleryItemType;
-} & Handlers;
 
 export type StandaloneGalleryHandler = {
   goNext: () => void;
@@ -37,14 +28,37 @@ export type StandaloneGalleryHandler = {
   setIndex: (nextIndex: number) => void;
 };
 
-type PageRenderer = {
-  pagerProps: RenderPageProps<GalleryItemType>;
+type ImageRendererProps<T> = {
+  item: RenderPageProps<T>['item'];
+  pagerProps: RenderPageProps<T>;
   width: number;
   height: number;
   renderImage?: IImageTransformerProps['renderImage'];
-} & Handlers;
+} & Handlers<T>;
 
-function PageRenderer({
+export interface StandaloneGalleryProps<ItemT>
+  extends Handlers<ItemT> {
+  items: ReadonlyArray<ItemT>;
+  renderPage?: (props: ImageRendererProps<ItemT>) => JSX.Element;
+  renderImage?: IImageTransformerProps['renderImage'];
+  keyExtractor?: (item: ItemT, index: number) => string;
+  initialIndex?: number;
+  width?: number;
+  height?: number;
+  numToRender?: number;
+  gutterWidth?: number;
+  onIndexChange?: (nextIndex: number) => void;
+  getItem?: (data: ReadonlyArray<ItemT>, index: number) => ItemT;
+}
+
+function isImageItemType(type: any): type is GalleryItemType {
+  return (
+    typeof type === 'object' && 'width' in type && 'height' in type
+  );
+}
+
+export function ImageRenderer<T = unknown>({
+  item,
   pagerProps,
   width,
   height,
@@ -52,11 +66,15 @@ function PageRenderer({
   onTap,
   onInteraction,
   renderImage,
-}: PageRenderer) {
-  // TODO: Handle case when pagerProps.page is a promise
+}: ImageRendererProps<T>) {
+  if (!isImageItemType(item)) {
+    throw new Error(
+      'ImageRenderer: item should have both width and height',
+    );
+  }
 
-  const scaleFactor = pagerProps.page.width / width;
-  const targetHeight = pagerProps.page.height / scaleFactor;
+  const scaleFactor = item.width / width;
+  const targetHeight = item.height / scaleFactor;
 
   return (
     <ImageTransformer
@@ -66,9 +84,9 @@ function PageRenderer({
       height={targetHeight}
       renderImage={renderImage}
       onStateChange={pagerProps.onPageStateChange}
-      width={width}
       outerGestureHandlerRefs={pagerProps.pagerRefs}
-      uri={pagerProps.page.uri}
+      uri={item.uri}
+      width={width}
       onDoubleTap={onDoubleTap}
       onTap={onTap}
       onInteraction={onInteraction}
@@ -76,63 +94,120 @@ function PageRenderer({
   );
 }
 
-export const StandaloneGallery = React.forwardRef<
-  StandaloneGalleryHandler,
-  StandaloneGalleryProps
->(
-  (
-    {
-      images,
-      width = dimensions.width,
-      height = dimensions.height,
-      gutterWidth,
-      initialIndex = 0,
-      onIndexChange,
-      getItem,
+export class StandaloneGallery<ItemT> extends React.PureComponent<
+  StandaloneGalleryProps<ItemT>,
+  {
+    localIndex: number;
+  }
+> {
+  static ImageRenderer = ImageRenderer;
+
+  tempIndex: number = this.props.initialIndex ?? 0;
+
+  constructor(props: StandaloneGalleryProps<ItemT>) {
+    super(props);
+
+    this._renderPage = this._renderPage.bind(this);
+    this._keyExtractor = this._keyExtractor.bind(this);
+  }
+
+  state = {
+    localIndex: this.props.initialIndex ?? 0,
+  };
+
+  get totalCount() {
+    return this.props.items.length;
+  }
+
+  private setLocalIndex(nextIndex: number) {
+    this.setState({
+      localIndex: nextIndex,
+    });
+  }
+
+  private setTempIndex(nextIndex: number) {
+    this.tempIndex = nextIndex;
+  }
+
+  setIndex(nextIndex: number) {
+    this.setLocalIndex(nextIndex);
+  }
+
+  goNext() {
+    const nextIndex = this.tempIndex + 1;
+    if (nextIndex > this.totalCount - 1) {
+      console.warn(
+        'StandaloneGallery: Index cannot be bigger than pages count',
+      );
+      return;
+    }
+
+    this.setIndex(nextIndex);
+  }
+
+  goBack() {
+    const nextIndex = this.tempIndex - 1;
+
+    if (nextIndex < 0) {
+      console.warn('StandaloneGallery: Index cannot be negative');
+      return;
+    }
+
+    this.setIndex(nextIndex);
+  }
+
+  _keyExtractor(item: ItemT, index: number) {
+    if (typeof this.props.keyExtractor === 'function') {
+      return this.props.keyExtractor(item, index);
+    }
+
+    return index.toString();
+  }
+
+  _renderPage(pagerProps: RenderPageProps<ItemT>) {
+    const {
       onDoubleTap,
       onTap,
       onInteraction,
-      onPagerTranslateChange,
-    },
-    ref,
-  ) => {
-    const tempIndex = useRef(initialIndex);
-    const [localIndex, setLocalIndex] = useState(initialIndex);
+      width = dimensions.width,
+      height = dimensions.height,
+      renderPage,
+      renderImage,
+    } = this.props;
 
-    const totalCount = images.length;
+    const props = {
+      item: pagerProps.item,
+      width,
+      height,
+      pagerProps,
+      onDoubleTap,
+      onTap,
+      onInteraction,
+      renderImage,
+    };
 
-    React.useImperativeHandle(ref, () => ({
-      setIndex(nextIndex: number) {
-        setLocalIndex(nextIndex);
-      },
-
-      goNext() {
-        const nextIndex = tempIndex.current + 1;
-        if (nextIndex > totalCount - 1) {
-          console.warn(
-            'StandaloneGallery: Index cannot be bigger than pages count',
-          );
-          return;
-        }
-
-        this.setIndex(nextIndex);
-      },
-
-      goBack() {
-        const nextIndex = tempIndex.current - 1;
-
-        if (nextIndex < 0) {
-          console.warn('StandaloneGallery: Index cannot be negative');
-          return;
-        }
-
-        this.setIndex(nextIndex);
-      },
-    }));
-
-    function setTempIndex(index: number) {
-      tempIndex.current = index;
+    if (typeof renderPage === 'function') {
+      return renderPage(props);
     }
+
+    return <ImageRenderer {...props} />;
+  }
+
+  render() {
+    const {
+      items,
+      gutterWidth,
+      onIndexChange,
+      getItem,
+      width = dimensions.width,
+      onPagerTranslateChange,
+      numToRender,
+      onGesture,
+    } = this.props;
+
+    const setTempIndex = (index: number) => {
+      this.setTempIndex(index);
+    };
 
     function onIndexChangeWorklet(nextIndex: number) {
       'worklet';
@@ -146,27 +221,19 @@ export const StandaloneGallery = React.forwardRef<
 
     return (
       <ImagePager
-        totalCount={totalCount}
+        totalCount={this.totalCount}
         getItem={getItem}
-        keyExtractor={(item) => item.id}
-        initialIndex={localIndex}
-        pages={images}
+        keyExtractor={this._keyExtractor}
+        initialIndex={this.state.localIndex}
+        pages={items}
         width={width}
         gutterWidth={gutterWidth}
         onIndexChange={onIndexChangeWorklet}
         onPagerTranslateChange={onPagerTranslateChange}
-        renderPage={(props) => (
-          <PageRenderer
-            width={width}
-            height={height}
-            key={props.page.id}
-            pagerProps={props}
-            onDoubleTap={onDoubleTap}
-            onTap={onTap}
-            onInteraction={onInteraction}
-          />
-        )}
+        onGesture={onGesture}
+        renderPage={this._renderPage}
+        numToRender={numToRender}
       />
     );
-  },
-);
+  }
+}
