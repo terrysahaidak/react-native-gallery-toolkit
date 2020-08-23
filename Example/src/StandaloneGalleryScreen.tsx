@@ -1,4 +1,9 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
 import {
   Dimensions,
   View,
@@ -11,7 +16,10 @@ import Video from 'react-native-video';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { StandaloneGallery } from 'reanimated-gallery';
 
-import { RectButton } from 'react-native-gesture-handler';
+import {
+  RectButton,
+  PanGestureHandlerGestureEvent,
+} from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import Animated, {
   useSharedValue,
@@ -20,6 +28,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useScreens } from 'react-native-screens';
+import { createAnimatedGestureHandler } from '../../src/useAnimatedGestureHandler';
 
 useScreens(true);
 
@@ -119,6 +128,8 @@ export default function ImageGalleryScreen() {
   const [index, setIndex] = useState(20);
   const headerShown = useSharedValue(true);
 
+  const translateY = useSharedValue(1);
+
   const galleryRef = useRef<StandaloneGallery<GalleryItemType>>(null);
 
   function onIndexChange(nextIndex: number) {
@@ -162,6 +173,46 @@ export default function ImageGalleryScreen() {
     };
   });
 
+  function handleClose() {
+    nav.goBack();
+  }
+
+  const handler = useCallback(
+    createAnimatedGestureHandler<PanGestureHandlerGestureEvent, {}>({
+      shouldHandleEvent: (evt) => {
+        'worklet';
+
+        return (
+          evt.numberOfPointers === 1 &&
+          Math.abs(evt.velocityX) < Math.abs(evt.velocityY)
+        );
+      },
+
+      onActive: (evt) => {
+        'worklet';
+
+        translateY.value = evt.translationY;
+      },
+
+      onEnd: () => {
+        if (translateY.value > 80) {
+          handleClose();
+        } else {
+          translateY.value = withTiming(0);
+        }
+      },
+    }),
+    [],
+  );
+
+  const translateStyles = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateY: translateY.value,
+      },
+    ],
+  }));
+
   return (
     <View style={{ flex: 1 }}>
       <Animated.View
@@ -174,57 +225,68 @@ export default function ImageGalleryScreen() {
         ]}
       />
 
-      <StandaloneGallery
-        ref={galleryRef}
-        initialIndex={1}
-        items={images}
-        keyExtractor={(item) => item.id}
-        gutterWidth={24}
-        onIndexChange={onIndexChange}
-        getItem={(data, i) => {
-          return data[i];
-        }}
-        renderPage={({ item, ...rest }) => {
-          if (item.type === 'image') {
-            return (
-              <StandaloneGallery.ImageRenderer
-                item={item}
-                {...rest}
-              />
-            );
-          }
+      <Animated.View
+        style={[translateStyles, StyleSheet.absoluteFill]}
+      >
+        <StandaloneGallery
+          ref={galleryRef}
+          initialIndex={1}
+          items={images}
+          keyExtractor={(item) => item.id}
+          gutterWidth={24}
+          onIndexChange={onIndexChange}
+          getItem={(data, i) => {
+            return data[i];
+          }}
+          renderPage={({ item, ...rest }) => {
+            if (item.type === 'image') {
+              return (
+                <StandaloneGallery.ImageRenderer
+                  item={item}
+                  {...rest}
+                />
+              );
+            }
 
-          return null;
+            return null;
 
-          // return (
-          //   <Video
-          //     // controls
-          //     // paused
-          //     style={{
-          //       ...StyleSheet.absoluteFillObject,
-          //       top: 120,
-          //       bottom: 120,
-          //     }}
-          //     source={{ uri: item.uri }}
-          //   />
-          // );
-        }}
-        onInteraction={() => {
-          hide();
-        }}
-        onTap={() => {
-          toggleHeaderShown();
-        }}
-        onDoubleTap={(isScaled) => {
-          if (!isScaled) {
+            // return (
+            //   <Video
+            //     // controls
+            //     // paused
+            //     style={{
+            //       ...StyleSheet.absoluteFillObject,
+            //       top: 120,
+            //       bottom: 120,
+            //     }}
+            //     source={{ uri: item.uri }}
+            //   />
+            // );
+          }}
+          onInteraction={() => {
             hide();
-          }
-        }}
-        numToRender={2}
-        // onPagerTranslateChange={(translateX) => {
-        //   console.log(translateX);
-        // }}
-      />
+          }}
+          onTap={() => {
+            toggleHeaderShown();
+          }}
+          onDoubleTap={(isScaled) => {
+            if (!isScaled) {
+              hide();
+            }
+          }}
+          numToRender={2}
+          onGesture={(evt, isActive) => {
+            'worklet';
+
+            if (isActive.value) {
+              handler(evt);
+            }
+          }}
+          // onPagerTranslateChange={(translateX) => {
+          //   console.log(translateX);
+          // }}
+        />
+      </Animated.View>
 
       <Animated.View
         style={[
