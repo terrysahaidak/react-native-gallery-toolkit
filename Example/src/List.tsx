@@ -7,11 +7,10 @@ import {
 } from '@react-navigation/native';
 import {
   createStackNavigator,
-  TransitionPresets,
   Header,
   StackHeaderProps,
 } from '@react-navigation/stack';
-import { View, Text, Platform, StatusBar } from 'react-native';
+import { View, Text, StatusBar } from 'react-native';
 import { useGalleryInit } from 'reanimated-gallery';
 import Animated from 'react-native-reanimated';
 import StandaloneGalleryScreen, {
@@ -77,19 +76,13 @@ export default function App() {
     <>
       <StatusBar translucent showHideTransition="fade" />
       <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{
-            ...(Platform.OS === 'android'
-              ? TransitionPresets.ScaleFromCenterAndroid
-              : TransitionPresets.DefaultTransition),
-          }}
-          headerMode="screen"
-        >
+        <Stack.Navigator headerMode="screen">
           <Stack.Screen component={Home} name="Home" />
           <Stack.Screen
             name="Standalone"
             component={StandaloneGalleryScreen}
             options={({ route }) => ({
+              animationEnabled: false,
               headerTransparent: true,
               headerBackground: () => (
                 <View style={{ backgroundColor: 'white', flex: 1 }} />

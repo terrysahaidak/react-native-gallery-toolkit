@@ -72,12 +72,12 @@ const images: GalleryItemType[] = Array.from(
   },
 );
 
-images.push({
-  type: 'video',
-  id: '8',
-  uri:
-    'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-});
+// images.push({
+//   type: 'video',
+//   id: '8',
+//   uri:
+//     'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+// });
 
 function Button({
   onPress,
@@ -129,6 +129,7 @@ export default function ImageGalleryScreen() {
   const headerShown = useSharedValue(true);
 
   const translateY = useSharedValue(1);
+  const bottomTranslateY = useSharedValue(1);
 
   const galleryRef = useRef<StandaloneGallery<GalleryItemType>>(null);
 
@@ -173,8 +174,20 @@ export default function ImageGalleryScreen() {
     };
   });
 
+  const aStyles3 = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateY: bottomTranslateY.value }],
+    };
+  });
+
   function handleClose() {
     nav.goBack();
+  }
+
+  function shouldPagerHandleGestureEvent() {
+    'worklet';
+
+    return translateY.value === 0;
   }
 
   const handler = useCallback(
@@ -192,13 +205,19 @@ export default function ImageGalleryScreen() {
         'worklet';
 
         translateY.value = evt.translationY;
+
+        bottomTranslateY.value =
+          evt.translationY > 0 ? evt.translationY : 0;
       },
 
       onEnd: () => {
         if (translateY.value > 80) {
-          handleClose();
+          translateY.value = withTiming(-800, undefined, () => {
+            handleClose();
+          });
         } else {
           translateY.value = withTiming(0);
+          bottomTranslateY.value = withTiming(0);
         }
       },
     }),
@@ -235,6 +254,7 @@ export default function ImageGalleryScreen() {
           keyExtractor={(item) => item.id}
           gutterWidth={24}
           onIndexChange={onIndexChange}
+
           getItem={(data, i) => {
             return data[i];
           }}
@@ -275,6 +295,7 @@ export default function ImageGalleryScreen() {
             }
           }}
           numToRender={2}
+          shouldPagerHandleGestureEvent={shouldPagerHandleGestureEvent}
           onGesture={(evt, isActive) => {
             'worklet';
 
@@ -303,6 +324,7 @@ export default function ImageGalleryScreen() {
             backgroundColor: 'white',
           },
           aStyles,
+          aStyles3,
         ]}
       >
         <Button onPress={onBack} text="Back" />

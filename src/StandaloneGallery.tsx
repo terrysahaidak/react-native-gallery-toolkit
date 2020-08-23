@@ -1,5 +1,6 @@
 import React from 'react';
 import { Dimensions } from 'react-native';
+
 import { GalleryItemType } from './types';
 
 import {
@@ -19,7 +20,10 @@ type Handlers<T> = {
   onDoubleTap?: IImageTransformerProps['onDoubleTap'];
   onInteraction?: IImageTransformerProps['onInteraction'];
   onPagerTranslateChange?: (translateX: number) => void;
-onGesture?: ImagePagerProps<T>['onGesture'];
+  onGesture?: ImagePagerProps<T>['onGesture'];
+  shouldPagerHandleGestureEvent?: ImagePagerProps<
+    T
+  >['shouldHandleGestureEvent'];
 };
 
 export type StandaloneGalleryHandler = {
@@ -203,6 +207,7 @@ export class StandaloneGallery<ItemT> extends React.PureComponent<
       onPagerTranslateChange,
       numToRender,
       onGesture,
+      shouldPagerHandleGestureEvent,
     } = this.props;
 
     const setTempIndex = (index: number) => {
@@ -230,6 +235,7 @@ export class StandaloneGallery<ItemT> extends React.PureComponent<
         gutterWidth={gutterWidth}
         onIndexChange={onIndexChangeWorklet}
         onPagerTranslateChange={onPagerTranslateChange}
+        shouldHandleGestureEvent={shouldPagerHandleGestureEvent}
         onGesture={onGesture}
         renderPage={this._renderPage}
         numToRender={numToRender}

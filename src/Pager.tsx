@@ -167,7 +167,17 @@ export type ImagePagerProps<T> = {
       PanGestureHandlerEventExtra,
     isActive: Animated.SharedValue<boolean>,
   ) => void;
+  shouldHandleGestureEvent?: (
+    event: GestureHandlerGestureEventNativeEvent &
+      PanGestureHandlerEventExtra,
+  ) => boolean;
 };
+
+function workletNoopTrue() {
+  'worklet';
+
+  return true;
+}
 
 export function ImagePager<TPage>({
   pages,
@@ -185,6 +195,7 @@ export function ImagePager<TPage>({
   springConfig,
   onPagerTranslateChange = workletNoop,
   onGesture = workletNoop,
+  shouldHandleGestureEvent = workletNoopTrue,
   initialDiffValue = 0,
 }: ImagePagerProps<TPage>) {
   fixGestureHandler();
@@ -358,7 +369,8 @@ export function ImagePager<TPage>({
       return (
         evt.numberOfPointers === 1 &&
         isActive.value &&
-        Math.abs(evt.velocityX) > Math.abs(evt.velocityY)
+        Math.abs(evt.velocityX) > Math.abs(evt.velocityY) &&
+        shouldHandleGestureEvent(evt)
       );
     },
 
