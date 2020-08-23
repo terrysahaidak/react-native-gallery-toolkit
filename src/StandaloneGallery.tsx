@@ -19,7 +19,7 @@ type Handlers<T> = {
   onDoubleTap?: IImageTransformerProps['onDoubleTap'];
   onInteraction?: IImageTransformerProps['onInteraction'];
   onPagerTranslateChange?: (translateX: number) => void;
-  onGesture?: ImagePagerProps<T>['onGesture'];
+onGesture?: ImagePagerProps<T>['onGesture'];
 };
 
 export type StandaloneGalleryHandler = {

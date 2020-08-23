@@ -165,6 +165,7 @@ export type ImagePagerProps<T> = {
   onGesture?: (
     event: GestureHandlerGestureEventNativeEvent &
       PanGestureHandlerEventExtra,
+    isActive: Animated.SharedValue<boolean>,
   ) => void;
 };
 
@@ -350,7 +351,7 @@ export function ImagePager<TPage>({
     }
   >({
     onGesture: (evt) => {
-      onGesture(evt);
+      onGesture(evt, isActive);
     },
 
     shouldHandleEvent: (evt) => {
@@ -470,7 +471,6 @@ export function ImagePager<TPage>({
           ref={pagerRef}
           simultaneousHandlers={tapRef}
           onGestureEvent={onPan}
-          activeOffsetX={[-10, 10]}
         >
           <Animated.View style={StyleSheet.absoluteFill}>
             <TapGestureHandler
