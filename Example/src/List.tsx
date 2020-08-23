@@ -16,6 +16,7 @@ import Animated from 'react-native-reanimated';
 import StandaloneGalleryScreen, {
   useToggleOpacity,
 } from './StandaloneGalleryScreen';
+import StandaloneGalleryBasicScreen from './StandaloneGalleryBasicScreen';
 
 const Stack = createStackNavigator();
 
@@ -48,7 +49,8 @@ function Home() {
 
   return (
     <>
-      <ListItem title="Standalone" />
+      <ListItem title="Standalone basic" />
+      <ListItem title="Standalone full featured" />
     </>
   );
 }
@@ -79,7 +81,11 @@ export default function App() {
         <Stack.Navigator headerMode="screen">
           <Stack.Screen component={Home} name="Home" />
           <Stack.Screen
-            name="Standalone"
+            component={StandaloneGalleryBasicScreen}
+            name="Standalone basic"
+          />
+          <Stack.Screen
+            name="Standalone full featured"
             component={StandaloneGalleryScreen}
             options={({ route }) => ({
               animationEnabled: false,

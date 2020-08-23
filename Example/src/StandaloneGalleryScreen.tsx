@@ -128,8 +128,8 @@ export default function ImageGalleryScreen() {
   const [index, setIndex] = useState(20);
   const headerShown = useSharedValue(true);
 
-  const translateY = useSharedValue(1);
-  const bottomTranslateY = useSharedValue(1);
+  const translateY = useSharedValue(0);
+  const bottomTranslateY = useSharedValue(0);
 
   const galleryRef = useRef<StandaloneGallery<GalleryItemType>>(null);
 
@@ -254,7 +254,6 @@ export default function ImageGalleryScreen() {
           keyExtractor={(item) => item.id}
           gutterWidth={24}
           onIndexChange={onIndexChange}
-
           getItem={(data, i) => {
             return data[i];
           }}
@@ -295,7 +294,9 @@ export default function ImageGalleryScreen() {
             }
           }}
           numToRender={2}
-          shouldPagerHandleGestureEvent={shouldPagerHandleGestureEvent}
+          shouldPagerHandleGestureEvent={
+            shouldPagerHandleGestureEvent
+          }
           onGesture={(evt, isActive) => {
             'worklet';
 
