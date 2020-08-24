@@ -5,7 +5,7 @@
 
 # Development status
 
-Currently, only standalone gallery (which you can render on a separate screen) is available. I'm preparing documentation for Pager and ImageTransformer components. For more info see Roadmap.
+Currently, only standalone gallery (which you can render on a separate screen) is available. I'm preparing documentation for Pager and ImageTransformer components.
 
 ![Gallery in action gif](gifs/promo.gif)
 
@@ -50,24 +50,24 @@ const images: GalleryItemType[] = [
 ];
 
 export default function App() {
-  return <StandaloneGallery images={images} />;
+  return <StandaloneGallery items={images} />;
 }
 
 ```
 
 For full example see [Examples](#examples).
 
-### ImagePager
+#### Props
 
 WIP
 
-### ImageTransformer
+### Pager
 
 WIP
 
-## Props
+### Transformer
 
-
+WIP
 
 ## Examples
 
