@@ -1,9 +1,12 @@
 import React from 'react';
-
+import { Dimensions } from 'react-native';
 import {
   StandaloneGallery,
   GalleryItemType,
 } from 'reanimated-gallery';
+import { useHeaderHeight } from '@react-navigation/stack';
+
+const { height } = Dimensions.get('window');
 
 const images: GalleryItemType[] = [
   {
@@ -21,5 +24,11 @@ const images: GalleryItemType[] = [
 ];
 
 export default function StandaloneGalleryBasicScreen() {
-  return <StandaloneGallery items={images} />;
+  const headerHeight = useHeaderHeight();
+  return (
+    <StandaloneGallery
+      height={height - headerHeight}
+      items={images}
+    />
+  );
 }
