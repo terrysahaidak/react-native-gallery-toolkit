@@ -84,7 +84,12 @@ export default function App() {
     <>
       <StatusBar translucent showHideTransition="fade" />
       <NavigationContainer>
-        <Stack.Navigator headerMode="screen">
+        <Stack.Navigator
+          screenOptions={{
+            gestureEnabled: false,
+          }}
+          headerMode="screen"
+        >
           <Stack.Screen component={Home} name="Home" />
           <Stack.Screen
             component={StandaloneGalleryBasicScreen}
@@ -99,7 +104,6 @@ export default function App() {
               headerBackground: () => (
                 <View style={{ backgroundColor: 'white', flex: 1 }} />
               ),
-              gestureEnabled: false,
               header: (headerProps) => (
                 <CustomHeader
                   headerShown={route?.params?.headerShown ?? true}

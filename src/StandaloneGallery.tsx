@@ -56,7 +56,7 @@ function isImageItemType(type: any): type is GalleryItemType {
     typeof type === 'object' &&
     'width' in type &&
     'height' in type &&
-    'source' in type
+    'uri' in type
   );
 }
 
