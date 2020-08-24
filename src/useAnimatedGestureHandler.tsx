@@ -102,8 +102,7 @@ export function createAnimatedGestureHandler<
   const isAndroid = Platform.OS === 'android';
 
   const handler = (
-    event: T['nativeEvent'] &
-      GestureHandlerStateChangeEvent['nativeEvent'],
+    event: T['nativeEvent'],
   ) => {
     'worklet';
 
@@ -162,6 +161,7 @@ export function createAnimatedGestureHandler<
         handlers.onActive(event, context);
       }
       if (
+        // @ts-ignore
         event.oldState === ACTIVE &&
         event.state === END &&
         handlers.onEnd
@@ -169,6 +169,7 @@ export function createAnimatedGestureHandler<
         handlers.onEnd(event, context);
       }
       if (
+        // @ts-ignore
         event.oldState === ACTIVE &&
         event.state === FAILED &&
         handlers.onFail
@@ -176,13 +177,14 @@ export function createAnimatedGestureHandler<
         handlers.onFail(event, context);
       }
       if (
+        // @ts-ignore
         event.oldState === ACTIVE &&
         event.state === CANCELLED &&
         handlers.onCancel
       ) {
         handlers.onCancel(event, context);
       }
-
+      // @ts-ignore
       if (event.oldState === ACTIVE) {
         if (handlers.onFinish) {
           handlers.onFinish(
@@ -197,7 +199,7 @@ export function createAnimatedGestureHandler<
         handlers.afterEach(event, context);
       }
     }
-
+    // @ts-ignore
     if (event.oldState === ACTIVE) {
       context._shouldSkip = undefined;
     }
