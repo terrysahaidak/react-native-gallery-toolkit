@@ -3,48 +3,44 @@ import { Dimensions } from 'react-native';
 
 import { GalleryItemType } from './types';
 
-import {
-  ImagePager,
-  RenderPageProps,
-  ImagePagerProps,
-} from './Pager';
+import { Pager, RenderPageProps, PagerProps } from './Pager';
 import {
   ImageTransformer,
-  IImageTransformerProps,
+  ImageTransformerProps,
 } from './ImageTransformer';
 
 const dimensions = Dimensions.get('window');
 
-type Handlers<T> = {
-  onTap?: IImageTransformerProps['onTap'];
-  onDoubleTap?: IImageTransformerProps['onDoubleTap'];
-  onInteraction?: IImageTransformerProps['onInteraction'];
+interface Handlers<T> {
+  onTap?: ImageTransformerProps['onTap'];
+  onDoubleTap?: ImageTransformerProps['onDoubleTap'];
+  onInteraction?: ImageTransformerProps['onInteraction'];
   onPagerTranslateChange?: (translateX: number) => void;
-  onGesture?: ImagePagerProps<T>['onGesture'];
-  shouldPagerHandleGestureEvent?: ImagePagerProps<
+  onGesture?: PagerProps<T>['onGesture'];
+  shouldPagerHandleGestureEvent?: PagerProps<
     T
   >['shouldHandleGestureEvent'];
-};
+}
 
-export type StandaloneGalleryHandler = {
+export interface StandaloneGalleryHandler {
   goNext: () => void;
   goBack: () => void;
   setIndex: (nextIndex: number) => void;
-};
+}
 
-type ImageRendererProps<T> = {
+interface ImageRendererProps<T> extends Handlers<T> {
   item: RenderPageProps<T>['item'];
   pagerProps: RenderPageProps<T>;
   width: number;
   height: number;
-  renderImage?: IImageTransformerProps['renderImage'];
-} & Handlers<T>;
+  renderImage?: ImageTransformerProps['renderImage'];
+}
 
 export interface StandaloneGalleryProps<ItemT>
   extends Handlers<ItemT> {
   items: ReadonlyArray<ItemT>;
   renderPage?: (props: ImageRendererProps<ItemT>) => JSX.Element;
-  renderImage?: IImageTransformerProps['renderImage'];
+  renderImage?: ImageTransformerProps['renderImage'];
   keyExtractor?: (item: ItemT, index: number) => string;
   initialIndex?: number;
   width?: number;
@@ -57,7 +53,10 @@ export interface StandaloneGalleryProps<ItemT>
 
 function isImageItemType(type: any): type is GalleryItemType {
   return (
-    typeof type === 'object' && 'width' in type && 'height' in type
+    typeof type === 'object' &&
+    'width' in type &&
+    'height' in type &&
+    'source' in type
   );
 }
 
@@ -225,7 +224,7 @@ export class StandaloneGallery<ItemT> extends React.PureComponent<
     }
 
     return (
-      <ImagePager
+      <Pager
         totalCount={this.totalCount}
         getItem={getItem}
         keyExtractor={this._keyExtractor}

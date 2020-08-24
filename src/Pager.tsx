@@ -23,8 +23,6 @@ import {
   PanGestureHandler,
   TapGestureHandler,
   PanGestureHandlerGestureEvent,
-  GestureHandlerGestureEventNativeEvent,
-  PanGestureHandlerEventExtra,
 } from 'react-native-gesture-handler';
 import { useAnimatedGestureHandler } from './useAnimatedGestureHandler';
 import {
@@ -61,7 +59,7 @@ type PageRefs = [
   React.Ref<PanGestureHandler>,
 ];
 
-export type RenderPageProps<T> = {
+export interface RenderPageProps<T> {
   index: number;
   pagerRefs: PageRefs;
   onPageStateChange: (value: boolean) => void;
@@ -69,9 +67,9 @@ export type RenderPageProps<T> = {
   width: number;
   isActive: Animated.SharedValue<boolean>;
   isPagerInProgress: Animated.SharedValue<boolean>;
-};
+}
 
-type IPageProps = {
+interface PageProps {
   item: any;
   pagerRefs: PageRefs;
   onPageStateChange: (value: boolean) => void;
@@ -84,9 +82,9 @@ type IPageProps = {
   width: number;
   currentIndex: Animated.SharedValue<number>;
   isPagerInProgress: Animated.SharedValue<boolean>;
-};
+}
 
-const Page = React.memo<IPageProps>(
+const Page = React.memo<PageProps>(
   ({
     pagerRefs,
     item,
@@ -146,7 +144,7 @@ const Page = React.memo<IPageProps>(
   },
 );
 
-export type ImagePagerProps<T> = {
+export interface PagerProps<T> {
   initialIndex: number;
   totalCount: number;
   pages: ReadonlyArray<T>;
@@ -163,15 +161,13 @@ export type ImagePagerProps<T> = {
   springConfig?: Omit<Animated.WithSpringConfig, 'velocity'>;
   onPagerTranslateChange?: (translateX: number) => void;
   onGesture?: (
-    event: GestureHandlerGestureEventNativeEvent &
-      PanGestureHandlerEventExtra,
+    event: PanGestureHandlerGestureEvent['nativeEvent'],
     isActive: Animated.SharedValue<boolean>,
   ) => void;
   shouldHandleGestureEvent?: (
-    event: GestureHandlerGestureEventNativeEvent &
-      PanGestureHandlerEventExtra,
+    event: PanGestureHandlerGestureEvent['nativeEvent'],
   ) => boolean;
-};
+}
 
 function workletNoopTrue() {
   'worklet';
@@ -179,7 +175,7 @@ function workletNoopTrue() {
   return true;
 }
 
-export function ImagePager<TPage>({
+export function Pager<TPage>({
   pages,
   initialIndex,
   totalCount,
@@ -197,7 +193,7 @@ export function ImagePager<TPage>({
   onGesture = workletNoop,
   shouldHandleGestureEvent = workletNoopTrue,
   initialDiffValue = 0,
-}: ImagePagerProps<TPage>) {
+}: PagerProps<TPage>) {
   fixGestureHandler();
 
   // make sure to not calculate translate with gutter

@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useCallback } from 'react';
 import {
   StyleSheet,
   Image,
@@ -62,7 +62,14 @@ const defaultTimingConfig = {
   easing: Easing.bezier(0.33, 0.01, 0, 1),
 };
 
-export type IImageTransformerProps = {
+export interface RenderImageProps {
+  width: number;
+  height: number;
+  source: { uri: string } | ImageRequireSource;
+  onLoad: () => void;
+};
+
+export interface ImageTransformerProps {
   outerGestureHandlerRefs?: React.Ref<any>[];
   source?: ImageRequireSource;
   uri?: string;
@@ -73,11 +80,7 @@ export type IImageTransformerProps = {
     height: number;
   };
   onStateChange?: (isActive: boolean) => void;
-  renderImage?: (props: {
-    width: number;
-    height: number;
-    source: { uri: string } | ImageRequireSource;
-  }) => React.ComponentType<any>;
+  renderImage?: (props: RenderImageProps) => JSX.Element;
   isActive?: Animated.SharedValue<boolean>;
   outerGestureHandlerActive?: Animated.SharedValue<boolean>;
   onTap?: (isScaled: boolean) => void;
@@ -90,6 +93,8 @@ export type IImageTransformerProps = {
   MAX_SCALE?: number;
   MIN_SCALE?: number;
   OVER_SCALE?: number;
+
+  enabled?: boolean;
 };
 
 function checkIsNotUsed(handlerState: Animated.SharedValue<State>) {
@@ -105,7 +110,7 @@ const AnimatedImageComponent = Animated.createAnimatedComponent(
   Image,
 );
 
-export const ImageTransformer = React.memo<IImageTransformerProps>(
+export const ImageTransformer = React.memo<ImageTransformerProps>(
   ({
     outerGestureHandlerRefs = [],
     source,
@@ -127,6 +132,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     OVER_SCALE = 0.5,
     timingConfig = defaultTimingConfig,
     springConfig = defaultSpringConfig,
+    enabled = true,
   }) => {
     fixGestureHandler();
 
@@ -139,6 +145,14 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     const imageSource = source ?? {
       uri: uri!,
     };
+
+    const interactionsEnabled = useSharedValue(false);
+    const setInteractionsEnabled = useCallback((value: boolean) => {
+      interactionsEnabled.value = value;
+    }, []);
+    const onLoadImageSuccess = useCallback(() => {
+      setInteractionsEnabled(true);
+    }, []);
 
     const pinchRef = useRef(null);
     const panRef = useRef(null);
@@ -283,7 +297,8 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         return (
           scale.value > 1 &&
           typeof outerGestureHandlerActive !== 'undefined' &&
-          !outerGestureHandlerActive.value
+          !outerGestureHandlerActive.value &&
+          interactionsEnabled.value
         );
       },
 
@@ -373,7 +388,8 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         return (
           evt.numberOfPointers === 2 &&
           typeof outerGestureHandlerActive !== 'undefined' &&
-          !outerGestureHandlerActive.value
+          !outerGestureHandlerActive.value &&
+          interactionsEnabled.value
         );
       },
 
@@ -461,7 +477,8 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         return (
           evt.numberOfPointers === 1 &&
           typeof outerGestureHandlerActive !== 'undefined' &&
-          !outerGestureHandlerActive.value
+          !outerGestureHandlerActive.value &&
+          interactionsEnabled.value
         );
       },
 
@@ -516,7 +533,8 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         return (
           evt.numberOfPointers === 1 &&
           typeof outerGestureHandlerActive !== 'undefined' &&
-          !outerGestureHandlerActive.value
+          !outerGestureHandlerActive.value &&
+          interactionsEnabled.value
         );
       },
 
@@ -569,6 +587,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
     return (
       <Animated.View style={[styles.container, { width }, style]}>
         <PinchGestureHandler
+          enabled={enabled}
           ref={pinchRef}
           onGestureEvent={onScaleEvent}
           simultaneousHandlers={[
@@ -579,6 +598,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
         >
           <Animated.View style={styles.fill}>
             <PanGestureHandler
+              enabled={enabled}
               ref={panRef}
               minDist={10}
               avgTouches
@@ -591,6 +611,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
             >
               <Animated.View style={styles.fill}>
                 <TapGestureHandler
+                  enabled={enabled}
                   ref={tapRef}
                   numberOfTaps={1}
                   maxDeltaX={8}
@@ -607,6 +628,7 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
                     <Animated.View style={styles.fill}>
                       <Animated.View style={styles.wrapper}>
                         <TapGestureHandler
+                          enabled={enabled}
                           ref={doubleTapRef}
                           numberOfTaps={2}
                           maxDelayMs={140}
@@ -625,9 +647,11 @@ export const ImageTransformer = React.memo<IImageTransformerProps>(
                                 source: imageSource,
                                 width: targetWidth,
                                 height: targetHeight,
+                                onLoad: onLoadImageSuccess,
                               })
                             ) : (
                               <AnimatedImageComponent
+                                onLoad={onLoadImageSuccess}
                                 source={imageSource}
                                 style={{
                                   width: targetWidth,

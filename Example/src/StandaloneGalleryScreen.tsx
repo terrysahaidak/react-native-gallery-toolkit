@@ -10,11 +10,17 @@ import {
   Text,
   StatusBar,
   StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
-import Video from 'react-native-video';
+import Image from 'react-native-fast-image';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { StandaloneGallery } from 'reanimated-gallery';
+import {
+  StandaloneGallery,
+  createAnimatedGestureHandler,
+  RenderImageProps,
+  
+} from 'reanimated-gallery';
 
 import {
   RectButton,
@@ -26,11 +32,6 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
-
-import { useScreens } from 'react-native-screens';
-import { createAnimatedGestureHandler } from '../../src/useAnimatedGestureHandler';
-
-useScreens(true);
 
 const dimensions = Dimensions.get('window');
 
@@ -72,12 +73,20 @@ const images: GalleryItemType[] = Array.from(
   },
 );
 
-// images.push({
-//   type: 'video',
-//   id: '8',
-//   uri:
-//     'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-// });
+images.push({
+  type: 'image',
+  id: '8',
+  uri: 'https://picsum.photos/id/index/height/400',
+  width: 200,
+  height: 200,
+});
+
+images.push({
+  type: 'video',
+  id: '7',
+  uri:
+    'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+});
 
 function Button({
   onPress,
@@ -122,6 +131,62 @@ export function useToggleOpacity(prop: boolean) {
   return styles;
 }
 
+function ImageRender({
+  width,
+  height,
+  source,
+  onLoad,
+}: RenderImageProps) {
+  const [isLoading, setLoadingState] = useState(true);
+  const [isError, setErrorState] = useState(false);
+
+  return (
+    <>
+      {isLoading && (
+        <View
+          style={{
+            width,
+            height,
+            justifyContent: 'center',
+            alignItems: 'center',
+            ...StyleSheet.absoluteFillObject,
+          }}
+        >
+          <ActivityIndicator size="large" color="blue" />
+        </View>
+      )}
+      {isError && (
+        <View
+          style={{
+            width,
+            height,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingTop: 80,
+            ...StyleSheet.absoluteFillObject,
+          }}
+        >
+          <Text>Error loading image</Text>
+        </View>
+      )}
+      <Image
+        onError={() => {
+          setErrorState(true);
+        }}
+        onLoad={() => {
+          onLoad();
+          setLoadingState(false);
+        }}
+        style={{
+          width,
+          height,
+        }}
+        source={source}
+      />
+    </>
+  );
+}
+
 export default function ImageGalleryScreen() {
   const nav = useNavigation();
 
@@ -161,20 +226,9 @@ export default function ImageGalleryScreen() {
     setHeaderShown(false);
   }
 
-  const aStyles = useToggleOpacity(headerShown.value);
-  const aStyles2 = useAnimatedStyle(() => {
-    if (headerShown.value) {
-      return {
-        opacity: withTiming(0),
-      };
-    }
+  const opacityAnimatedStyles = useToggleOpacity(headerShown.value);
 
-    return {
-      opacity: withTiming(1),
-    };
-  });
-
-  const aStyles3 = useAnimatedStyle(() => {
+  const translateYAnimatedStyles = useAnimatedStyle(() => {
     return {
       transform: [{ translateY: bottomTranslateY.value }],
     };
@@ -212,9 +266,9 @@ export default function ImageGalleryScreen() {
 
       onEnd: () => {
         if (translateY.value > 80) {
-          translateY.value = withTiming(-800, undefined, () => {
-            handleClose();
-          });
+          translateY.value = withTiming(-800, undefined);
+
+          handleClose();
         } else {
           translateY.value = withTiming(0);
           bottomTranslateY.value = withTiming(0);
@@ -235,16 +289,6 @@ export default function ImageGalleryScreen() {
   return (
     <View style={{ flex: 1 }}>
       <Animated.View
-        style={[
-          StyleSheet.absoluteFill,
-          {
-            backgroundColor: 'black',
-          },
-          aStyles2,
-        ]}
-      />
-
-      <Animated.View
         style={[translateStyles, StyleSheet.absoluteFill]}
       >
         <StandaloneGallery
@@ -254,6 +298,9 @@ export default function ImageGalleryScreen() {
           keyExtractor={(item) => item.id}
           gutterWidth={24}
           onIndexChange={onIndexChange}
+          renderImage={(props) => {
+            return <ImageRender {...props} />;
+          }}
           getItem={(data, i) => {
             return data[i];
           }}
@@ -267,20 +314,12 @@ export default function ImageGalleryScreen() {
               );
             }
 
-            return null;
-
-            // return (
-            //   <Video
-            //     // controls
-            //     // paused
-            //     style={{
-            //       ...StyleSheet.absoluteFillObject,
-            //       top: 120,
-            //       bottom: 120,
-            //     }}
-            //     source={{ uri: item.uri }}
-            //   />
-            // );
+            // TODO: Figure out why Video component is not working
+            return (
+              <View>
+                <Text>I can be a video</Text>
+              </View>
+            );
           }}
           onInteraction={() => {
             hide();
@@ -324,8 +363,8 @@ export default function ImageGalleryScreen() {
             alignItems: 'center',
             backgroundColor: 'white',
           },
-          aStyles,
-          aStyles3,
+          opacityAnimatedStyles,
+          translateYAnimatedStyles,
         ]}
       >
         <Button onPress={onBack} text="Back" />
