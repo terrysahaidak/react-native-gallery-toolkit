@@ -59,18 +59,18 @@ type PageRefs = [
   React.Ref<PanGestureHandler>,
 ];
 
-export type RenderPageProps<T> = {
+export interface RenderPageProps<T> {
   index: number;
   pagerRefs: PageRefs;
   onPageStateChange: (value: boolean) => void;
-  page: T;
+  item: T;
   width: number;
   isActive: Animated.SharedValue<boolean>;
   isPagerInProgress: Animated.SharedValue<boolean>;
-};
+}
 
-type IPageProps = {
-  page: any;
+interface PageProps {
+  item: any;
   pagerRefs: PageRefs;
   onPageStateChange: (value: boolean) => void;
   gutterWidth: number;
@@ -82,12 +82,12 @@ type IPageProps = {
   width: number;
   currentIndex: Animated.SharedValue<number>;
   isPagerInProgress: Animated.SharedValue<boolean>;
-};
+}
 
-const Page = React.memo<IPageProps>(
+const Page = React.memo<PageProps>(
   ({
     pagerRefs,
-    page,
+    item,
     onPageStateChange,
     gutterWidth,
     index,
@@ -129,7 +129,7 @@ const Page = React.memo<IPageProps>(
             index,
             pagerRefs,
             onPageStateChange,
-            page,
+            item,
             width,
             isActive,
             isPagerInProgress,
@@ -144,11 +144,12 @@ const Page = React.memo<IPageProps>(
   },
 );
 
-type IImagePager<T> = {
+export interface PagerProps<T> {
   initialIndex: number;
   totalCount: number;
-  pages: T[];
+  pages: ReadonlyArray<T>;
   numToRender?: number;
+  initialDiffValue?: number;
   width?: number;
   gutterWidth?: number;
   onIndexChange?: (nextIndex: number) => void;
@@ -159,9 +160,22 @@ type IImagePager<T> = {
   pagerWrapperStyles?: any;
   springConfig?: Omit<Animated.WithSpringConfig, 'velocity'>;
   onPagerTranslateChange?: (translateX: number) => void;
-};
+  onGesture?: (
+    event: PanGestureHandlerGestureEvent['nativeEvent'],
+    isActive: Animated.SharedValue<boolean>,
+  ) => void;
+  shouldHandleGestureEvent?: (
+    event: PanGestureHandlerGestureEvent['nativeEvent'],
+  ) => boolean;
+}
 
-export function ImagePager<TPage>({
+function workletNoopTrue() {
+  'worklet';
+
+  return true;
+}
+
+export function Pager<TPage>({
   pages,
   initialIndex,
   totalCount,
@@ -176,7 +190,10 @@ export function ImagePager<TPage>({
   getItem,
   springConfig,
   onPagerTranslateChange = workletNoop,
-}: IImagePager<TPage>) {
+  onGesture = workletNoop,
+  shouldHandleGestureEvent = workletNoopTrue,
+  initialDiffValue = 0,
+}: PagerProps<TPage>) {
   fixGestureHandler();
 
   // make sure to not calculate translate with gutter
@@ -207,7 +224,7 @@ export function ImagePager<TPage>({
   const scale = useSharedValue(1);
   const velocity = useSharedValue(0);
 
-  const [diffValue, setDiffValue] = useState(numToRender);
+  const [diffValue, setDiffValue] = useState(initialDiffValue);
   useEffect(() => {
     setDiffValue(numToRender);
   }, [numToRender]);
@@ -340,11 +357,16 @@ export function ImagePager<TPage>({
       pagerActive: boolean;
     }
   >({
+    onGesture: (evt) => {
+      onGesture(evt, isActive);
+    },
+
     shouldHandleEvent: (evt) => {
       return (
         evt.numberOfPointers === 1 &&
         isActive.value &&
-        Math.abs(evt.velocityX) > Math.abs(evt.velocityY)
+        Math.abs(evt.velocityX) > Math.abs(evt.velocityY) &&
+        shouldHandleGestureEvent(evt)
       );
     },
 
@@ -421,20 +443,20 @@ export function ImagePager<TPage>({
 
   const pagerRefs = useMemo<PageRefs>(() => [pagerRef, tapRef], []);
 
-  const pagesToRender = pages.map((page, i) => {
+  const pagesToRender = pages.map((item, i) => {
     const shouldRender = getShouldRender(i, activeIndex, diffValue);
 
     if (!shouldRender) {
       return null;
     }
 
-    const pageToUse =
-      typeof getItem === 'undefined' ? page : getItem(pages, i);
+    const itemToUse =
+      typeof getItem === 'function' ? getItem(pages, i) : item;
 
     return (
       <Page
-        key={keyExtractor(page, i)}
-        page={pageToUse}
+        key={keyExtractor(item, i)}
+        item={itemToUse}
         currentIndex={index}
         pagerRefs={pagerRefs}
         onPageStateChange={onPageStateChange}
@@ -457,7 +479,6 @@ export function ImagePager<TPage>({
           ref={pagerRef}
           simultaneousHandlers={tapRef}
           onGestureEvent={onPan}
-          activeOffsetX={[-10, 10]}
         >
           <Animated.View style={StyleSheet.absoluteFill}>
             <TapGestureHandler

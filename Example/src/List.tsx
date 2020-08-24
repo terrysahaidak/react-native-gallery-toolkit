@@ -7,16 +7,16 @@ import {
 } from '@react-navigation/native';
 import {
   createStackNavigator,
-  TransitionPresets,
   Header,
   StackHeaderProps,
 } from '@react-navigation/stack';
-import { View, Text, Platform, StatusBar } from 'react-native';
+import { View, Text, StatusBar } from 'react-native';
 import { useGalleryInit } from 'reanimated-gallery';
 import Animated from 'react-native-reanimated';
 import StandaloneGalleryScreen, {
   useToggleOpacity,
 } from './StandaloneGalleryScreen';
+import StandaloneGalleryBasicScreen from './StandaloneGalleryBasicScreen';
 
 const Stack = createStackNavigator();
 
@@ -49,7 +49,8 @@ function Home() {
 
   return (
     <>
-      <ListItem title="Standalone" />
+      <ListItem title="Standalone basic" />
+      <ListItem title="Standalone full featured" />
     </>
   );
 }
@@ -71,6 +72,12 @@ function CustomHeader({
   );
 }
 
+const forFade = ({ current }) => ({
+  cardStyle: {
+    opacity: current.progress,
+  },
+});
+
 export default function App() {
   useGalleryInit();
   return (
@@ -79,22 +86,24 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator
           screenOptions={{
-            ...(Platform.OS === 'android'
-              ? TransitionPresets.ScaleFromCenterAndroid
-              : TransitionPresets.DefaultTransition),
+            gestureEnabled: false,
           }}
           headerMode="screen"
         >
           <Stack.Screen component={Home} name="Home" />
           <Stack.Screen
-            name="Standalone"
+            component={StandaloneGalleryBasicScreen}
+            name="Standalone basic"
+          />
+          <Stack.Screen
+            name="Standalone full featured"
             component={StandaloneGalleryScreen}
             options={({ route }) => ({
+              cardStyleInterpolator: forFade,
               headerTransparent: true,
               headerBackground: () => (
                 <View style={{ backgroundColor: 'white', flex: 1 }} />
               ),
-              gestureEnabled: false,
               header: (headerProps) => (
                 <CustomHeader
                   headerShown={route?.params?.headerShown ?? true}
