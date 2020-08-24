@@ -72,6 +72,12 @@ function CustomHeader({
   );
 }
 
+const forFade = ({ current }) => ({
+  cardStyle: {
+    opacity: current.progress,
+  },
+});
+
 export default function App() {
   useGalleryInit();
   return (
@@ -88,7 +94,7 @@ export default function App() {
             name="Standalone full featured"
             component={StandaloneGalleryScreen}
             options={({ route }) => ({
-              animationEnabled: false,
+              cardStyleInterpolator: forFade,
               headerTransparent: true,
               headerBackground: () => (
                 <View style={{ backgroundColor: 'white', flex: 1 }} />
