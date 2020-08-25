@@ -144,26 +144,30 @@ const Page = React.memo<PageProps>(
   },
 );
 
-export interface PagerProps<T> {
-  initialIndex: number;
-  totalCount: number;
-  pages: ReadonlyArray<T>;
+export interface PagerReusableProps<T> {
   numToRender?: number;
   initialDiffValue?: number;
-  width?: number;
   gutterWidth?: number;
   onIndexChange?: (nextIndex: number) => void;
   renderPage: (props: RenderPageProps<T>) => JSX.Element;
-  shouldRenderGutter?: boolean;
-  keyExtractor: (item: T, index: number) => string;
-  getItem?: (data: T[], index: number) => T;
-  pagerWrapperStyles?: any;
-  springConfig?: Omit<Animated.WithSpringConfig, 'velocity'>;
   onPagerTranslateChange?: (translateX: number) => void;
   onGesture?: (
     event: PanGestureHandlerGestureEvent['nativeEvent'],
     isActive: Animated.SharedValue<boolean>,
   ) => void;
+}
+
+export interface PagerProps<T> extends PagerReusableProps<T> {
+  totalCount: number;
+  initialIndex: number;
+  pages: ReadonlyArray<T>;
+  width?: number;
+  shouldRenderGutter?: boolean;
+  keyExtractor: (item: T, index: number) => string;
+  getItem?: (data: readonly T[], index: number) => T;
+  pagerWrapperStyles?: any;
+  springConfig?: Omit<Animated.WithSpringConfig, 'velocity'>;
+
   shouldHandleGestureEvent?: (
     event: PanGestureHandlerGestureEvent['nativeEvent'],
   ) => boolean;
@@ -443,34 +447,45 @@ export function Pager<TPage>({
 
   const pagerRefs = useMemo<PageRefs>(() => [pagerRef, tapRef], []);
 
-  const pagesToRender = pages.map((item, i) => {
+  const pagesToRender = [];
+
+  for (let i = 0; i < totalCount; i += 1) {
+    let itemToUse;
+
+    if (typeof getItem === 'function') {
+      itemToUse = getItem(pages, i);
+    } else if (Array.isArray(pages)) {
+      itemToUse = pages[i];
+    } else {
+      throw new Error(
+        'Pager: items either should be an array of getItem should be defined',
+      );
+    }
+
     const shouldRender = getShouldRender(i, activeIndex, diffValue);
 
     if (!shouldRender) {
-      return null;
+      pagesToRender.push(null);
+    } else {
+      pagesToRender.push(
+        <Page
+          key={keyExtractor(itemToUse, i)}
+          item={itemToUse}
+          currentIndex={index}
+          pagerRefs={pagerRefs}
+          onPageStateChange={onPageStateChange}
+          index={i}
+          length={totalCount}
+          gutterWidth={gutterWidth}
+          renderPage={renderPage}
+          getPageTranslate={getPageTranslate}
+          width={width}
+          isPagerInProgress={isPagerInProgress}
+          shouldRenderGutter={shouldRenderGutter}
+        />,
+      );
     }
-
-    const itemToUse =
-      typeof getItem === 'function' ? getItem(pages, i) : item;
-
-    return (
-      <Page
-        key={keyExtractor(item, i)}
-        item={itemToUse}
-        currentIndex={index}
-        pagerRefs={pagerRefs}
-        onPageStateChange={onPageStateChange}
-        index={i}
-        length={totalCount}
-        gutterWidth={gutterWidth}
-        renderPage={renderPage}
-        getPageTranslate={getPageTranslate}
-        width={width}
-        isPagerInProgress={isPagerInProgress}
-        shouldRenderGutter={shouldRenderGutter}
-      />
-    );
-  });
+  }
 
   return (
     <View style={StyleSheet.absoluteFillObject}>
