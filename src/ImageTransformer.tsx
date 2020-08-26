@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useCallback } from 'react';
+import React, { useRef, useCallback } from 'react';
 import {
   StyleSheet,
   Image,
@@ -603,7 +603,7 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
             <PanGestureHandler
               enabled={enabled}
               ref={panRef}
-              minDist={10}
+              minDist={4}
               avgTouches
               simultaneousHandlers={[
                 pinchRef,

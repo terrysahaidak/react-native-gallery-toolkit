@@ -295,13 +295,21 @@ export function Pager<TPage, ItemT = UnpackItemT<T>>({
   const onChangePageAnimation = (noVelocity?: boolean) => {
     'worklet';
 
+    function stiffnessFromTension(oValue: number) {
+      return (oValue - 30) * 3.62 + 194;
+    }
+
+    function dampingFromFriction(oValue: number) {
+      return (oValue - 8) * 3 + 25;
+    }
+
     const configToUse =
       typeof springConfig !== 'undefined'
         ? springConfig
         : {
-            stiffness: 1000,
-            damping: 100,
-            mass: 1.5,
+            stiffness: stiffnessFromTension(400),
+            damping: dampingFromFriction(50),
+            mass: 5,
             overshootClamping: true,
             restDisplacementThreshold: 0.01,
             restSpeedThreshold: 0.01,
@@ -310,6 +318,10 @@ export function Pager<TPage, ItemT = UnpackItemT<T>>({
     // @ts-ignore
     // cannot use merge and spread here :(
     configToUse.velocity = noVelocity ? 0 : velocity.value;
+
+    if (offsetX.value === toValueAnimation.value) {
+      return;
+    }
 
     offsetX.value = withSpring(
       toValueAnimation.value,
@@ -450,7 +462,7 @@ export function Pager<TPage, ItemT = UnpackItemT<T>>({
         return;
       }
 
-      onChangePageAnimation();
+      onChangePageAnimation(true);
     },
   });
 
@@ -516,6 +528,7 @@ export function Pager<TPage, ItemT = UnpackItemT<T>>({
       <Animated.View style={[StyleSheet.absoluteFill]}>
         <PanGestureHandler
           ref={pagerRef}
+          activeOffsetX={[-4, 4]}
           simultaneousHandlers={tapRef}
           onGestureEvent={onPan}
         >
