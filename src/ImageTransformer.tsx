@@ -67,9 +67,21 @@ export interface RenderImageProps {
   height: number;
   source: { uri: string } | ImageRequireSource;
   onLoad: () => void;
-};
+}
 
-export interface ImageTransformerProps {
+export interface ImageTransformerReusableProps {
+  renderImage?: (props: RenderImageProps) => JSX.Element;
+  DOUBLE_TAP_SCALE?: number;
+  MAX_SCALE?: number;
+  MIN_SCALE?: number;
+  OVER_SCALE?: number;
+  onTap?: (isScaled: boolean) => void;
+  onDoubleTap?: (isScaled: boolean) => void;
+  onInteraction?: (type: 'scale' | 'pan') => void;
+}
+
+export interface ImageTransformerProps
+  extends ImageTransformerReusableProps {
   outerGestureHandlerRefs?: React.Ref<any>[];
   source?: ImageRequireSource;
   uri?: string;
@@ -80,22 +92,13 @@ export interface ImageTransformerProps {
     height: number;
   };
   onStateChange?: (isActive: boolean) => void;
-  renderImage?: (props: RenderImageProps) => JSX.Element;
   isActive?: Animated.SharedValue<boolean>;
   outerGestureHandlerActive?: Animated.SharedValue<boolean>;
-  onTap?: (isScaled: boolean) => void;
-  onDoubleTap?: (isScaled: boolean) => void;
-  onInteraction?: (type: 'scale' | 'pan') => void;
   springConfig?: Animated.WithSpringConfig;
   timingConfig?: Animated.TimingConfig;
   style?: ViewStyle;
-  DOUBLE_TAP_SCALE?: number;
-  MAX_SCALE?: number;
-  MIN_SCALE?: number;
-  OVER_SCALE?: number;
-
   enabled?: boolean;
-};
+}
 
 function checkIsNotUsed(handlerState: Animated.SharedValue<State>) {
   'worklet';

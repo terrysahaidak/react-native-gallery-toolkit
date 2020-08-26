@@ -1,9 +1,4 @@
-import React, {
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-} from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import {
   Dimensions,
   View,
@@ -11,6 +6,7 @@ import {
   StatusBar,
   StyleSheet,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import Image from 'react-native-fast-image';
 
@@ -19,7 +15,6 @@ import {
   StandaloneGallery,
   createAnimatedGestureHandler,
   RenderImageProps,
-  
 } from 'reanimated-gallery';
 
 import {
@@ -32,6 +27,10 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
+import {
+  StackNavigationOptions,
+  HeaderBackButton,
+} from '@react-navigation/stack';
 
 const dimensions = Dimensions.get('window');
 
@@ -88,6 +87,38 @@ images.push({
     'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
 });
 
+const s = StyleSheet.create({
+  button: {
+    backgroundColor: 'black',
+    padding: 16,
+    borderRadius: 8,
+  },
+  buttonText: { color: 'white' },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...StyleSheet.absoluteFillObject,
+  },
+  errorContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 80,
+    ...StyleSheet.absoluteFillObject,
+  },
+  bottomBar: {
+    flexDirection: 'row',
+    position: 'absolute',
+    padding: 20,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flex: 1,
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
+});
+
 function Button({
   onPress,
   text,
@@ -96,37 +127,32 @@ function Button({
   text: string;
 }) {
   return (
-    <RectButton
-      onPress={onPress}
-      style={{
-        backgroundColor: 'black',
-        padding: 16,
-        borderRadius: 8,
-      }}
-    >
-      <Text style={{ color: 'white' }}>{text}</Text>
+    <RectButton onPress={onPress} style={s.button}>
+      <Text style={s.buttonText}>{text}</Text>
     </RectButton>
   );
 }
 
-export function useToggleOpacity(prop: boolean) {
-  const opacity = useSharedValue(1);
+export function useToggleOpacity(
+  prop: Animated.SharedValue<boolean>,
+) {
   const translateY = useSharedValue(1);
-  const styles = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ translateY: translateY.value }],
-  }));
 
-  useEffect(() => {
-    if (prop) {
-      translateY.value = 0;
-      opacity.value = withTiming(1);
-    } else {
-      opacity.value = withTiming(0, undefined, () => {
-        translateY.value = -99999;
-      });
+  const styles = useAnimatedStyle(() => {
+    if (prop.value) {
+      return {
+        opacity: withTiming(1),
+        transform: [{ translateY: 0 }],
+      };
     }
-  }, [prop]);
+
+    return {
+      opacity: withTiming(0, undefined, () => {
+        translateY.value = -99999;
+      }),
+      transform: [{ translateY: translateY.value }],
+    };
+  });
 
   return styles;
 }
@@ -143,28 +169,19 @@ function ImageRender({
   return (
     <>
       {isLoading && (
-        <View
-          style={{
-            width,
-            height,
-            justifyContent: 'center',
-            alignItems: 'center',
-            ...StyleSheet.absoluteFillObject,
-          }}
-        >
+        <View style={[s.loadingContainer, { width, height }]}>
           <ActivityIndicator size="large" color="blue" />
         </View>
       )}
       {isError && (
         <View
-          style={{
-            width,
-            height,
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingTop: 80,
-            ...StyleSheet.absoluteFillObject,
-          }}
+          style={[
+            {
+              width,
+              height,
+            },
+            s.errorContainer,
+          ]}
         >
           <Text>Error loading image</Text>
         </View>
@@ -187,16 +204,18 @@ function ImageRender({
   );
 }
 
-export default function ImageGalleryScreen() {
+export default function FullFeatured() {
   const nav = useNavigation();
 
-  const [index, setIndex] = useState(20);
+  const [index, setIndex] = useState(1);
   const headerShown = useSharedValue(true);
 
   const translateY = useSharedValue(0);
   const bottomTranslateY = useSharedValue(0);
 
-  const galleryRef = useRef<StandaloneGallery<GalleryItemType>>(null);
+  const galleryRef = useRef<StandaloneGallery<GalleryItemType[]>>(
+    null,
+  );
 
   function onIndexChange(nextIndex: number) {
     setIndex(nextIndex);
@@ -226,7 +245,7 @@ export default function ImageGalleryScreen() {
     setHeaderShown(false);
   }
 
-  const opacityAnimatedStyles = useToggleOpacity(headerShown.value);
+  const opacityAnimatedStyles = useToggleOpacity(headerShown);
 
   const translateYAnimatedStyles = useAnimatedStyle(() => {
     return {
@@ -266,9 +285,7 @@ export default function ImageGalleryScreen() {
 
       onEnd: () => {
         if (translateY.value > 80) {
-          translateY.value = withTiming(-800, undefined);
-
-          handleClose();
+          translateY.value = withTiming(-800, undefined, handleClose);
         } else {
           translateY.value = withTiming(0);
           bottomTranslateY.value = withTiming(0);
@@ -288,6 +305,11 @@ export default function ImageGalleryScreen() {
 
   return (
     <View style={{ flex: 1 }}>
+      <CustomHeader
+        bottomTranslateY={bottomTranslateY}
+        headerShown={headerShown}
+      />
+
       <Animated.View
         style={[translateStyles, StyleSheet.absoluteFill]}
       >
@@ -300,9 +322,6 @@ export default function ImageGalleryScreen() {
           onIndexChange={onIndexChange}
           renderImage={(props) => {
             return <ImageRender {...props} />;
-          }}
-          getItem={(data, i) => {
-            return data[i];
           }}
           renderPage={({ item, ...rest }) => {
             if (item.type === 'image') {
@@ -351,18 +370,7 @@ export default function ImageGalleryScreen() {
 
       <Animated.View
         style={[
-          {
-            flexDirection: 'row',
-            position: 'absolute',
-            padding: 20,
-            bottom: 0,
-            left: 0,
-            right: 0,
-            flex: 1,
-            justifyContent: 'space-around',
-            alignItems: 'center',
-            backgroundColor: 'white',
-          },
+          s.bottomBar,
           opacityAnimatedStyles,
           translateYAnimatedStyles,
         ]}
@@ -376,3 +384,52 @@ export default function ImageGalleryScreen() {
     </View>
   );
 }
+
+const STATUS_BAR_HEIGHT = Platform.select({
+  ios: 20,
+  android: StatusBar.currentHeight,
+})!;
+
+const HEADER_HEIGHT = Platform.select({
+  ios: 44 + STATUS_BAR_HEIGHT,
+  android: 56 + STATUS_BAR_HEIGHT,
+});
+
+function CustomHeader({
+  bottomTranslateY,
+  headerShown,
+}: {
+  bottomTranslateY: Animated.SharedValue<number>;
+  headerShown: Animated.SharedValue<boolean>;
+}) {
+  const nav = useNavigation();
+
+  const style = useAnimatedStyle(() => ({
+    height: HEADER_HEIGHT,
+    paddingTop: STATUS_BAR_HEIGHT,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    zIndex: 1,
+    transform: [
+      {
+        translateY: bottomTranslateY.value * -1,
+      },
+    ],
+  }));
+
+  const opacityAnimatedStyles = useToggleOpacity(headerShown);
+
+  return (
+    <Animated.View style={[style, opacityAnimatedStyles]}>
+      <HeaderBackButton onPress={nav.goBack} />
+    </Animated.View>
+  );
+}
+
+FullFeatured.options = (): StackNavigationOptions => ({
+  headerTransparent: true,
+  headerBackground: () => (
+    <View style={{ backgroundColor: 'white', flex: 1 }} />
+  ),
+  headerShown: false,
+});

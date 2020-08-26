@@ -1,5 +1,5 @@
 // import ImageGalleryScreen from './src/PagerReaction';
-import ImageGalleryScreen from './src/List';
+import Navigation from './src/Navigation';
 // import ImageGalleryScreen from './src/ImageGalleryScreen';
 
-export default ImageGalleryScreen;
+export default Navigation;

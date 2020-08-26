@@ -76,7 +76,10 @@ interface PageProps {
   gutterWidth: number;
   index: number;
   length: number;
-  renderPage: (props: RenderPageProps<any>) => JSX.Element;
+  renderPage: (
+    props: RenderPageProps<any>,
+    index: number,
+  ) => JSX.Element;
   shouldRenderGutter: boolean;
   getPageTranslate: (index: number) => number;
   width: number;
@@ -125,15 +128,18 @@ const Page = React.memo<PageProps>(
             },
           ]}
         >
-          {renderPage({
+          {renderPage(
+            {
+              index,
+              pagerRefs,
+              onPageStateChange,
+              item,
+              width,
+              isActive,
+              isPagerInProgress,
+            },
             index,
-            pagerRefs,
-            onPageStateChange,
-            item,
-            width,
-            isActive,
-            isPagerInProgress,
-          })}
+          )}
         </View>
 
         {index !== length - 1 && shouldRenderGutter && (
@@ -149,7 +155,10 @@ export interface PagerReusableProps<T> {
   initialDiffValue?: number;
   gutterWidth?: number;
   onIndexChange?: (nextIndex: number) => void;
-  renderPage: (props: RenderPageProps<T>) => JSX.Element;
+  renderPage: (
+    props: RenderPageProps<T>,
+    index: number,
+  ) => JSX.Element;
   onPagerTranslateChange?: (translateX: number) => void;
   onGesture?: (
     event: PanGestureHandlerGestureEvent['nativeEvent'],
@@ -157,14 +166,29 @@ export interface PagerReusableProps<T> {
   ) => void;
 }
 
-export interface PagerProps<T> extends PagerReusableProps<T> {
+type UnpackItemT<T> = T extends Array<infer ItemT>
+  ? ItemT
+  : T extends ReadonlyArray<infer ItemT>
+  ? ItemT
+  : T extends Map<any, infer ItemT>
+  ? ItemT
+  : T extends Set<infer ItemT>
+  ? ItemT
+  : T extends {
+      [key: string]: infer ItemT;
+    }
+  ? ItemT
+  : any;
+
+export interface PagerProps<T, ItemT>
+  extends PagerReusableProps<ItemT> {
   totalCount: number;
   initialIndex: number;
-  pages: ReadonlyArray<T>;
+  pages: T;
   width?: number;
   shouldRenderGutter?: boolean;
-  keyExtractor: (item: T, index: number) => string;
-  getItem?: (data: readonly T[], index: number) => T;
+  keyExtractor: (item: ItemT, index: number) => string;
+  getItem?: (data: T, index: number) => ItemT | undefined;
   pagerWrapperStyles?: any;
   springConfig?: Omit<Animated.WithSpringConfig, 'velocity'>;
 
@@ -179,7 +203,7 @@ function workletNoopTrue() {
   return true;
 }
 
-export function Pager<TPage>({
+export function Pager<TPage, ItemT = UnpackItemT<T>>({
   pages,
   initialIndex,
   totalCount,
@@ -197,7 +221,7 @@ export function Pager<TPage>({
   onGesture = workletNoop,
   shouldHandleGestureEvent = workletNoopTrue,
   initialDiffValue = 0,
-}: PagerProps<TPage>) {
+}: PagerProps<TPage, ItemT>) {
   fixGestureHandler();
 
   // make sure to not calculate translate with gutter

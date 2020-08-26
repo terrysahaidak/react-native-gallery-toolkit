@@ -16,9 +16,10 @@ interface Handlers<T> {
   onDoubleTap?: ImageTransformerProps['onDoubleTap'];
   onInteraction?: ImageTransformerProps['onInteraction'];
   onPagerTranslateChange?: (translateX: number) => void;
-  onGesture?: PagerProps<T>['onGesture'];
+  onGesture?: PagerProps<T, any>['onGesture'];
   shouldPagerHandleGestureEvent?: PagerProps<
-    T
+    T,
+    any
   >['shouldHandleGestureEvent'];
 }
 
@@ -28,7 +29,7 @@ export interface StandaloneGalleryHandler {
   setIndex: (nextIndex: number) => void;
 }
 
-interface ImageRendererProps<T> extends Handlers<T> {
+export interface ImageRendererProps<T> extends Handlers<T> {
   item: RenderPageProps<T>['item'];
   pagerProps: RenderPageProps<T>;
   width: number;
@@ -36,10 +37,27 @@ interface ImageRendererProps<T> extends Handlers<T> {
   renderImage?: ImageTransformerProps['renderImage'];
 }
 
-export interface StandaloneGalleryProps<ItemT>
+type UnpackItemT<T> = T extends (infer ItemT)[]
+  ? ItemT
+  : T extends ReadonlyArray<infer ItemT>
+  ? ItemT
+  : T extends Map<any, infer ItemT>
+  ? ItemT
+  : T extends Set<infer ItemT>
+  ? ItemT
+  : T extends {
+      [key: string]: infer ItemT;
+    }
+  ? ItemT
+  : any;
+
+export interface StandaloneGalleryProps<T, ItemT>
   extends Handlers<ItemT> {
-  items: ReadonlyArray<ItemT>;
-  renderPage?: (props: ImageRendererProps<ItemT>) => JSX.Element;
+  items: T;
+  renderPage?: (
+    props: ImageRendererProps<ItemT>,
+    index: number,
+  ) => JSX.Element;
   renderImage?: ImageTransformerProps['renderImage'];
   keyExtractor?: (item: ItemT, index: number) => string;
   initialIndex?: number;
@@ -48,7 +66,8 @@ export interface StandaloneGalleryProps<ItemT>
   numToRender?: number;
   gutterWidth?: number;
   onIndexChange?: (nextIndex: number) => void;
-  getItem?: (data: ReadonlyArray<ItemT>, index: number) => ItemT;
+  getItem?: (data: T, index: number) => ItemT | undefined;
+  getTotalCount?: (data: T) => number;
 }
 
 function isImageItemType(type: any): type is GalleryItemType {
@@ -97,8 +116,11 @@ export function ImageRenderer<T = unknown>({
   );
 }
 
-export class StandaloneGallery<ItemT> extends React.PureComponent<
-  StandaloneGalleryProps<ItemT>,
+export class StandaloneGallery<
+  T,
+  ItemT = UnpackItemT<T>
+> extends React.PureComponent<
+  StandaloneGalleryProps<T, ItemT>,
   {
     localIndex: number;
   }
@@ -107,7 +129,7 @@ export class StandaloneGallery<ItemT> extends React.PureComponent<
 
   tempIndex: number = this.props.initialIndex ?? 0;
 
-  constructor(props: StandaloneGalleryProps<ItemT>) {
+  constructor(props: StandaloneGalleryProps<T, ItemT>) {
     super(props);
 
     this._renderPage = this._renderPage.bind(this);
@@ -119,7 +141,17 @@ export class StandaloneGallery<ItemT> extends React.PureComponent<
   };
 
   get totalCount() {
-    return this.props.items.length;
+    if (Array.isArray(this.props.items)) {
+      return this.props.items.length;
+    }
+
+    if (typeof this.props.getTotalCount === 'function') {
+      return this.props.getTotalCount(this.props.items);
+    }
+
+    throw new Error(
+      'StandaloneGallery: either items should be an array or getTotalCount should be defined',
+    );
   }
 
   private setLocalIndex(nextIndex: number) {
@@ -167,7 +199,7 @@ export class StandaloneGallery<ItemT> extends React.PureComponent<
     return index.toString();
   }
 
-  _renderPage(pagerProps: RenderPageProps<ItemT>) {
+  _renderPage(pagerProps: RenderPageProps<ItemT>, index: number) {
     const {
       onDoubleTap,
       onTap,
@@ -190,7 +222,7 @@ export class StandaloneGallery<ItemT> extends React.PureComponent<
     };
 
     if (typeof renderPage === 'function') {
-      return renderPage(props);
+      return renderPage(props, index);
     }
 
     return <ImageRenderer {...props} />;
