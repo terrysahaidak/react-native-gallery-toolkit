@@ -95,20 +95,17 @@ export function ImageRenderer<T = unknown>({
     );
   }
 
-  const scaleFactor = item.width / width;
-  const targetHeight = item.height / scaleFactor;
-
   return (
     <ImageTransformer
       outerGestureHandlerActive={pagerProps.isPagerInProgress}
       isActive={pagerProps.isActive}
       windowDimensions={{ width, height }}
-      height={targetHeight}
+      height={item.height}
       renderImage={renderImage}
       onStateChange={pagerProps.onPageStateChange}
       outerGestureHandlerRefs={pagerProps.pagerRefs}
       uri={item.uri}
-      width={width}
+      width={item.width}
       onDoubleTap={onDoubleTap}
       onTap={onTap}
       onInteraction={onInteraction}

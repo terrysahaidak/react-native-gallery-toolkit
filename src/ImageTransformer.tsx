@@ -524,6 +524,10 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
 
       const target = vec.multiply([origin, koef]);
 
+      if (targetImageSize.y < canvas.y) {
+        target.y = 0;
+      }
+
       offset.x.value = withTiming(target.x, timingConfig);
       offset.y.value = withTiming(target.y, timingConfig);
     }
