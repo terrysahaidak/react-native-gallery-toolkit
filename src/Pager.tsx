@@ -203,7 +203,7 @@ function workletNoopTrue() {
   return true;
 }
 
-export function Pager<TPage, ItemT = UnpackItemT<T>>({
+export function Pager<TPages, ItemT = UnpackItemT<TPages>>({
   pages,
   initialIndex,
   totalCount,
@@ -221,7 +221,7 @@ export function Pager<TPage, ItemT = UnpackItemT<T>>({
   onGesture = workletNoop,
   shouldHandleGestureEvent = workletNoopTrue,
   initialDiffValue = 0,
-}: PagerProps<TPage, ItemT>) {
+}: PagerProps<TPages, ItemT>) {
   fixGestureHandler();
 
   // make sure to not calculate translate with gutter
@@ -266,7 +266,6 @@ export function Pager<TPage, ItemT = UnpackItemT<T>>({
   const toValueAnimation = useSharedValue(
     getPageTranslate(initialIndex),
   );
-  const gestureTranslationX = useSharedValue(0);
 
   const offsetX = useSharedValue(getPageTranslate(initialIndex));
 
@@ -335,10 +334,10 @@ export function Pager<TPage, ItemT = UnpackItemT<T>>({
   };
 
   // S3 Pager
-  function getCanSwipe() {
+  function getCanSwipe(currentTranslate: number = 0) {
     'worklet';
 
-    const nextTranslate = offsetX.value + gestureTranslationX.value;
+    const nextTranslate = offsetX.value + currentTranslate;
 
     if (nextTranslate > 0) {
       return false;
@@ -347,7 +346,7 @@ export function Pager<TPage, ItemT = UnpackItemT<T>>({
     const totalTranslate =
       width * (length.value - 1) + gutterWidth * (length.value - 1);
 
-    if (nextTranslate <= -totalTranslate) {
+    if (Math.abs(nextTranslate) >= totalTranslate) {
       return false;
     }
 
@@ -411,12 +410,12 @@ export function Pager<TPage, ItemT = UnpackItemT<T>>({
     },
 
     onEvent: (evt) => {
-      gestureTranslationX.value = evt.translationX;
       velocity.value = evt.velocityX;
     },
 
     onActive: (evt) => {
-      pagerX.value = getCanSwipe()
+      const canSwipe = getCanSwipe(evt.translationX);
+      pagerX.value = canSwipe
         ? evt.translationX
         : friction(evt.translationX);
     },
@@ -425,16 +424,23 @@ export function Pager<TPage, ItemT = UnpackItemT<T>>({
       offsetX.value += pagerX.value;
       pagerX.value = 0;
 
+      const canSwipe = getCanSwipe();
+
       const nextIndex = getNextIndex(evt.velocityX);
 
       const vx = Math.abs(evt.velocityX);
 
-      const shouldMoveToNextPage = vx > 10 && getCanSwipe();
+      const translation = Math.abs(evt.translationX);
+      const isHalf = width / 2 < translation;
 
-      // we invert the value since the tranlationY is left to right
+      const shouldMoveToNextPage = (vx > 10 || isHalf) && canSwipe;
+
+      // we invert the value since the translationY is left to right
       toValueAnimation.value = -(shouldMoveToNextPage
         ? -getPageTranslate(nextIndex)
         : -getPageTranslate(index.value));
+
+      console.log(toValueAnimation.value, nextIndex, evt.velocityX);
 
       onChangePageAnimation(!shouldMoveToNextPage);
 
