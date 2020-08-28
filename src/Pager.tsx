@@ -65,7 +65,7 @@ export interface RenderPageProps<T> {
   onPageStateChange: (value: boolean) => void;
   item: T;
   width: number;
-  isActive: Animated.SharedValue<boolean>;
+  isPageActive: Animated.SharedValue<boolean>;
   isPagerInProgress: Animated.SharedValue<boolean>;
 }
 
@@ -102,7 +102,7 @@ const Page = React.memo<PageProps>(
     currentIndex,
     isPagerInProgress,
   }) => {
-    const isActive = useDerivedValue(() => {
+    const isPageActive = useDerivedValue(() => {
       // FIXME: This causes crashe
       // return currentIndex.value === index;
       return false;
@@ -135,7 +135,7 @@ const Page = React.memo<PageProps>(
               onPageStateChange,
               item,
               width,
-              isActive,
+              isPageActive,
               isPagerInProgress,
             },
             index,

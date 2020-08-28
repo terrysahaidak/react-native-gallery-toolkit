@@ -83,8 +83,7 @@ export interface ImageTransformerReusableProps {
 export interface ImageTransformerProps
   extends ImageTransformerReusableProps {
   outerGestureHandlerRefs?: React.Ref<any>[];
-  source?: ImageRequireSource;
-  uri?: string;
+  source?: ImageRequireSource | string;
   width: number;
   height: number;
   windowDimensions: {
@@ -117,7 +116,6 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
   ({
     outerGestureHandlerRefs = [],
     source,
-    uri,
     width,
     height,
     onStateChange = workletNoop,
@@ -145,9 +143,12 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
       );
     }
 
-    const imageSource = source ?? {
-      uri: uri!,
-    };
+    const imageSource =
+      typeof source === 'string'
+        ? {
+            uri: source,
+          }
+        : source;
 
     const interactionsEnabled = useSharedValue(false);
     const setInteractionsEnabled = useCallback((value: boolean) => {
