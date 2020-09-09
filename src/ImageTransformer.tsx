@@ -9,7 +9,6 @@ import {
 import Animated, {
   withSpring,
   withTiming,
-  useSharedValue,
   useAnimatedStyle,
   cancelAnimation,
   useDerivedValue,
@@ -32,6 +31,7 @@ import {
   clamp,
   workletNoop,
   useAnimatedReaction,
+  useSharedValue,
 } from './utils';
 
 const styles = {
@@ -137,7 +137,7 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
   }) => {
     fixGestureHandler();
 
-    if (typeof source === 'undefined' && typeof uri === 'undefined') {
+    if (typeof source === 'undefined') {
       throw new Error(
         'ImageTransformer: either source or uri should be passed to display an image',
       );
@@ -300,8 +300,9 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
       shouldHandleEvent: () => {
         return (
           scale.value > 1 &&
-          typeof outerGestureHandlerActive !== 'undefined' &&
-          !outerGestureHandlerActive.value &&
+          (typeof outerGestureHandlerActive !== 'undefined'
+            ? !outerGestureHandlerActive.value
+            : true) &&
           interactionsEnabled.value
         );
       },
@@ -357,8 +358,6 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
 
     useAnimatedReaction(
       () => {
-        'worklet';
-
         if (typeof isActive === 'undefined') {
           return true;
         }
@@ -366,8 +365,6 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
         return isActive.value;
       },
       (currentActive) => {
-        'worklet';
-
         if (!currentActive) {
           resetSharedState();
         }
@@ -391,8 +388,9 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
       shouldHandleEvent: (evt) => {
         return (
           evt.numberOfPointers === 2 &&
-          typeof outerGestureHandlerActive !== 'undefined' &&
-          !outerGestureHandlerActive.value &&
+          (typeof outerGestureHandlerActive !== 'undefined'
+            ? !outerGestureHandlerActive.value
+            : true) &&
           interactionsEnabled.value
         );
       },
@@ -480,8 +478,9 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
       shouldHandleEvent: (evt) => {
         return (
           evt.numberOfPointers === 1 &&
-          typeof outerGestureHandlerActive !== 'undefined' &&
-          !outerGestureHandlerActive.value &&
+          (typeof outerGestureHandlerActive !== 'undefined'
+            ? !outerGestureHandlerActive.value
+            : true) &&
           interactionsEnabled.value
         );
       },
@@ -540,8 +539,9 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
       shouldHandleEvent: (evt) => {
         return (
           evt.numberOfPointers === 1 &&
-          typeof outerGestureHandlerActive !== 'undefined' &&
-          !outerGestureHandlerActive.value &&
+          (typeof outerGestureHandlerActive !== 'undefined'
+            ? !outerGestureHandlerActive.value
+            : true) &&
           interactionsEnabled.value
         );
       },
@@ -593,7 +593,9 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
     });
 
     return (
-      <Animated.View style={[styles.container, { width }, style]}>
+      <Animated.View
+        style={[styles.container, { width: targetWidth }, style]}
+      >
         <PinchGestureHandler
           enabled={enabled}
           ref={pinchRef}

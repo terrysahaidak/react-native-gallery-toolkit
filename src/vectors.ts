@@ -1,4 +1,5 @@
-import Animated, { useSharedValue } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
+import { useSharedValue } from './utils';
 
 type SharedValueType = number;
 

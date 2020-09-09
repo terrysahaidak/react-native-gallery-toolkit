@@ -6,7 +6,6 @@ import React, {
   useMemo,
 } from 'react';
 import Animated, {
-  useSharedValue,
   useAnimatedStyle,
   withSpring,
   cancelAnimation,
@@ -30,6 +29,7 @@ import {
   fixGestureHandler,
   getShouldRender,
   workletNoop,
+  useSharedValue,
 } from './utils';
 
 const dimensions = Dimensions.get('window');
@@ -103,9 +103,7 @@ const Page = React.memo<PageProps>(
     isPagerInProgress,
   }) => {
     const isPageActive = useDerivedValue(() => {
-      // FIXME: This causes crashe
-      // return currentIndex.value === index;
-      return false;
+      return currentIndex.value === index;
     });
 
     return (

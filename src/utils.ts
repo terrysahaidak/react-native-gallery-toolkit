@@ -1,6 +1,9 @@
 import { Dimensions } from 'react-native';
 // @ts-ignore
-import { useMapper } from 'react-native-reanimated';
+import {
+  useMapper,
+  useSharedValue as REAuseSharedValue,
+} from 'react-native-reanimated';
 import { useState, useEffect, useRef } from 'react';
 import { GalleryItemType } from './GalleryState';
 
@@ -100,4 +103,14 @@ export function useAnimatedReaction<R>(
     const input = prepare();
     react(input);
   }, inputs);
+}
+
+export function useSharedValue<T>(value: T) {
+  const ref = useRef<T>(null);
+  if (ref.current === null) {
+    // @ts-ignore
+    ref.current = value;
+  }
+
+  return REAuseSharedValue(ref.current);
 }

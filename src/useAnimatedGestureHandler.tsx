@@ -5,10 +5,7 @@ import Animated, {
   useEvent,
   useDerivedValue,
 } from 'react-native-reanimated';
-import {
-  GestureHandlerGestureEvent,
-  GestureHandlerStateChangeEvent,
-} from 'react-native-gesture-handler';
+import { GestureHandlerGestureEvent } from 'react-native-gesture-handler';
 
 function useRemoteContext<T extends object>(initialValue: T) {
   const initRef = useRef<{ context: T } | null>(null);
@@ -101,9 +98,7 @@ export function createAnimatedGestureHandler<
   });
   const isAndroid = Platform.OS === 'android';
 
-  const handler = (
-    event: T['nativeEvent'],
-  ) => {
+  const handler = (event: T['nativeEvent']) => {
     'worklet';
 
     // const UNDETERMINED = 0;
