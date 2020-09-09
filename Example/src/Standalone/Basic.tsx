@@ -21,6 +21,18 @@ const images: GalleryItemType[] = [
     height: 200,
     uri: 'https://placekitten.com/400/200',
   },
+  {
+    id: '3',
+    width: 400,
+    height: 200,
+    uri: 'https://placekitten.com/400/200',
+  },
+  {
+    id: '4',
+    width: 400,
+    height: 200,
+    uri: 'https://placekitten.com/400/200',
+  },
 ];
 
 export default function StandaloneGalleryBasicScreen() {

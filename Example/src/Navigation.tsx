@@ -10,6 +10,7 @@ import { Text, StatusBar } from 'react-native';
 import { useGalleryInit } from 'reanimated-gallery';
 
 import Standalone from './Standalone/Standalone';
+import ImageTransformer from './ImageTransformer';
 
 const Stack = createStackNavigator();
 
@@ -45,7 +46,7 @@ export function List({ items }: { items: string[] }) {
 }
 
 function Home() {
-  return <List items={['Standalone']} />;
+  return <List items={['Standalone', 'Image Transformer']} />;
 }
 
 export default function App() {
@@ -55,7 +56,7 @@ export default function App() {
       <StatusBar translucent showHideTransition="fade" />
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="Home"
+          // initialRouteName="Standalone"
           screenOptions={{
             gestureEnabled: false,
           }}
@@ -66,6 +67,11 @@ export default function App() {
             options={{ headerShown: false }}
             component={Standalone}
             name="Standalone"
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            component={ImageTransformer}
+            name="Image Transformer"
           />
         </Stack.Navigator>
       </NavigationContainer>
