@@ -1,11 +1,12 @@
 import { Dimensions } from 'react-native';
-// @ts-ignore
 import {
+  // @ts-ignore
   useMapper,
   useSharedValue as REAuseSharedValue,
+  // eslint-disable-next-line import/no-unresolved
 } from 'react-native-reanimated';
-import { useState, useEffect, useRef } from 'react';
-import { GalleryItemType } from './GalleryState';
+import React, { useState, useEffect, useRef } from 'react';
+import { GalleryItemType } from './types';
 
 const dimensions = Dimensions.get('window');
 
@@ -114,3 +115,5 @@ export function useSharedValue<T>(value: T) {
 
   return REAuseSharedValue(ref.current);
 }
+
+export const typedMemo: <T>(c: T) => T = React.memo;

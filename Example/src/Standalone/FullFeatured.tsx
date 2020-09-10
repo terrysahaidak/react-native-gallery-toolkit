@@ -340,17 +340,17 @@ export default function FullFeatured() {
               </View>
             );
           }}
-          onInteraction={() => {
+          onInteraction={useCallback(() => {
             hide();
-          }}
-          onTap={() => {
+          }, [])}
+          onTap={useCallback(() => {
             toggleHeaderShown();
-          }}
-          onDoubleTap={(isScaled) => {
+          }, [])}
+          onDoubleTap={useCallback((isScaled: boolean) => {
             if (!isScaled) {
               hide();
             }
-          }}
+          }, [])}
           numToRender={2}
           shouldPagerHandleGestureEvent={
             shouldPagerHandleGestureEvent

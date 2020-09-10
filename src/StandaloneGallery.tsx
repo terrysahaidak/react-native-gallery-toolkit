@@ -122,7 +122,7 @@ export class StandaloneGallery<
     localIndex: number;
   }
 > {
-  static ImageRenderer = ImageRenderer;
+  static ImageRenderer = React.memo(ImageRenderer);
 
   tempIndex: number = this.props.initialIndex ?? 0;
 
