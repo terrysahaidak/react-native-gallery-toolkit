@@ -152,7 +152,7 @@ export function useToggleOpacity(
       }),
       transform: [{ translateY: translateY.value }],
     };
-  });
+  }, []);
 
   return styles;
 }
@@ -251,7 +251,7 @@ export default function FullFeatured() {
     return {
       transform: [{ translateY: bottomTranslateY.value }],
     };
-  });
+  }, []);
 
   function handleClose() {
     nav.goBack();
@@ -301,7 +301,7 @@ export default function FullFeatured() {
         translateY: translateY.value,
       },
     ],
-  }));
+  }), []);
 
   return (
     <View style={{ flex: 1 }}>
@@ -415,7 +415,7 @@ function CustomHeader({
         translateY: bottomTranslateY.value * -1,
       },
     ],
-  }));
+  }), []);
 
   const opacityAnimatedStyles = useToggleOpacity(headerShown);
 

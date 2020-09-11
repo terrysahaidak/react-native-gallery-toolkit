@@ -80,7 +80,7 @@ function ListItem({ item, index }) {
     return {
       opacity: opacity.value,
     };
-  });
+  }, []);
 
   return (
     <TouchableWithoutFeedback

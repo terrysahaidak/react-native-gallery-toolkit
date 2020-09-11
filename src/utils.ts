@@ -98,12 +98,16 @@ export function useAnimatedReaction<R>(
     };
   }
   const { inputs } = inputsRef.current;
-  useMapper(() => {
-    'worklet';
+  useMapper(
+    () => {
+      'worklet';
 
-    const input = prepare();
-    react(input);
-  }, inputs);
+      const input = prepare();
+      react(input);
+    },
+    inputs,
+    [],
+  );
 }
 
 export function useSharedValue<T>(value: T) {

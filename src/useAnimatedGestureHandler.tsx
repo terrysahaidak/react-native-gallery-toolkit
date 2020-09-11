@@ -33,7 +33,7 @@ export function useDiff(sharedValue: Animated.SharedValue<any>) {
     context.prev = sharedValue.value;
 
     return context.stash;
-  });
+  }, []);
 }
 
 export function diff(context: any, name: string, value: any) {
@@ -214,8 +214,9 @@ export function useAnimatedGestureHandler<
     [],
   );
 
-  return useEvent(handler, [
-    'onGestureHandlerStateChange',
-    'onGestureHandlerEvent',
-  ]);
+  return useEvent(
+    handler,
+    ['onGestureHandlerStateChange', 'onGestureHandlerEvent'],
+    false,
+  );
 }

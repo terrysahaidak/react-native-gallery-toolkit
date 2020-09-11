@@ -10,7 +10,6 @@ import Animated, {
   withSpring,
   cancelAnimation,
   useDerivedValue,
-  runOnUI,
 } from 'react-native-reanimated';
 import {
   Dimensions,
@@ -88,7 +87,7 @@ interface PageProps {
   isPagerInProgress: Animated.SharedValue<boolean>;
 }
 
-const Page = React.memo<PageProps>(
+const Page = typedMemo(
   ({
     pagerRefs,
     item,
@@ -102,10 +101,10 @@ const Page = React.memo<PageProps>(
     width,
     currentIndex,
     isPagerInProgress,
-  }) => {
+  }: PageProps) => {
     const isPageActive = useDerivedValue(() => {
       return currentIndex.value === index;
-    });
+    }, []);
 
     return (
       <View
@@ -273,9 +272,9 @@ export const Pager = typedMemo(function Pager<
 
   const totalWidth = useDerivedValue(() => {
     return length.value * width + gutterWidth * length.value - 2;
-  });
+  }, []);
 
-  const onIndexChangeCb = useCallback((nextIndex) => {
+  const onIndexChangeCb = useCallback((nextIndex: number) => {
     'worklet';
 
     if (onIndexChange) {
@@ -388,7 +387,7 @@ export const Pager = typedMemo(function Pager<
       Math.floor(Math.abs(getPageTranslate(index.value))) !==
       Math.floor(Math.abs(offsetX.value + pagerX.value))
     );
-  });
+  }, []);
 
   const onPan = useAnimatedGestureHandler<
     PanGestureHandlerGestureEvent,
@@ -483,7 +482,7 @@ export const Pager = typedMemo(function Pager<
         },
       ],
     };
-  });
+  }, []);
 
   const pagerRefs = useMemo<PageRefs>(() => [pagerRef, tapRef], []);
 

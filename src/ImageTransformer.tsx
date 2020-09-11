@@ -94,7 +94,7 @@ export interface ImageTransformerProps
   isActive?: Animated.SharedValue<boolean>;
   outerGestureHandlerActive?: Animated.SharedValue<boolean>;
   springConfig?: Animated.WithSpringConfig;
-  timingConfig?: Animated.TimingConfig;
+  timingConfig?: Animated.WithTimingConfig;
   style?: ViewStyle;
   enabled?: boolean;
 }
@@ -184,7 +184,7 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
 
     const canPanVertically = useDerivedValue(() => {
       return windowDimensions.height < targetHeight * scale.value;
-    });
+    }, []);
 
     function resetSharedState(animated?: boolean) {
       'worklet';
@@ -590,7 +590,7 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
           { scale: scale.value },
         ],
       };
-    });
+    }, []);
 
     return (
       <Animated.View
