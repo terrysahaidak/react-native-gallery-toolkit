@@ -330,10 +330,10 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
             vec.set(ctx.panOffset, ctx.pan);
           } else {
             // subtract the offset and assign fixed pan
-            const nextTranslate = vec.add([
+            const nextTranslate = vec.add(
               ctx.pan,
               vec.invert(ctx.panOffset),
-            ]);
+            );
             translation.x.value = nextTranslate.x;
 
             if (canPanVertically.value) {
@@ -347,7 +347,7 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
         panState.value = evt.state;
 
         vec.set(ctx.panOffset, 0);
-        vec.set(offset, vec.add([offset, translation]));
+        vec.set(offset, vec.add(offset, translation));
         vec.set(translation, 0);
 
         maybeRunOnEnd();
@@ -413,11 +413,11 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
 
         // this is just to be able to use with vectors
         const focal = vec.create(evt.focalX, evt.focalY);
-        const CENTER = vec.divide([canvas, 2]);
+        const CENTER = vec.divide(canvas, 2);
 
         // focal with translate offset
         // it alow us to scale into different point even then we pan the image
-        ctx.adjustFocal = vec.sub([focal, vec.add([CENTER, offset])]);
+        ctx.adjustFocal = vec.sub(focal, vec.add(CENTER, offset));
       },
 
       afterEach: (evt, ctx) => {
@@ -438,13 +438,13 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
       onActive: (evt, ctx) => {
         pinchState.value = evt.state;
 
-        const pinch = vec.sub([ctx.adjustFocal, ctx.origin]);
+        const pinch = vec.sub(ctx.adjustFocal, ctx.origin);
 
-        const nextTranslation = vec.add([
+        const nextTranslation = vec.add(
           pinch,
           ctx.origin,
-          vec.multiply([-1, ctx.gestureScale, ctx.origin]),
-        ]);
+          vec.multiply(-1, ctx.gestureScale, ctx.origin),
+        );
 
         vec.set(scaleTranslation, nextTranslation);
       },
@@ -456,7 +456,7 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
         // store scale value
         scaleOffset.value = scale.value;
 
-        vec.set(offset, vec.add([offset, scaleTranslation]));
+        vec.set(offset, vec.add(offset, scaleTranslation));
         vec.set(scaleTranslation, 0);
 
         if (scaleOffset.value < 1) {
@@ -505,24 +505,24 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
       scale.value = withTiming(DOUBLE_TAP_SCALE, timingConfig);
       scaleOffset.value = DOUBLE_TAP_SCALE;
 
-      const targetImageSize = vec.multiply([image, DOUBLE_TAP_SCALE]);
+      const targetImageSize = vec.multiply(image, DOUBLE_TAP_SCALE);
 
-      const CENTER = vec.divide([canvas, 2]);
-      const imageCenter = vec.divide([image, 2]);
+      const CENTER = vec.divide(canvas, 2);
+      const imageCenter = vec.divide(image, 2);
 
       const focal = vec.create(x, y);
 
-      const origin = vec.multiply([
+      const origin = vec.multiply(
         -1,
-        vec.sub([vec.divide([targetImageSize, 2]), CENTER]),
-      ]);
+        vec.sub(vec.divide(targetImageSize, 2), CENTER),
+      );
 
-      const koef = vec.sub([
-        vec.multiply([vec.divide([1, imageCenter]), focal]),
+      const koef = vec.sub(
+        vec.multiply(vec.divide(1, imageCenter), focal),
         1,
-      ]);
+      );
 
-      const target = vec.multiply([origin, koef]);
+      const target = vec.multiply(origin, koef);
 
       if (targetImageSize.y < canvas.y) {
         target.y = 0;

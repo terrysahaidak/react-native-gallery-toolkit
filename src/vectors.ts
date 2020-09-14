@@ -102,7 +102,7 @@ export const create = <T extends SharedValueType>(x: T, y: T) => {
   };
 };
 
-export const add = (vectors: VectorList) => {
+export const add = (...vectors: VectorList) => {
   'worklet';
 
   return {
@@ -111,7 +111,7 @@ export const add = (vectors: VectorList) => {
   };
 };
 
-export const sub = (vectors: VectorList) => {
+export const sub = (...vectors: VectorList) => {
   'worklet';
 
   return {
@@ -120,7 +120,7 @@ export const sub = (vectors: VectorList) => {
   };
 };
 
-export const divide = (vectors: VectorList) => {
+export const divide = (...vectors: VectorList) => {
   'worklet';
 
   return {
@@ -129,7 +129,7 @@ export const divide = (vectors: VectorList) => {
   };
 };
 
-export const multiply = (vectors: VectorList) => {
+export const multiply = (...vectors: VectorList) => {
   'worklet';
 
   return {
@@ -173,7 +173,7 @@ export const set = <T extends VectorType>(
   }
 };
 
-export const min = (vectors: VectorList) => {
+export const min = (...vectors: VectorList) => {
   'worklet';
 
   const getMin = (prop: VectorProp) => {
@@ -191,7 +191,7 @@ export const min = (vectors: VectorList) => {
   };
 };
 
-export const max = (vectors: VectorList) => {
+export const max = (...vectors: VectorList) => {
   'worklet';
 
   const getMax = (prop: VectorProp) =>
@@ -215,7 +215,7 @@ export const clamp = <T extends Vector<any>>(
 ) => {
   'worklet';
 
-  return min([max([lowerBound, value]), upperBound]);
+  return min(max(lowerBound, value), upperBound);
 };
 
 export const eq = <T extends Vector<any>>(

@@ -87,7 +87,7 @@ interface GestureHandlers<T, TContext extends Context> {
   ) => void;
 }
 
-type OnGestureEvent<T> = (event: T) => void;
+type OnGestureEvent<T extends GestureHandlerGestureEvent> = (event: T) => void;
 
 export function createAnimatedGestureHandler<
   T extends GestureHandlerGestureEvent,

@@ -250,7 +250,6 @@ export const Pager = typedMemo(function Pager<
     isActive.value = value;
   }
 
-  const scale = useSharedValue(1);
   const velocity = useSharedValue(0);
 
   const [diffValue, setDiffValue] = useState(initialDiffValue);
@@ -454,17 +453,10 @@ export const Pager = typedMemo(function Pager<
     },
 
     onStart: () => {
-      if (scale.value !== 1) {
-        return;
-      }
       cancelAnimation(offsetX);
     },
 
     onEnd: () => {
-      if (scale.value !== 1) {
-        return;
-      }
-
       onChangePageAnimation(true);
     },
   });
