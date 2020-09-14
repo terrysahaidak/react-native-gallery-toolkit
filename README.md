@@ -1,9 +1,10 @@
 <p align="center">
   <h1 align="center">Reanimated Gallery</h1>
+
+  <img src="gifs/promo.gif" alt="Gallery in action gif" align="center" />
+
   <h3 align="center"> Reanimated 2 powered Gallery implementation</h3>
 </p>
-
-![Gallery in action gif](gifs/promo.gif)
 
 - [Installation](#installation)
 - [Usage](#usage)
