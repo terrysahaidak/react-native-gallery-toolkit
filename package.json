@@ -1,8 +1,12 @@
 {
-  "name": "reanimated-gallery",
+  "name": "react-native-gallery-toolkit",
   "version": "1.0.0-alpha.1",
   "private": true,
   "main": "./src/index.ts",
+  "scripts": {
+    "postinstall": "npx patch-package",
+    "build": "tsdx build"
+  },
   "peerDependencies": {
     "react-native-reanimated": "^2.0.0-alpha.5",
     "react-native": "*",
@@ -32,6 +36,7 @@
     "react-native": "0.62.2",
     "react-native-gesture-handler": "^1.6.1",
     "react-native-reanimated": "^2.0.0-alpha.6",
+    "tsdx": "^0.13.3",
     "typescript": "^3.9.5"
   },
   "jest": {

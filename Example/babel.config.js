@@ -6,7 +6,7 @@ module.exports = {
       'module-resolver',
       {
         alias: {
-          'reanimated-gallery': '../src/index',
+          'react-native-gallery-toolkit': '../src/index',
         },
       },
     ],

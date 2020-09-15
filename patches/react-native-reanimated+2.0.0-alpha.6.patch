@@ -76,27 +76,3 @@ index 70ebafa..d78da4a 100644
      ): OnScroll;
  
      export function useAnimatedRef<T extends Component>(): RefObject<T>;
-diff --git a/node_modules/react-native-reanimated/src/createAnimatedComponent.js b/node_modules/react-native-reanimated/src/createAnimatedComponent.js
-index 5df9340..c24ea77 100644
---- a/node_modules/react-native-reanimated/src/createAnimatedComponent.js
-+++ b/node_modules/react-native-reanimated/src/createAnimatedComponent.js
-@@ -132,7 +132,7 @@ export default function createAnimatedComponent(Component) {
-             // event was in prev and is still in current props
-             attached.add(prop.__nodeID);
-           }
--        } else if (prop instanceof WorkletEventHandler) {
-+        } else if (prop instanceof WorkletEventHandler && prop.reattachNeeded) {
-           prop.unregisterFromEvents();
-         }
-       }
-@@ -141,8 +141,9 @@ export default function createAnimatedComponent(Component) {
-         if (prop instanceof AnimatedEvent && !attached.has(prop.__nodeID)) {
-           // not yet attached
-           prop.attachEvent(node, key);
--        } else if (prop instanceof WorkletEventHandler) {
-+        } else if (prop instanceof WorkletEventHandler && prop.reattachNeeded) {
-           prop.registerForEvents(viewTag, key);
-+          prop.reattachNeeded = false;
-         }
-       }
-     }

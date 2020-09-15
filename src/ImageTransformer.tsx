@@ -34,7 +34,7 @@ import {
   useSharedValue,
 } from './utils';
 
-const styles = {
+const styles = StyleSheet.create({
   fill: {
     ...StyleSheet.absoluteFillObject,
   },
@@ -46,7 +46,7 @@ const styles = {
   container: {
     flex: 1,
   },
-};
+});
 
 const defaultSpringConfig = {
   stiffness: 1000,

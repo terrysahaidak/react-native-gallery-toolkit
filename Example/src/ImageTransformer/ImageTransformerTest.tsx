@@ -3,7 +3,7 @@ import { Dimensions, View } from 'react-native';
 import {
   GalleryItemType,
   ImageTransformer,
-} from 'reanimated-gallery';
+} from 'react-native-gallery-toolkit';
 import { useHeaderHeight } from '@react-navigation/stack';
 
 const { height, width } = Dimensions.get('window');

@@ -7,16 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		00E356F31AD99517003FC87E /* ReanimatedGalleryExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* ReanimatedGalleryExampleTests.m */; };
+		00E356F31AD99517003FC87E /* ReactNativeGalleryToolkitExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* ReactNativeGalleryToolkitExampleTests.m */; };
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		2DCD954D1E0B4F2C00145EB5 /* ReanimatedGalleryExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* ReanimatedGalleryExampleTests.m */; };
-		7DAF48432B880D2BEC10890F /* libPods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 01E4227EDC703ECEE15843A1 /* libPods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.a */; };
-		BB1A075BA3BBEEB123B7C19D /* libPods-ReanimatedGalleryExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A23A5D0F211E6D600B9D8C2 /* libPods-ReanimatedGalleryExample.a */; };
+		2DCD954D1E0B4F2C00145EB5 /* ReactNativeGalleryToolkitExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* ReactNativeGalleryToolkitExampleTests.m */; };
+		7DAF48432B880D2BEC10890F /* libPods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 01E4227EDC703ECEE15843A1 /* libPods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests.a */; };
+		BB1A075BA3BBEEB123B7C19D /* libPods-ReactNativeGalleryToolkitExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A23A5D0F211E6D600B9D8C2 /* libPods-ReactNativeGalleryToolkitExample.a */; };
 		DE7F0DC32480358800CE35E4 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = DE7F0DC22480358800CE35E4 /* AppDelegate.mm */; };
 /* End PBXBuildFile section */
 
@@ -26,38 +26,38 @@
 			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
-			remoteInfo = ReanimatedGalleryExample;
+			remoteInfo = ReactNativeGalleryToolkitExample;
 		};
 		2D02E4911E0B4A5D006451C7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 2D02E47A1E0B4A5D006451C7;
-			remoteInfo = "ReanimatedGalleryExample-tvOS";
+			remoteInfo = "ReactNativeGalleryToolkitExample-tvOS";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
-		00E356EE1AD99517003FC87E /* ReanimatedGalleryExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ReanimatedGalleryExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		00E356EE1AD99517003FC87E /* ReactNativeGalleryToolkitExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ReactNativeGalleryToolkitExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		00E356F21AD99517003FC87E /* ReanimatedGalleryExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ReanimatedGalleryExampleTests.m; sourceTree = "<group>"; };
-		01E4227EDC703ECEE15843A1 /* libPods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07F961A680F5B00A75B9A /* ReanimatedGalleryExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReanimatedGalleryExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = ReanimatedGalleryExample/AppDelegate.h; sourceTree = "<group>"; };
-		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = ReanimatedGalleryExample/AppDelegate.m; sourceTree = "<group>"; };
+		00E356F21AD99517003FC87E /* ReactNativeGalleryToolkitExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ReactNativeGalleryToolkitExampleTests.m; sourceTree = "<group>"; };
+		01E4227EDC703ECEE15843A1 /* libPods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* ReactNativeGalleryToolkitExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReactNativeGalleryToolkitExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = ReactNativeGalleryToolkitExample/AppDelegate.h; sourceTree = "<group>"; };
+		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = ReactNativeGalleryToolkitExample/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ReanimatedGalleryExample/Images.xcassets; sourceTree = "<group>"; };
-		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ReanimatedGalleryExample/Info.plist; sourceTree = "<group>"; };
-		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ReanimatedGalleryExample/main.m; sourceTree = "<group>"; };
-		2D02E47B1E0B4A5D006451C7 /* ReanimatedGalleryExample-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ReanimatedGalleryExample-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		2D02E4901E0B4A5D006451C7 /* ReanimatedGalleryExample-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ReanimatedGalleryExample-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		445E134E1B353E55A3B815B2 /* Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.release.xcconfig"; path = "Target Support Files/Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests/Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.release.xcconfig"; sourceTree = "<group>"; };
-		6852286950EE2139E287C85F /* Pods-ReanimatedGalleryExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReanimatedGalleryExample.release.xcconfig"; path = "Target Support Files/Pods-ReanimatedGalleryExample/Pods-ReanimatedGalleryExample.release.xcconfig"; sourceTree = "<group>"; };
-		6F4E2D10CFA6260D2E52D7FE /* Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests/Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
-		8A23A5D0F211E6D600B9D8C2 /* libPods-ReanimatedGalleryExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ReanimatedGalleryExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		B97D791C69B7490024245F97 /* Pods-ReanimatedGalleryExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReanimatedGalleryExample.debug.xcconfig"; path = "Target Support Files/Pods-ReanimatedGalleryExample/Pods-ReanimatedGalleryExample.debug.xcconfig"; sourceTree = "<group>"; };
-		DE7F0DC22480358800CE35E4 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = ReanimatedGalleryExample/AppDelegate.mm; sourceTree = "<group>"; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ReactNativeGalleryToolkitExample/Images.xcassets; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ReactNativeGalleryToolkitExample/Info.plist; sourceTree = "<group>"; };
+		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ReactNativeGalleryToolkitExample/main.m; sourceTree = "<group>"; };
+		2D02E47B1E0B4A5D006451C7 /* ReactNativeGalleryToolkitExample-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ReactNativeGalleryToolkitExample-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2D02E4901E0B4A5D006451C7 /* ReactNativeGalleryToolkitExample-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ReactNativeGalleryToolkitExample-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		445E134E1B353E55A3B815B2 /* Pods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests.release.xcconfig"; path = "Target Support Files/Pods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests/Pods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests.release.xcconfig"; sourceTree = "<group>"; };
+		6852286950EE2139E287C85F /* Pods-ReactNativeGalleryToolkitExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReactNativeGalleryToolkitExample.release.xcconfig"; path = "Target Support Files/Pods-ReactNativeGalleryToolkitExample/Pods-ReactNativeGalleryToolkitExample.release.xcconfig"; sourceTree = "<group>"; };
+		6F4E2D10CFA6260D2E52D7FE /* Pods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests/Pods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
+		8A23A5D0F211E6D600B9D8C2 /* libPods-ReactNativeGalleryToolkitExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ReactNativeGalleryToolkitExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B97D791C69B7490024245F97 /* Pods-ReactNativeGalleryToolkitExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReactNativeGalleryToolkitExample.debug.xcconfig"; path = "Target Support Files/Pods-ReactNativeGalleryToolkitExample/Pods-ReactNativeGalleryToolkitExample.debug.xcconfig"; sourceTree = "<group>"; };
+		DE7F0DC22480358800CE35E4 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = ReactNativeGalleryToolkitExample/AppDelegate.mm; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
@@ -67,7 +67,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7DAF48432B880D2BEC10890F /* libPods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.a in Frameworks */,
+				7DAF48432B880D2BEC10890F /* libPods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,7 +75,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB1A075BA3BBEEB123B7C19D /* libPods-ReanimatedGalleryExample.a in Frameworks */,
+				BB1A075BA3BBEEB123B7C19D /* libPods-ReactNativeGalleryToolkitExample.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,13 +96,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		00E356EF1AD99517003FC87E /* ReanimatedGalleryExampleTests */ = {
+		00E356EF1AD99517003FC87E /* ReactNativeGalleryToolkitExampleTests */ = {
 			isa = PBXGroup;
 			children = (
-				00E356F21AD99517003FC87E /* ReanimatedGalleryExampleTests.m */,
+				00E356F21AD99517003FC87E /* ReactNativeGalleryToolkitExampleTests.m */,
 				00E356F01AD99517003FC87E /* Supporting Files */,
 			);
-			path = ReanimatedGalleryExampleTests;
+			path = ReactNativeGalleryToolkitExampleTests;
 			sourceTree = "<group>";
 		};
 		00E356F01AD99517003FC87E /* Supporting Files */ = {
@@ -113,7 +113,7 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		13B07FAE1A68108700A75B9A /* ReanimatedGalleryExample */ = {
+		13B07FAE1A68108700A75B9A /* ReactNativeGalleryToolkitExample */ = {
 			isa = PBXGroup;
 			children = (
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
@@ -124,7 +124,7 @@
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
 			);
-			name = ReanimatedGalleryExample;
+			name = ReactNativeGalleryToolkitExample;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
@@ -132,8 +132,8 @@
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
-				8A23A5D0F211E6D600B9D8C2 /* libPods-ReanimatedGalleryExample.a */,
-				01E4227EDC703ECEE15843A1 /* libPods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.a */,
+				8A23A5D0F211E6D600B9D8C2 /* libPods-ReactNativeGalleryToolkitExample.a */,
+				01E4227EDC703ECEE15843A1 /* libPods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -149,9 +149,9 @@
 			isa = PBXGroup;
 			children = (
 				DE7F0DC22480358800CE35E4 /* AppDelegate.mm */,
-				13B07FAE1A68108700A75B9A /* ReanimatedGalleryExample */,
+				13B07FAE1A68108700A75B9A /* ReactNativeGalleryToolkitExample */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
-				00E356EF1AD99517003FC87E /* ReanimatedGalleryExampleTests */,
+				00E356EF1AD99517003FC87E /* ReactNativeGalleryToolkitExampleTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				89D0CD3BAF17FC89D9C0AFAE /* Pods */,
@@ -164,10 +164,10 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* ReanimatedGalleryExample.app */,
-				00E356EE1AD99517003FC87E /* ReanimatedGalleryExampleTests.xctest */,
-				2D02E47B1E0B4A5D006451C7 /* ReanimatedGalleryExample-tvOS.app */,
-				2D02E4901E0B4A5D006451C7 /* ReanimatedGalleryExample-tvOSTests.xctest */,
+				13B07F961A680F5B00A75B9A /* ReactNativeGalleryToolkitExample.app */,
+				00E356EE1AD99517003FC87E /* ReactNativeGalleryToolkitExampleTests.xctest */,
+				2D02E47B1E0B4A5D006451C7 /* ReactNativeGalleryToolkitExample-tvOS.app */,
+				2D02E4901E0B4A5D006451C7 /* ReactNativeGalleryToolkitExample-tvOSTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -175,10 +175,10 @@
 		89D0CD3BAF17FC89D9C0AFAE /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				B97D791C69B7490024245F97 /* Pods-ReanimatedGalleryExample.debug.xcconfig */,
-				6852286950EE2139E287C85F /* Pods-ReanimatedGalleryExample.release.xcconfig */,
-				6F4E2D10CFA6260D2E52D7FE /* Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.debug.xcconfig */,
-				445E134E1B353E55A3B815B2 /* Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.release.xcconfig */,
+				B97D791C69B7490024245F97 /* Pods-ReactNativeGalleryToolkitExample.debug.xcconfig */,
+				6852286950EE2139E287C85F /* Pods-ReactNativeGalleryToolkitExample.release.xcconfig */,
+				6F4E2D10CFA6260D2E52D7FE /* Pods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests.debug.xcconfig */,
+				445E134E1B353E55A3B815B2 /* Pods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -186,9 +186,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		00E356ED1AD99517003FC87E /* ReanimatedGalleryExampleTests */ = {
+		00E356ED1AD99517003FC87E /* ReactNativeGalleryToolkitExampleTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "ReanimatedGalleryExampleTests" */;
+			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "ReactNativeGalleryToolkitExampleTests" */;
 			buildPhases = (
 				5F90E3645A5B324A114D0BBC /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
@@ -201,14 +201,14 @@
 			dependencies = (
 				00E356F51AD99517003FC87E /* PBXTargetDependency */,
 			);
-			name = ReanimatedGalleryExampleTests;
-			productName = ReanimatedGalleryExampleTests;
-			productReference = 00E356EE1AD99517003FC87E /* ReanimatedGalleryExampleTests.xctest */;
+			name = ReactNativeGalleryToolkitExampleTests;
+			productName = ReactNativeGalleryToolkitExampleTests;
+			productReference = 00E356EE1AD99517003FC87E /* ReactNativeGalleryToolkitExampleTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		13B07F861A680F5B00A75B9A /* ReanimatedGalleryExample */ = {
+		13B07F861A680F5B00A75B9A /* ReactNativeGalleryToolkitExample */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ReanimatedGalleryExample" */;
+			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ReactNativeGalleryToolkitExample" */;
 			buildPhases = (
 				F0D3B534C7A858790046689D /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
@@ -222,14 +222,14 @@
 			);
 			dependencies = (
 			);
-			name = ReanimatedGalleryExample;
-			productName = ReanimatedGalleryExample;
-			productReference = 13B07F961A680F5B00A75B9A /* ReanimatedGalleryExample.app */;
+			name = ReactNativeGalleryToolkitExample;
+			productName = ReactNativeGalleryToolkitExample;
+			productReference = 13B07F961A680F5B00A75B9A /* ReactNativeGalleryToolkitExample.app */;
 			productType = "com.apple.product-type.application";
 		};
-		2D02E47A1E0B4A5D006451C7 /* ReanimatedGalleryExample-tvOS */ = {
+		2D02E47A1E0B4A5D006451C7 /* ReactNativeGalleryToolkitExample-tvOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2D02E4BA1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "ReanimatedGalleryExample-tvOS" */;
+			buildConfigurationList = 2D02E4BA1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "ReactNativeGalleryToolkitExample-tvOS" */;
 			buildPhases = (
 				FD10A7F122414F3F0027D42C /* Start Packager */,
 				2D02E4771E0B4A5D006451C7 /* Sources */,
@@ -241,14 +241,14 @@
 			);
 			dependencies = (
 			);
-			name = "ReanimatedGalleryExample-tvOS";
-			productName = "ReanimatedGalleryExample-tvOS";
-			productReference = 2D02E47B1E0B4A5D006451C7 /* ReanimatedGalleryExample-tvOS.app */;
+			name = "ReactNativeGalleryToolkitExample-tvOS";
+			productName = "ReactNativeGalleryToolkitExample-tvOS";
+			productReference = 2D02E47B1E0B4A5D006451C7 /* ReactNativeGalleryToolkitExample-tvOS.app */;
 			productType = "com.apple.product-type.application";
 		};
-		2D02E48F1E0B4A5D006451C7 /* ReanimatedGalleryExample-tvOSTests */ = {
+		2D02E48F1E0B4A5D006451C7 /* ReactNativeGalleryToolkitExample-tvOSTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2D02E4BB1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "ReanimatedGalleryExample-tvOSTests" */;
+			buildConfigurationList = 2D02E4BB1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "ReactNativeGalleryToolkitExample-tvOSTests" */;
 			buildPhases = (
 				2D02E48C1E0B4A5D006451C7 /* Sources */,
 				2D02E48D1E0B4A5D006451C7 /* Frameworks */,
@@ -259,9 +259,9 @@
 			dependencies = (
 				2D02E4921E0B4A5D006451C7 /* PBXTargetDependency */,
 			);
-			name = "ReanimatedGalleryExample-tvOSTests";
-			productName = "ReanimatedGalleryExample-tvOSTests";
-			productReference = 2D02E4901E0B4A5D006451C7 /* ReanimatedGalleryExample-tvOSTests.xctest */;
+			name = "ReactNativeGalleryToolkitExample-tvOSTests";
+			productName = "ReactNativeGalleryToolkitExample-tvOSTests";
+			productReference = 2D02E4901E0B4A5D006451C7 /* ReactNativeGalleryToolkitExample-tvOSTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -290,7 +290,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "ReanimatedGalleryExample" */;
+			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "ReactNativeGalleryToolkitExample" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -303,10 +303,10 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				13B07F861A680F5B00A75B9A /* ReanimatedGalleryExample */,
-				00E356ED1AD99517003FC87E /* ReanimatedGalleryExampleTests */,
-				2D02E47A1E0B4A5D006451C7 /* ReanimatedGalleryExample-tvOS */,
-				2D02E48F1E0B4A5D006451C7 /* ReanimatedGalleryExample-tvOSTests */,
+				13B07F861A680F5B00A75B9A /* ReactNativeGalleryToolkitExample */,
+				00E356ED1AD99517003FC87E /* ReactNativeGalleryToolkitExampleTests */,
+				2D02E47A1E0B4A5D006451C7 /* ReactNativeGalleryToolkitExample-tvOS */,
+				2D02E48F1E0B4A5D006451C7 /* ReactNativeGalleryToolkitExample-tvOSTests */,
 			);
 		};
 /* End PBXProject section */
@@ -380,7 +380,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests/Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests-resources.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests/Pods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests-resources.sh",
 				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
@@ -389,7 +389,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests/Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests/Pods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		4AD2C5508790C76CFD507DD5 /* [CP] Copy Pods Resources */ = {
@@ -398,7 +398,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ReanimatedGalleryExample/Pods-ReanimatedGalleryExample-resources.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-ReactNativeGalleryToolkitExample/Pods-ReactNativeGalleryToolkitExample-resources.sh",
 				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
@@ -407,7 +407,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ReanimatedGalleryExample/Pods-ReanimatedGalleryExample-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ReactNativeGalleryToolkitExample/Pods-ReactNativeGalleryToolkitExample-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		5F90E3645A5B324A114D0BBC /* [CP] Check Pods Manifest.lock */ = {
@@ -425,7 +425,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -447,7 +447,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-ReanimatedGalleryExample-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-ReactNativeGalleryToolkitExample-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -499,7 +499,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				00E356F31AD99517003FC87E /* ReanimatedGalleryExampleTests.m in Sources */,
+				00E356F31AD99517003FC87E /* ReactNativeGalleryToolkitExampleTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -525,7 +525,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2DCD954D1E0B4F2C00145EB5 /* ReanimatedGalleryExampleTests.m in Sources */,
+				2DCD954D1E0B4F2C00145EB5 /* ReactNativeGalleryToolkitExampleTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -534,12 +534,12 @@
 /* Begin PBXTargetDependency section */
 		00E356F51AD99517003FC87E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 13B07F861A680F5B00A75B9A /* ReanimatedGalleryExample */;
+			target = 13B07F861A680F5B00A75B9A /* ReactNativeGalleryToolkitExample */;
 			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
 		};
 		2D02E4921E0B4A5D006451C7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 2D02E47A1E0B4A5D006451C7 /* ReanimatedGalleryExample-tvOS */;
+			target = 2D02E47A1E0B4A5D006451C7 /* ReactNativeGalleryToolkitExample-tvOS */;
 			targetProxy = 2D02E4911E0B4A5D006451C7 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -551,7 +551,7 @@
 				13B07FB21A68108700A75B9A /* Base */,
 			);
 			name = LaunchScreen.xib;
-			path = ReanimatedGalleryExample;
+			path = ReactNativeGalleryToolkitExample;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -559,14 +559,14 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6F4E2D10CFA6260D2E52D7FE /* Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.debug.xcconfig */;
+			baseConfigurationReference = 6F4E2D10CFA6260D2E52D7FE /* Pods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = ReanimatedGalleryExampleTests/Info.plist;
+				INFOPLIST_FILE = ReactNativeGalleryToolkitExampleTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = (
@@ -576,17 +576,17 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ReanimatedGalleryExample.app/ReanimatedGalleryExample";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ReactNativeGalleryToolkitExample.app/ReactNativeGalleryToolkitExample";
 			};
 			name = Debug;
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 445E134E1B353E55A3B815B2 /* Pods-ReanimatedGalleryExample-ReanimatedGalleryExampleTests.release.xcconfig */;
+			baseConfigurationReference = 445E134E1B353E55A3B815B2 /* Pods-ReactNativeGalleryToolkitExample-ReactNativeGalleryToolkitExampleTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
-				INFOPLIST_FILE = ReanimatedGalleryExampleTests/Info.plist;
+				INFOPLIST_FILE = ReactNativeGalleryToolkitExampleTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = (
@@ -596,13 +596,13 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ReanimatedGalleryExample.app/ReanimatedGalleryExample";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ReactNativeGalleryToolkitExample.app/ReactNativeGalleryToolkitExample";
 			};
 			name = Release;
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B97D791C69B7490024245F97 /* Pods-ReanimatedGalleryExample.debug.xcconfig */;
+			baseConfigurationReference = B97D791C69B7490024245F97 /* Pods-ReactNativeGalleryToolkitExample.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -612,7 +612,7 @@
 					"$(inherited)",
 					"FB_SONARKIT_ENABLED=1",
 				);
-				INFOPLIST_FILE = ReanimatedGalleryExample/Info.plist;
+				INFOPLIST_FILE = ReactNativeGalleryToolkitExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -620,7 +620,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = ReanimatedGalleryExample;
+				PRODUCT_NAME = ReactNativeGalleryToolkitExample;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -629,12 +629,12 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6852286950EE2139E287C85F /* Pods-ReanimatedGalleryExample.release.xcconfig */;
+			baseConfigurationReference = 6852286950EE2139E287C85F /* Pods-ReactNativeGalleryToolkitExample.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				INFOPLIST_FILE = ReanimatedGalleryExample/Info.plist;
+				INFOPLIST_FILE = ReactNativeGalleryToolkitExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -642,7 +642,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = ReanimatedGalleryExample;
+				PRODUCT_NAME = ReactNativeGalleryToolkitExample;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -660,14 +660,14 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_TESTABILITY = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
-				INFOPLIST_FILE = "ReanimatedGalleryExample-tvOS/Info.plist";
+				INFOPLIST_FILE = "ReactNativeGalleryToolkitExample-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.ReanimatedGalleryExample-tvOS";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.ReactNativeGalleryToolkitExample-tvOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				TARGETED_DEVICE_FAMILY = 3;
@@ -687,14 +687,14 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_NO_COMMON_BLOCKS = YES;
-				INFOPLIST_FILE = "ReanimatedGalleryExample-tvOS/Info.plist";
+				INFOPLIST_FILE = "ReactNativeGalleryToolkitExample-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.ReanimatedGalleryExample-tvOS";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.ReactNativeGalleryToolkitExample-tvOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				TARGETED_DEVICE_FAMILY = 3;
@@ -713,17 +713,17 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_TESTABILITY = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
-				INFOPLIST_FILE = "ReanimatedGalleryExample-tvOSTests/Info.plist";
+				INFOPLIST_FILE = "ReactNativeGalleryToolkitExample-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.ReanimatedGalleryExample-tvOSTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.ReactNativeGalleryToolkitExample-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ReanimatedGalleryExample-tvOS.app/ReanimatedGalleryExample-tvOS";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ReactNativeGalleryToolkitExample-tvOS.app/ReactNativeGalleryToolkitExample-tvOS";
 				TVOS_DEPLOYMENT_TARGET = 10.1;
 			};
 			name = Debug;
@@ -739,17 +739,17 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_NO_COMMON_BLOCKS = YES;
-				INFOPLIST_FILE = "ReanimatedGalleryExample-tvOSTests/Info.plist";
+				INFOPLIST_FILE = "ReactNativeGalleryToolkitExample-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.ReanimatedGalleryExample-tvOSTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.ReactNativeGalleryToolkitExample-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ReanimatedGalleryExample-tvOS.app/ReanimatedGalleryExample-tvOS";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ReactNativeGalleryToolkitExample-tvOS.app/ReactNativeGalleryToolkitExample-tvOS";
 				TVOS_DEPLOYMENT_TARGET = 10.1;
 			};
 			name = Release;
@@ -870,7 +870,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "ReanimatedGalleryExampleTests" */ = {
+		00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "ReactNativeGalleryToolkitExampleTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				00E356F61AD99517003FC87E /* Debug */,
@@ -879,7 +879,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ReanimatedGalleryExample" */ = {
+		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ReactNativeGalleryToolkitExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
@@ -888,7 +888,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2D02E4BA1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "ReanimatedGalleryExample-tvOS" */ = {
+		2D02E4BA1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "ReactNativeGalleryToolkitExample-tvOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2D02E4971E0B4A5E006451C7 /* Debug */,
@@ -897,7 +897,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2D02E4BB1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "ReanimatedGalleryExample-tvOSTests" */ = {
+		2D02E4BB1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "ReactNativeGalleryToolkitExample-tvOSTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2D02E4991E0B4A5E006451C7 /* Debug */,
@@ -906,7 +906,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "ReanimatedGalleryExample" */ = {
+		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "ReactNativeGalleryToolkitExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,

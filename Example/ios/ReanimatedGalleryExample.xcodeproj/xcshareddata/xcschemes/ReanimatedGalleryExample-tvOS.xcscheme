@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-               BuildableName = "ReanimatedGalleryExample-tvOS.app"
-               BlueprintName = "ReanimatedGalleryExample-tvOS"
-               ReferencedContainer = "container:ReanimatedGalleryExample.xcodeproj">
+               BuildableName = "ReactNativeGalleryToolkitExample-tvOS.app"
+               BlueprintName = "ReactNativeGalleryToolkitExample-tvOS"
+               ReferencedContainer = "container:ReactNativeGalleryToolkitExample.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2D02E48F1E0B4A5D006451C7"
-               BuildableName = "ReanimatedGalleryExample-tvOSTests.xctest"
-               BlueprintName = "ReanimatedGalleryExample-tvOSTests"
-               ReferencedContainer = "container:ReanimatedGalleryExample.xcodeproj">
+               BuildableName = "ReactNativeGalleryToolkitExample-tvOSTests.xctest"
+               BlueprintName = "ReactNativeGalleryToolkitExample-tvOSTests"
+               ReferencedContainer = "container:ReactNativeGalleryToolkitExample.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "ReanimatedGalleryExample-tvOS.app"
-            BlueprintName = "ReanimatedGalleryExample-tvOS"
-            ReferencedContainer = "container:ReanimatedGalleryExample.xcodeproj">
+            BuildableName = "ReactNativeGalleryToolkitExample-tvOS.app"
+            BlueprintName = "ReactNativeGalleryToolkitExample-tvOS"
+            ReferencedContainer = "container:ReactNativeGalleryToolkitExample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "ReanimatedGalleryExample-tvOS.app"
-            BlueprintName = "ReanimatedGalleryExample-tvOS"
-            ReferencedContainer = "container:ReanimatedGalleryExample.xcodeproj">
+            BuildableName = "ReactNativeGalleryToolkitExample-tvOS.app"
+            BlueprintName = "ReactNativeGalleryToolkitExample-tvOS"
+            ReferencedContainer = "container:ReactNativeGalleryToolkitExample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

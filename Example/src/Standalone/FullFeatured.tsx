@@ -15,7 +15,7 @@ import {
   StandaloneGallery,
   createAnimatedGestureHandler,
   RenderImageProps,
-} from 'reanimated-gallery';
+} from 'react-native-gallery-toolkit';
 
 import {
   RectButton,

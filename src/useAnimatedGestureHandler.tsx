@@ -1,9 +1,8 @@
 import { useRef, useCallback } from 'react';
 import { Platform } from 'react-native';
-import Animated, {
+import {
   makeRemote,
   useEvent,
-  useDerivedValue,
 } from 'react-native-reanimated';
 import { GestureHandlerGestureEvent } from 'react-native-gesture-handler';
 
@@ -19,24 +18,7 @@ function useRemoteContext<T extends object>(initialValue: T) {
   return context;
 }
 
-export function useDiff(sharedValue: Animated.SharedValue<any>) {
-  const context = useRemoteContext({
-    stash: 0,
-    prev: null,
-  });
-
-  return useDerivedValue(() => {
-    context.stash =
-      context.prev !== null
-        ? sharedValue.value - (context.prev ?? 0)
-        : 0;
-    context.prev = sharedValue.value;
-
-    return context.stash;
-  }, []);
-}
-
-export function diff(context: any, name: string, value: any) {
+function diff(context: any, name: string, value: any) {
   'worklet';
 
   if (!context.___diffs) {
@@ -214,6 +196,7 @@ export function useAnimatedGestureHandler<
     [],
   );
 
+  // @ts-ignore
   return useEvent(
     handler,
     ['onGestureHandlerStateChange', 'onGestureHandlerEvent'],

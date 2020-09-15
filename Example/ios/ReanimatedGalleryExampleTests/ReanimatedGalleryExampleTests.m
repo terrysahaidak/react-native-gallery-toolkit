@@ -7,11 +7,11 @@
 #define TIMEOUT_SECONDS 600
 #define TEXT_TO_LOOK_FOR @"Welcome to React"
 
-@interface ReanimatedGalleryExampleTests : XCTestCase
+@interface ReactNativeGalleryToolkitExampleTests : XCTestCase
 
 @end
 
-@implementation ReanimatedGalleryExampleTests
+@implementation ReactNativeGalleryToolkitExampleTests
 
 - (BOOL)findSubviewInView:(UIView *)view matching:(BOOL(^)(UIView *view))test
 {

@@ -1,3 +1,5 @@
+const { peerDependencies } = require('./package.json');
+
 module.exports = {
   root: true,
   extends: ['airbnb', 'prettier', 'prettier/react'],
@@ -37,6 +39,7 @@ module.exports = {
       'error',
       { functions: false, classes: false },
     ],
+    'import/no-unresolved': ["error", { ignore: Object.keys(peerDependencies) }]
     'no-void': 0,
     'import/extensions': 0,
   },

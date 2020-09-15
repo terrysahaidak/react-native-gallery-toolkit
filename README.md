@@ -1,11 +1,13 @@
 <p align="center">
-  <h1 align="center">Reanimated Gallery</h1>
-  <h3 align="center"> Reanimated 2 powered Gallery implementation</h3>
+  <h1 align="center">React Native Gallery Toolkit</h1>
+  <h3 align="center"> Reanimated 2 and Gesturer Handler powered Gallery implementation</h3>
 </p>
 
 <p align="center">
   <img width="200" height="400" src="gifs/promo.gif" alt="Gallery in action gif">
 </p>
+
+[![npm](https://img.shields.io/npm/v/react-native-gallery-toolkit.svg?style=plastic)](https://npmjs.com/package/react-native-gallery-toolkit)
 
 - [Installation](#installation)
 - [Standalone gallery](#standalone-gallery)
@@ -31,7 +33,7 @@ Also, the library itself is in the alpha testing stage and may contain bugs.
 Use npm or yarn to install the library
 
 ```bash
-npm i --save reanimated-gallery
+npm i --save react-native-gallery-toolkit
 ```
 
 > Also, you need to install [react-native-reanimated@alpha.6](https://github.com/software-mansion/react-native-reanimated) (then new 2 version) and [react-native-gesture-handler](https://github.com/software-mansion/react-native-gesture-handler), and follow their installation instructions.
@@ -51,7 +53,7 @@ import {
   StandaloneGallery,
   GalleryItemType,
   StandaloneGalleryHandler,
-} from 'reanimated-gallery';
+} from 'react-native-gallery-toolkit';
 
 const images: GalleryItemType[] = [
   {
@@ -134,7 +136,7 @@ WIP
 
 ## Examples
 
-The source code for the example (showcase) app is under the [`Example/`](https://github.com/terrysahaidak/reanimated-gallery/blob/master/Example/) directory.
+The source code for the example (showcase) app is under the [`Example/`](https://github.com/terrysahaidak/react-native-gallery-toolkit/blob/master/Example/) directory.
 Clone the repo, go to the Example/ folder and run:
 
 ```bash

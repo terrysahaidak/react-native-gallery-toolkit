@@ -11,7 +11,7 @@ import {
   useGalleryItem,
   GalleryOverlay,
   GalleryProvider,
-} from 'reanimated-gallery';
+} from 'react-native-gallery-toolkit';
 
 const dimensions = Dimensions.get('window');
 

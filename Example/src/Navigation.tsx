@@ -7,7 +7,7 @@ import {
 } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Text, StatusBar } from 'react-native';
-import { useGalleryInit } from 'reanimated-gallery';
+import { useGalleryInit } from 'react-native-gallery-toolkit';
 
 import Standalone from './Standalone/Standalone';
 import ImageTransformer from './ImageTransformer';
