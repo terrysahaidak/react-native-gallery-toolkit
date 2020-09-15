@@ -129,7 +129,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.reactNativegallerytoolkitexample"
+        applicationId "com.reactnativegallerytoolkitexample"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

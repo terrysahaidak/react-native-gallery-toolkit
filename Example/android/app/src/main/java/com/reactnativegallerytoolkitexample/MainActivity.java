@@ -1,4 +1,4 @@
-package com.reactNativegallerytoolkitexample;
+package com.reactnativegallerytoolkitexample;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
