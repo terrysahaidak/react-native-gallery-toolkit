@@ -1,7 +1,7 @@
 {
   "name": "react-native-gallery-toolkit",
-  "version": "1.0.0-alpha.1",
-  "private": true,
+  "version": "1.0.0-alpha.0",
+  "private": false,
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
   "react-native": "src/index.ts",
