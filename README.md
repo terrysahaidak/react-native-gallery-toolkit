@@ -86,7 +86,7 @@ See [Full featured example](./Example/src/Standalone/FullFeatured.tsx) for examp
 ### Base props
 
 Prop | Description | Type | Default
------- | ------ | ------ | ------
+------ | ------ | -------- | ------
 `items` | The array of items to render. But can also accept Map, Set, or Object with keys. If the type is not array, then `getTotalCount` and `getItem` should be defined too. | `Array<{ width: number, height: number, id: string, uri: string  }>` | `undefined`
 `width?` | Viewport width | `number` | `Dimensions.get('window').width`
 `height?` | Viewport height | `number` | `Dimensions.get('window').height`
@@ -100,7 +100,7 @@ Prop | Description | Type | Default
 Prop | Description | Type | Default
 ------ | ------ | ------ | ------
 `getTotalCount?` | If the type of `items` is not an array, then this method should be defined to provide the total count of items | `(data: T) => number` | Required when `items` is not an array
-`getItem?` | If the type of `items` is not an array, then this method should be defined to provide the current item based on the index. Can return either the `item` or `undefined`. | `(data: T, index: number) => ItemT | undefined` | Required when `items` is not an array
+`getItem?` | If the type of `items` is not an array, then this method should be defined to provide the current item based on the index. Can return either the `item` or `undefined`. | `(data: T, index: number) => ItemT or undefined` | Required when `items` is not an array
 `renderImage?` | Callback that can be used to render custom image component. As an example, it can be used to render custom loading/error states | `(props: RenderImageProps) => JSX.Element` | `() => Image`
 `renderPage?` | Callback that can be used to render custom page. Can be used to display some non-image pages such as Video, for instance | `(props: ImageRendererProps<T>, index: number) => JSX.Element` | `ImageTransformer`
 
@@ -111,7 +111,7 @@ Prop | Description | Type | Is worklet? | Default
 `onIndexChange?` | Fires when active index changes | `(nextIndex: number) => void`  | `Function` or `Worklet` | `undefined`
 `onTap?` | Executes when tap image transformer receives tap | `() => void` | `Function` or `Worklet` | `undefined`
 `onDoubleTap?` | Executes when tap image transformer receives double-tap  | `() => void` | `Function` or `Worklet` | `undefined`
-`onInteraction?` | Is called when either pan or scale has happened. | `(type: 'scale' | 'pan') => void` | `Function` or `Worklet` | `undefined`
+`onInteraction?` | Is called when either pan or scale has happened. | `(type: 'scale' or 'pan') => void` | `Function` or `Worklet` | `undefined`
 `onPagerTranslateChange?` | Executes on pager's horizontal pan | `(translateX: number) => void` | `Function` or `Worklet` | `undefined`
 `onGesture?` | Executes on pager's gesture | `(event: PanGestureHandlerGestureEvent, isActive: SharedValue<boolean>) => void` | `Function` or `Worklet` | `undefined`
 `shouldPagerHandleGestureEvent?` | Worklet that will be passed to pager's `shouldHandleEvent` to determine should pager handle this event. Can be used to handle "swipe down to close".  | `(event: PanGestureHandlerGestureEvent) => boolean` | Only `Worklet` | `undefined`
