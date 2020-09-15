@@ -26,15 +26,15 @@ import {
   PanGestureHandlerGestureEvent,
 } from 'react-native-gesture-handler';
 import { GalleryState, IGalleryImage } from './GalleryState';
-import { useAnimatedGestureHandler } from './useAnimatedGestureHandler';
-import { ImageTransformer } from './ImageTransformer';
+import { useAnimatedGestureHandler } from '../src/useAnimatedGestureHandler';
+import { ImageTransformer } from '../src/ImageTransformer';
 
 import {
   friction,
   fixGestureHandler,
   getShouldRender,
-} from './utils';
-import * as vec from './vectors';
+} from '../src/utils';
+import * as vec from '../src/vectors';
 
 const dimensions = Dimensions.get('window');
 

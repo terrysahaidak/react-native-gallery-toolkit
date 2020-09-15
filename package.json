@@ -2,10 +2,17 @@
   "name": "react-native-gallery-toolkit",
   "version": "1.0.0-alpha.1",
   "private": true,
-  "main": "./src/index.ts",
+  "main": "lib/commonjs/index.js",
+  "module": "lib/module/index.js",
+  "react-native": "src/index.ts",
+  "types": "lib/typescript/src/index.d.ts",
+  "files": [
+    "lib/",
+    "src/"
+  ],
   "scripts": {
     "postinstall": "npx patch-package",
-    "build": "tsdx build",
+    "prepare": "bob build",
     "initialize": "npm i && cd Example && npm i && npx pod-install"
   },
   "peerDependencies": {
@@ -18,6 +25,7 @@
     "@babel/core": "^7.6.2",
     "@babel/plugin-proposal-export-namespace-from": "^7.5.2",
     "@babel/runtime": "^7.10.2",
+    "@react-native-community/bob": "^0.16.2",
     "@react-native-community/eslint-config": "^0.0.5",
     "@types/react": "^16.9.49",
     "@types/react-native": "^0.60.21",
@@ -42,5 +50,14 @@
   },
   "jest": {
     "preset": "react-native"
+  },
+  "@react-native-community/bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      "commonjs",
+      "module",
+      "typescript"
+    ]
   }
 }

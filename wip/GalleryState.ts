@@ -1,7 +1,7 @@
 import React from 'react';
 import Animated from 'react-native-reanimated';
-import { normalizeDimensions } from './utils';
-import { GalleryItemType } from './types';
+import { normalizeDimensions } from '../src/utils';
+import { GalleryItemType } from '../src/types';
 
 export type IShowFunction = (value: GalleryState | null) => void;
 
