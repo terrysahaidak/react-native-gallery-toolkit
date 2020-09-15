@@ -1,25 +1,30 @@
 <p align="center">
   <h1 align="center">Reanimated Gallery</h1>
-
-  <img src="gifs/promo.gif" alt="Gallery in action gif" align="center" />
-
   <h3 align="center"> Reanimated 2 powered Gallery implementation</h3>
 </p>
 
+<p align="center">
+  <img width="200" height="400" src="gifs/promo.gif" alt="Gallery in action gif">
+</p>
+
 - [Installation](#installation)
-- [Usage](#usage)
-  - [Standalone gallery](#standalone-gallery)
-    - [Props](#props)
-      - [Base props](#base-props)
-      - [Advance props](#advance-props)
-      - [Handlers](#handlers)
-      - [Methods](#methods)
-  - [Pager](#pager)
-  - [Transformer](#transformer)
+- [Standalone gallery](#standalone-gallery)
+  - [Limitations](#limitations)
+  - [Base props](#base-props)
+  - [Advance props](#advance-props)
+  - [Handlers](#handlers)
+  - [Methods](#methods)
+- [Pager](#pager)
+- [Transformer](#transformer)
 - [Examples](#examples)
   - [Running on iOS](#running-on-ios)
   - [Running on Android](#running-on-android)
 - [LICENSE](#license)
+
+**Important!**
+
+The library uses Reanimated 2 alpha. It means that it may be unstable.
+Also, the library itself is in the alpha testing stage and may contain bugs.
 
 ## Installation
 
@@ -29,13 +34,15 @@ Use npm or yarn to install the library
 npm i --save reanimated-gallery
 ```
 
-> Also, you need to install latest [react-native-reanimated](https://github.com/software-mansion/react-native-reanimated) (then new 2 version) and [react-native-gesture-handler](https://github.com/software-mansion/react-native-gesture-handler), and follow their installation instructions.
+> Also, you need to install [react-native-reanimated@alpha.6](https://github.com/software-mansion/react-native-reanimated) (then new 2 version) and [react-native-gesture-handler](https://github.com/software-mansion/react-native-gesture-handler), and follow their installation instructions.
 
 Expo is not currently supported because it doesn't support Reanimated 2.
 
-## Usage
+**Important!**
 
-### Standalone gallery
+There is a bug in *react-native-reanimated@alpha.6* that causes gesture event handlers to reattach on each render. You can apply [this patch](./Example/patches/react-native-reanimated+2.0.0-alpha.6.patch) to workaround it.
+
+## Standalone gallery
 
 Standalone gallery renders Pager which supports thousands of images thanks to virtualization. Each page renders ImageTransformer component which gives ability to pinch-to-zoom, double tap to zoom, also you can run custom callbacks and worklets on on tab, double tap, pan.
 
@@ -67,13 +74,16 @@ export default function App() {
 
 ```
 
-For full example see [Examples](#examples).
-
-#### Props
-
 See [Full featured example](./Example/src/Standalone/FullFeatured.tsx) for example of usage of all the props.
 
-##### Base props
+### Limitations
+
+- Only portrait orientation currently supported
+- There is no way to change dimensions without full re-render of the gallery
+- Debugging is not supported because of Reanimated v2 uses TurboModules. Use flipper to debug your JS Context.
+- On Android tap on hold on the screen while page changes doesn't trigger animation to stop due to bug in Gesture Handler.
+
+### Base props
 
 Prop | Description | Type | Default
 ------ | ------ | ------ | ------
@@ -85,7 +95,7 @@ Prop | Description | Type | Default
 `initialIndex?` | The initial page index | `number` | 0
 `keyExtractor?` | Callback which extract the key of the page. Receives current item of the provided `items` as well as current index | `(item: T, index: number) => string` | Uses index as a key by default
 
-##### Advance props
+### Advance props
 
 Prop | Description | Type | Default
 ------ | ------ | ------ | ------
@@ -94,8 +104,7 @@ Prop | Description | Type | Default
 `renderImage?` | Callback that can be used to render custom image component. As an example, it can be used to render custom loading/error states | `(props: RenderImageProps) => JSX.Element` | `() => Image`
 `renderPage?` | Callback that can be used to render custom page. Can be used to display some non-image pages such as Video, for instance | `(props: ImageRendererProps<T>, index: number) => JSX.Element` | `ImageTransformer`
 
-
-##### Handlers
+### Handlers
 
 Prop | Description | Type | Is worklet? | Default
 ------ | ------ | ------ | ------ | ------
@@ -107,7 +116,7 @@ Prop | Description | Type | Is worklet? | Default
 `onGesture?` | Executes on pager's gesture | `(event: PanGestureHandlerGestureEvent, isActive: SharedValue<boolean>) => void` | `Function` or `Worklet` | `undefined`
 `shouldPagerHandleGestureEvent?` | Worklet that will be passed to pager's `shouldHandleEvent` to determine should pager handle this event. Can be used to handle "swipe down to close".  | `(event: PanGestureHandlerGestureEvent) => boolean` | Only `Worklet` | `undefined`
 
-##### Methods
+### Methods
 
 Name | Description | Type
 ------ | ------ | ------
@@ -115,11 +124,11 @@ Name | Description | Type
 `goBack` | Changes the active index backward | `() => void`
 `setIndex` | Sets the active index | `(nextIndex: number) => void`
 
-### Pager
+## Pager
 
 WIP
 
-### Transformer
+## Transformer
 
 WIP
 
