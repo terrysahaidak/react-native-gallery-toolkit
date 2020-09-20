@@ -31,6 +31,10 @@ import {
   StackNavigationOptions,
   HeaderBackButton,
 } from '@react-navigation/stack';
+import {
+  DetachedHeader,
+  HeaderPropsScrapper,
+} from '../DetachedHeader';
 
 const dimensions = Dimensions.get('window');
 
@@ -402,34 +406,28 @@ function CustomHeader({
   bottomTranslateY: Animated.SharedValue<number>;
   headerShown: Animated.SharedValue<boolean>;
 }) {
-  const nav = useNavigation();
+  const style = useAnimatedStyle(
+    () => ({
 
-  const style = useAnimatedStyle(() => ({
-    height: HEADER_HEIGHT,
-    paddingTop: STATUS_BAR_HEIGHT,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-    zIndex: 1,
-    transform: [
-      {
-        translateY: bottomTranslateY.value * -1,
-      },
-    ],
-  }), []);
+      zIndex: 1,
+      transform: [
+        {
+          translateY: bottomTranslateY.value * -1,
+        },
+      ],
+    }),
+    [],
+  );
 
   const opacityAnimatedStyles = useToggleOpacity(headerShown);
 
   return (
     <Animated.View style={[style, opacityAnimatedStyles]}>
-      <HeaderBackButton onPress={nav.goBack} />
+      <DetachedHeader />
     </Animated.View>
   );
 }
 
 FullFeatured.options = (): StackNavigationOptions => ({
-  headerTransparent: true,
-  headerBackground: () => (
-    <View style={{ backgroundColor: 'white', flex: 1 }} />
-  ),
-  headerShown: false,
+  header: HeaderPropsScrapper,
 });
