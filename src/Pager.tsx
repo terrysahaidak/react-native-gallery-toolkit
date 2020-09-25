@@ -543,7 +543,7 @@ export const Pager = typedMemo(function Pager<
         <PanGestureHandler
           ref={pagerRef}
           activeOffsetX={[-4, 4]}
-          activeOffsetY={[-4, 4]}
+          // activeOffsetY={[-4, 4]}
           simultaneousHandlers={tapRef}
           onGestureEvent={onPan}
         >

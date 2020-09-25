@@ -10,6 +10,8 @@ import Animated, {
   withTiming,
   useAnimatedStyle,
   Easing,
+  interpolate,
+  Extrapolate,
 } from 'react-native-reanimated';
 import {
   PinchGestureHandler,
@@ -135,6 +137,8 @@ export const ScalableImage = React.memo<ScalableImageProps>(
 
     const scale = useSharedValue(1);
     const scaleOffset = useSharedValue(1);
+    const zindex = useSharedValue(0);
+    const opacity = useSharedValue(0);
     const scaleTranslation = vec.useSharedVector(0, 0);
 
     const canvas = vec.create(
@@ -200,6 +204,7 @@ export const ScalableImage = React.memo<ScalableImageProps>(
       },
 
       onStart: (_, ctx) => {
+        zindex.value = 1;
         vec.set(ctx.origin, ctx.adjustFocal);
 
         onGestureStart();
@@ -224,6 +229,7 @@ export const ScalableImage = React.memo<ScalableImageProps>(
 
         // store scale value
         scale.value = withTiming(1, timingConfig, () => {
+          zindex.value = 0;
           onEnd();
         });
         vec.set(scaleTranslation, () => withTiming(0, timingConfig));
@@ -254,18 +260,47 @@ export const ScalableImage = React.memo<ScalableImageProps>(
       };
     }, []);
 
+    const animatedZIndex = useAnimatedStyle<ViewStyle>(() => {
+      return {
+        zIndex: zindex.value,
+      };
+    });
+
+    const overlayStyles = useAnimatedStyle(() => {
+      opacity.value = interpolate(
+        scale.value,
+        [1, 2],
+        [0, 0.4],
+        Extrapolate.CLAMP,
+      );
+
+      return {
+        backgroundColor: 'black',
+        opacity: opacity.value,
+        // opacity: 1 - 1 / scale.value + 0.1,
+        zIndex: zindex.value,
+        flex: 1,
+        transform: [
+          {
+            scale: scale.value > 1 ? 10 : 0,
+          },
+        ],
+      };
+    });
+
     return (
       <Animated.View
         style={[styles.container, { width: targetWidth }, style]}
       >
+        <Animated.View pointerEvents="none" style={[overlayStyles]} />
         <PinchGestureHandler
           enabled={enabled}
           ref={pinchRef}
           onGestureEvent={onScaleEvent}
           simultaneousHandlers={[...outerGestureHandlerRefs]}
         >
-          <Animated.View style={styles.wrapper}>
-            <Animated.View style={animatedStyles}>
+          <Animated.View style={[styles.wrapper, animatedZIndex]}>
+            <Animated.View style={[animatedStyles]}>
               {typeof renderImage === 'function' ? (
                 renderImage({
                   source: imageSource,
