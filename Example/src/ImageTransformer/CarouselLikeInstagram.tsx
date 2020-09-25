@@ -144,7 +144,7 @@ export default function CarouselLikeInstagramScreen() {
   return (
     <View style={{ zIndex: 1, flex: 1 }}>
       <FlatList
-        contentContainerStyle={{ marginVertical: 89 }}
+        contentContainerStyle={{ paddingVertical: 89 }}
         data={data}
         keyExtractor={({ id }) => `${id}`}
         renderItem={renderItem}
