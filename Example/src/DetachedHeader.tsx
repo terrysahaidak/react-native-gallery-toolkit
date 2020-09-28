@@ -9,7 +9,9 @@ const subs: Array<() => void> = [];
 function setProps(name: string, props: StackHeaderProps) {
   headerPropsMap.set(name, props);
 
-  subs.forEach((cb) => cb());
+  setTimeout(() => {
+    subs.forEach((cb) => cb());
+  }, 0);
 }
 
 function useHeaderProps() {
