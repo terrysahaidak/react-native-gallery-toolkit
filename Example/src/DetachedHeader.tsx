@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRoute } from '@react-navigation/native';
 import { Header, StackHeaderProps } from '@react-navigation/stack';
 import { View } from 'react-native';
+// import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 const headerPropsMap = new Map<string, StackHeaderProps>();
 const subs: Array<() => void> = [];
@@ -54,3 +55,32 @@ DetachedHeader.Container = ({
     </View>
   );
 };
+
+// DetachedHeader.AnimatedContainer = ({
+//   children,
+//   sharedZIndex,
+// }: {
+//   children: JSX.Element;
+//   sharedZIndex: Animated.SharedValue<number>;
+// }) => {
+//   const animatedStyles = useAnimatedStyle(() => {
+//     return {
+//       zIndex: sharedZIndex.value,
+//     };
+//   });
+//   return (
+//     <Animated.View
+//       style={[
+//         {
+//           position: 'absolute',
+//           top: 0,
+//           left: 0,
+//           right: 0,
+//         },
+//         animatedStyles,
+//       ]}
+//     >
+//       {children}
+//     </Animated.View>
+//   );
+// };
