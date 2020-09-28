@@ -60,7 +60,7 @@ export default function App() {
       <StatusBar translucent showHideTransition="fade" />
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="Lightbox"
+          initialRouteName="Home"
           screenOptions={{
             gestureEnabled: false,
           }}
