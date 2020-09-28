@@ -8,7 +8,6 @@ import {
 import Animated, {
   useAnimatedStyle,
   withSpring,
-  withTiming,
 } from 'react-native-reanimated';
 import { createAnimatedGestureHandler } from './useAnimatedGestureHandler';
 import { useSharedValue, workletNoop } from './utils';
@@ -79,11 +78,12 @@ export function Swipeout({
       },
 
       onEnd: (evt) => {
-        console.log(evt.velocityY);
-        if (
-          Math.abs(translateY.value) > 80 &&
-          Math.abs(evt.velocityY) > 30
-        ) {
+        const enoughVelocity = Math.abs(evt.velocityY) > 30;
+        const rightDirection =
+          (evt.translationY > 0 && evt.velocityY > 0) ||
+          (evt.translationY < 0 && evt.velocityY < 0);
+
+        if (enoughVelocity && rightDirection) {
           const invert = evt.velocityY < 0;
           translateY.value = withSpring(
             invert ? -toValue - 20 : toValue + 20,
@@ -102,7 +102,14 @@ export function Swipeout({
           onSwipeSuccess();
         } else {
           onSwipeFailure();
-          translateY.value = withTiming(0);
+          translateY.value = withSpring(0, {
+            stiffness: 1000,
+            damping: 500,
+            mass: 2,
+            restDisplacementThreshold: 10,
+            restSpeedThreshold: 10,
+            velocity: evt.velocityY,
+          });
         }
       },
     }),
