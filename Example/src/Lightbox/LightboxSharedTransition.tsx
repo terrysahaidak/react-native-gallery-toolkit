@@ -111,8 +111,12 @@ export function LightboxSharedTransition() {
     transform: [
       {
         translateY: controlsHidden.value
-          ? withTiming(-200)
-          : withTiming(0),
+          ? withTiming(-100, {
+              duration: 400,
+            })
+          : withTiming(0, {
+              duration: 400,
+            }),
       },
     ],
     position: 'absolute',
@@ -148,7 +152,7 @@ export function LightboxSharedTransition() {
     'worklet';
 
     backdropOpacity.value = withTiming(0, {
-      duration: 150,
+      duration: 100,
     });
   }
 
@@ -163,7 +167,7 @@ export function LightboxSharedTransition() {
     controlsHidden.value = false;
   }
 
-  const backdropStyles = useAnimatedStyle(() => {
+  const customBackdropStyles = useAnimatedStyle(() => {
     return {
       opacity: backdropOpacity.value,
     };
@@ -173,11 +177,15 @@ export function LightboxSharedTransition() {
     <View style={s.container}>
       <LightboxTransition
         measurements={payload as Measurements}
-        item={item}
+        source={item.uri}
+        targetDimensions={{
+          width: item.width,
+          height: item.height,
+        }}
         onReady={onLightboxReady}
-        BackdropComponent={({ animatedStyles }) => (
+        renderBackdropComponent={({ animatedStyles }) => (
           <Animated.View
-            style={[StyleSheet.absoluteFill, backdropStyles]}
+            style={[StyleSheet.absoluteFill, customBackdropStyles]}
           >
             <Animated.View
               style={[
@@ -189,7 +197,7 @@ export function LightboxSharedTransition() {
             />
           </Animated.View>
         )}
-        OverlayComponent={() => (
+        renderOverlayComponent={() => (
           <Animated.View style={controlsStyles}>
             <DetachedHeader.Container>
               <DetachedHeader />

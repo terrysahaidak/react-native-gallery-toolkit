@@ -112,7 +112,6 @@ export default function App() {
           ...sharedTransitionNavigationConfig,
           headerStyle: {
             elevation: 0,
-            backgroundColor: 'transparent',
           },
           header: HeaderPropsScrapper,
         }}

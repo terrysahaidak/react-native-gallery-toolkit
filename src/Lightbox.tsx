@@ -1,5 +1,11 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { Dimensions, Image, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  Dimensions,
+  Image,
+  StyleSheet,
+  View,
+  ImageRequireSource,
+} from 'react-native';
 import { TapGestureHandler } from 'react-native-gesture-handler';
 import Animated, {
   Easing,
@@ -9,16 +15,8 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
-import { GalleryItemType } from './types';
 import { useAnimatedGestureHandler } from './useAnimatedGestureHandler';
 import { useSharedValue, workletNoop } from './utils';
-
-const styles = StyleSheet.create({
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'black',
-  },
-});
 
 export interface Measurements {
   width: number;
@@ -43,12 +41,6 @@ export function LightBoxItem({
   index,
 }: LightBoxItemProps) {
   const ref = useAnimatedRef<Animated.View>();
-
-  // const width = useSharedValue(0);
-  // const height = useSharedValue(0);
-  // const x = useSharedValue(0);
-  // const y = useSharedValue(0);
-  // const opacity = useSharedValue(1);
 
   function handlePress(measurements: Measurements) {
     onPress({
@@ -100,26 +92,45 @@ const timingConfig = {
   easing: Easing.bezier(0.33, 0.01, 0, 1),
 };
 
-interface LightboxTransitionProps {
-  item: GalleryItemType;
+export interface RenderImageProps {
+  width: number;
+  height: number;
+  source: { uri: string } | ImageRequireSource;
+  imageStyles: ReturnType<typeof useAnimatedStyle>;
+}
+
+export interface LightboxTransitionProps {
+  source: ImageRequireSource | string;
   measurements: Measurements;
   dimensions?: {
     width: number;
     height: number;
   };
+  targetDimensions: {
+    width: number;
+    height: number;
+  };
   children: JSX.Element;
-  BackdropComponent?: React.ElementType;
-  OverlayComponent?: React.ElementType;
+  renderBackdropComponent?: (props: {
+    animatedStyles: ReturnType<typeof useAnimatedStyle>;
+    animationProgress: Animated.SharedValue<number>;
+  }) => JSX.Element;
+  renderOverlayComponent?: (props: {
+    animationProgress: Animated.SharedValue<number>;
+  }) => JSX.Element;
   onReady?: () => void;
+  renderImage?: (props: RenderImageProps) => JSX.Element;
 }
 
 export function LightboxTransition({
-  item,
+  source,
   measurements,
   dimensions = Dimensions.get('window'),
+  targetDimensions,
   children,
-  BackdropComponent,
-  OverlayComponent,
+  renderImage,
+  renderBackdropComponent,
+  renderOverlayComponent,
   onReady = workletNoop,
 }: LightboxTransitionProps) {
   const [renderChildren, setRenderChildren] = useState<boolean>(
@@ -127,11 +138,17 @@ export function LightboxTransition({
   );
 
   const { x, y, width, height } = measurements;
-  const { uri } = item;
+
+  const imageSource =
+    typeof source === 'string'
+      ? {
+          uri: source,
+        }
+      : source;
 
   const targetWidth = dimensions.width;
-  const scaleFactor = item.width / targetWidth;
-  const targetHeight = item.height / scaleFactor;
+  const scaleFactor = targetDimensions.width / targetWidth;
+  const targetHeight = targetDimensions.height / scaleFactor;
 
   const animationProgress = useSharedValue(0);
 
@@ -212,12 +229,32 @@ export function LightboxTransition({
 
   return (
     <View style={StyleSheet.absoluteFillObject}>
-      {BackdropComponent && (
-        <BackdropComponent animatedStyles={backdropStyles} />
-      )}
+      {renderBackdropComponent &&
+        renderBackdropComponent({
+          animatedStyles: backdropStyles,
+          animationProgress,
+        })}
 
       <Animated.View style={StyleSheet.absoluteFillObject}>
-        <AnimatedImage source={{ uri }} style={imageStyles} />
+        {typeof renderImage === 'function' ? (
+          renderImage({
+            source: imageSource,
+            width: targetWidth,
+            height: targetHeight,
+            imageStyles,
+          })
+        ) : (
+          <AnimatedImage
+            source={imageSource}
+            style={[
+              {
+                width: targetWidth,
+                height: targetHeight,
+              },
+              imageStyles,
+            ]}
+          />
+        )}
       </Animated.View>
 
       <Animated.View
@@ -233,7 +270,8 @@ export function LightboxTransition({
         )}
       </Animated.View>
 
-      {OverlayComponent && <OverlayComponent />}
+      {renderOverlayComponent &&
+        renderOverlayComponent({ animationProgress })}
     </View>
   );
 }
