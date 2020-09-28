@@ -162,6 +162,9 @@ export interface PagerReusableProps<T> {
     event: PanGestureHandlerGestureEvent['nativeEvent'],
     isActive: Animated.SharedValue<boolean>,
   ) => void;
+  onEnabledGesture?: (
+    event: PanGestureHandlerGestureEvent['nativeEvent'],
+  ) => void;
 }
 
 type UnpackItemT<T> = T extends Array<infer ItemT>
@@ -222,6 +225,7 @@ export const Pager = typedMemo(function Pager<
   springConfig,
   onPagerTranslateChange = workletNoop,
   onGesture = workletNoop,
+  onEnabledGesture = workletNoop,
   shouldHandleGestureEvent = workletNoopTrue,
   initialDiffValue = 0,
   outerGestureHandlerRefs = [],
@@ -296,24 +300,16 @@ export const Pager = typedMemo(function Pager<
   const onChangePageAnimation = (noVelocity?: boolean) => {
     'worklet';
 
-    function stiffnessFromTension(oValue: number) {
-      return (oValue - 30) * 3.62 + 194;
-    }
-
-    function dampingFromFriction(oValue: number) {
-      return (oValue - 8) * 3 + 25;
-    }
-
     const configToUse =
       typeof springConfig !== 'undefined'
         ? springConfig
         : {
-            stiffness: stiffnessFromTension(400),
-            damping: dampingFromFriction(50),
-            mass: 5,
+            stiffness: 1000,
+            damping: 500,
+            mass: 3,
             overshootClamping: true,
-            restDisplacementThreshold: 0.01,
-            restSpeedThreshold: 0.01,
+            restDisplacementThreshold: 10,
+            restSpeedThreshold: 10,
           };
 
     // @ts-ignore
@@ -400,14 +396,19 @@ export const Pager = typedMemo(function Pager<
   >({
     onGesture: (evt) => {
       onGesture(evt, isActive);
+
+      if (isActive.value && !isPagerInProgress.value) {
+        onEnabledGesture(evt);
+      }
     },
 
     shouldHandleEvent: (evt) => {
       return (
-        evt.numberOfPointers === 1 &&
-        isActive.value &&
-        Math.abs(evt.velocityX) > Math.abs(evt.velocityY) &&
-        shouldHandleGestureEvent(evt)
+        (evt.numberOfPointers === 1 &&
+          isActive.value &&
+          Math.abs(evt.velocityX) > Math.abs(evt.velocityY) &&
+          shouldHandleGestureEvent(evt)) ||
+        isPagerInProgress.value
       );
     },
 

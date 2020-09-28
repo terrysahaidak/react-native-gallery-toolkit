@@ -12,6 +12,8 @@ export * from './useAnimatedGestureHandler';
 export * from './ImageTransformer';
 export * from './Pager';
 export * from './ScalableImage';
+export * from './Lightbox';
+export * from './Swipeout';
 
 export {
   useInit as useGalleryInit,

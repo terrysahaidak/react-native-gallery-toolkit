@@ -11,6 +11,7 @@ import { useGalleryInit } from 'react-native-gallery-toolkit';
 
 import Standalone from './Standalone/Standalone';
 import ImageTransformer from './ImageTransformer';
+import Lightbox from './Lightbox';
 
 const Stack = createStackNavigator();
 
@@ -25,6 +26,7 @@ export function List({ items }: { items: string[] }) {
     <>
       {items.map((title) => (
         <RectButton
+          key={title}
           onPress={() => nav.navigate(title)}
           style={{
             height: 64,
@@ -46,7 +48,9 @@ export function List({ items }: { items: string[] }) {
 }
 
 function Home() {
-  return <List items={['Standalone', 'Image Transformer']} />;
+  return (
+    <List items={['Standalone', 'Image Transformer', 'Lightbox']} />
+  );
 }
 
 export default function App() {
@@ -56,7 +60,7 @@ export default function App() {
       <StatusBar translucent showHideTransition="fade" />
       <NavigationContainer>
         <Stack.Navigator
-          // initialRouteName="Standalone"
+          initialRouteName="Lightbox"
           screenOptions={{
             gestureEnabled: false,
           }}
@@ -72,6 +76,11 @@ export default function App() {
             options={{ headerShown: false }}
             component={ImageTransformer}
             name="Image Transformer"
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            component={Lightbox}
+            name="Lightbox"
           />
         </Stack.Navigator>
       </NavigationContainer>

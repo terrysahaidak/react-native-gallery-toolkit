@@ -69,6 +69,8 @@ export interface RenderImageProps {
   onLoad: () => void;
 }
 
+export type InteractionType = 'scale' | 'pan';
+
 export interface ImageTransformerReusableProps {
   renderImage?: (props: RenderImageProps) => JSX.Element;
   DOUBLE_TAP_SCALE?: number;
@@ -77,7 +79,7 @@ export interface ImageTransformerReusableProps {
   OVER_SCALE?: number;
   onTap?: (isScaled: boolean) => void;
   onDoubleTap?: (isScaled: boolean) => void;
-  onInteraction?: (type: 'scale' | 'pan') => void;
+  onInteraction?: (type: InteractionType) => void;
 }
 
 export interface ImageTransformerProps

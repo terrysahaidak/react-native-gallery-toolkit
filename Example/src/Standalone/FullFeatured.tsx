@@ -299,13 +299,16 @@ export default function FullFeatured() {
     [],
   );
 
-  const translateStyles = useAnimatedStyle(() => ({
-    transform: [
-      {
-        translateY: translateY.value,
-      },
-    ],
-  }), []);
+  const translateStyles = useAnimatedStyle(
+    () => ({
+      transform: [
+        {
+          translateY: translateY.value,
+        },
+      ],
+    }),
+    [],
+  );
 
   return (
     <View style={{ flex: 1 }}>
@@ -359,13 +362,7 @@ export default function FullFeatured() {
           shouldPagerHandleGestureEvent={
             shouldPagerHandleGestureEvent
           }
-          onGesture={(evt, isActive) => {
-            'worklet';
-
-            if (isActive.value) {
-              handler(evt);
-            }
-          }}
+          onPagerEnabledGesture={handler}
           // onPagerTranslateChange={(translateX) => {
           //   console.log(translateX);
           // }}
@@ -408,7 +405,6 @@ function CustomHeader({
 }) {
   const style = useAnimatedStyle(
     () => ({
-
       zIndex: 1,
       transform: [
         {

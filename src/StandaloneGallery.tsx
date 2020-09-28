@@ -7,6 +7,7 @@ import { Pager, RenderPageProps, PagerProps } from './Pager';
 import {
   ImageTransformer,
   ImageTransformerProps,
+  InteractionType,
 } from './ImageTransformer';
 
 const dimensions = Dimensions.get('window');
@@ -17,10 +18,12 @@ interface Handlers<T> {
   onInteraction?: ImageTransformerProps['onInteraction'];
   onPagerTranslateChange?: (translateX: number) => void;
   onGesture?: PagerProps<T, any>['onGesture'];
+  onPagerEnabledGesture?: PagerProps<T, any>['onEnabledGesture'];
   shouldPagerHandleGestureEvent?: PagerProps<
     T,
     any
   >['shouldHandleGestureEvent'];
+  onShouldHideControls?: (shouldHide: boolean) => void;
 }
 
 export interface StandaloneGalleryHandler {
@@ -126,6 +129,8 @@ export class StandaloneGallery<
 
   tempIndex: number = this.props.initialIndex ?? 0;
 
+  controlsHidden = false;
+
   constructor(props: StandaloneGalleryProps<T, ItemT>) {
     super(props);
 
@@ -207,14 +212,64 @@ export class StandaloneGallery<
       renderImage,
     } = this.props;
 
+    const onShouldHideControls = (
+      isScaled?: boolean | InteractionType,
+    ) => {
+      let shouldHide = true;
+
+      if (typeof isScaled === 'boolean') {
+        shouldHide = !isScaled;
+      } else if (typeof isScaled === 'string') {
+        shouldHide = true;
+      } else {
+        shouldHide = !this.controlsHidden;
+      }
+
+      this.controlsHidden = shouldHide;
+
+      if (this.props.onShouldHideControls) {
+        this.props.onShouldHideControls(shouldHide);
+      }
+    };
+
+    const _onDoubleTap = (isScaled: boolean) => {
+      'worklet';
+
+      if (onDoubleTap) {
+        onDoubleTap(isScaled);
+      }
+
+      onShouldHideControls(isScaled);
+    };
+
+    const _onTap = (isScaled: boolean) => {
+      'worklet';
+
+      if (onTap) {
+        onTap(isScaled);
+      }
+
+      onShouldHideControls();
+    };
+
+    const _onInteraction = (type: InteractionType) => {
+      'worklet';
+
+      if (onInteraction) {
+        onInteraction(type);
+      }
+
+      onShouldHideControls(type);
+    };
+
     const props = {
       item: pagerProps.item,
       width,
       height,
       pagerProps,
-      onDoubleTap,
-      onTap,
-      onInteraction,
+      onDoubleTap: _onDoubleTap,
+      onTap: _onTap,
+      onInteraction: _onInteraction,
       renderImage,
     };
 
@@ -236,6 +291,7 @@ export class StandaloneGallery<
       numToRender,
       onGesture,
       shouldPagerHandleGestureEvent,
+      onPagerEnabledGesture,
     } = this.props;
 
     const setTempIndex = (index: number) => {
@@ -265,6 +321,7 @@ export class StandaloneGallery<
         onPagerTranslateChange={onPagerTranslateChange}
         shouldHandleGestureEvent={shouldPagerHandleGestureEvent}
         onGesture={onGesture}
+        onEnabledGesture={onPagerEnabledGesture}
         renderPage={this._renderPage}
         numToRender={numToRender}
       />
