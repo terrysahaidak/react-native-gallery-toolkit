@@ -193,6 +193,8 @@ export interface PagerProps<T, ItemT>
   shouldHandleGestureEvent?: (
     event: PanGestureHandlerGestureEvent['nativeEvent'],
   ) => boolean;
+  outerGestureHandlerRefs?: React.Ref<any>[];
+  verticallyEnabled?: boolean;
 }
 
 function workletNoopTrue() {
@@ -222,6 +224,8 @@ export const Pager = typedMemo(function Pager<
   onGesture = workletNoop,
   shouldHandleGestureEvent = workletNoopTrue,
   initialDiffValue = 0,
+  outerGestureHandlerRefs = [],
+  verticallyEnabled = true,
 }: PagerProps<TPages, ItemT>) {
   fixGestureHandler();
 
@@ -543,8 +547,8 @@ export const Pager = typedMemo(function Pager<
         <PanGestureHandler
           ref={pagerRef}
           activeOffsetX={[-4, 4]}
-          // activeOffsetY={[-4, 4]}
-          simultaneousHandlers={tapRef}
+          activeOffsetY={verticallyEnabled ? [-4, 4] : undefined}
+          simultaneousHandlers={[tapRef, ...outerGestureHandlerRefs]}
           onGestureEvent={onPan}
         >
           <Animated.View style={StyleSheet.absoluteFill}>
