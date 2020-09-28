@@ -11,6 +11,7 @@ export * from './StandaloneGallery';
 export * from './useAnimatedGestureHandler';
 export * from './ImageTransformer';
 export * from './Pager';
+export * from './ScalableImage';
 
 export {
   useInit as useGalleryInit,
