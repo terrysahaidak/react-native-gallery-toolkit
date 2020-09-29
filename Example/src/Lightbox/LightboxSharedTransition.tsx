@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { ScrollView } from 'react-native-gesture-handler';
 import { generateImageList } from '../utils/generateImageList';
 import Animated, {
+  Easing,
   Extrapolate,
   interpolate,
   useAnimatedStyle,
@@ -21,6 +22,7 @@ import {
   StandaloneGallery,
   LightboxTransition,
   Swipeout,
+  LightboxTransitionProps,
 } from '../../../src';
 import {
   LightboxSharedTransitionListNavigationProp,
@@ -94,29 +96,21 @@ export function LightboxSharedTransitionList() {
   );
 }
 
-export function LightboxSharedTransition() {
-  const nav = useNavigation();
-  const route = useRoute<LightboxSharedTransitionScreenRoute>();
+function useControls() {
+  const controlsHidden = useSharedValue(false);
 
-  const { payload, list } = route.params;
-
-  const item = list[payload.index];
-
-  const theme = useTheme();
-
-  const controlsHidden = useSharedValue(true);
+  const translateYConfig = {
+    duration: 400,
+    easing: Easing.bezier(0.33, 0.01, 0, 1),
+  };
 
   const controlsStyles = useAnimatedStyle(() => ({
     opacity: controlsHidden.value ? withTiming(0) : withTiming(1),
     transform: [
       {
         translateY: controlsHidden.value
-          ? withTiming(-100, {
-              duration: 400,
-            })
-          : withTiming(0, {
-              duration: 400,
-            }),
+          ? withTiming(-100, translateYConfig)
+          : withTiming(0, translateYConfig),
       },
     ],
     position: 'absolute',
@@ -125,10 +119,39 @@ export function LightboxSharedTransition() {
     zIndex: 1,
   }));
 
-  function handleBack() {
+  const onShouldHideControls = useCallback((shouldHide: boolean) => {
+    controlsHidden.value = shouldHide;
+  }, []);
+
+  return {
+    controlsHidden,
+    controlsStyles,
+    onShouldHideControls,
+  };
+}
+
+export function LightboxSharedTransition() {
+  const nav = useNavigation();
+  const theme = useTheme();
+  const route = useRoute<LightboxSharedTransitionScreenRoute>();
+
+  const { payload, list } = route.params;
+  const item = list[payload.index];
+  const targetDimensions = {
+    width: item.width,
+    height: item.height,
+  };
+
+  const {
+    controlsHidden,
+    controlsStyles,
+    onShouldHideControls,
+  } = useControls();
+
+  const handleBack = useCallback(() => {
     nav.setOptions({ animationEnabled: false });
     nav.goBack();
-  }
+  }, []);
 
   const backdropOpacity = useSharedValue(1);
   const toValue = dimensions.height;
@@ -163,47 +186,59 @@ export function LightboxSharedTransition() {
     backdropOpacity.value = withTiming(1);
   }
 
-  function onLightboxReady() {
-    controlsHidden.value = false;
-  }
-
   const customBackdropStyles = useAnimatedStyle(() => {
     return {
       opacity: backdropOpacity.value,
     };
   }, []);
 
+  const renderBackdropComponent = useCallback<
+    LightboxTransitionProps['renderBackdropComponent']
+  >(
+    ({ animatedStyles }) => (
+      <Animated.View
+        style={[StyleSheet.absoluteFill, customBackdropStyles]}
+      >
+        <Animated.View
+          style={[
+            animatedStyles,
+            {
+              backgroundColor: theme.colors.background,
+            },
+          ]}
+        />
+      </Animated.View>
+    ),
+    [],
+  );
+
+  const renderOverlayComponent = useCallback<
+    LightboxTransitionProps['renderOverlayComponent']
+  >(
+    ({ animationProgress }) => (
+      <Animated.View
+        style={useAnimatedStyle(() => ({
+          opacity: animationProgress.value,
+        }))}
+      >
+        <Animated.View style={controlsStyles}>
+          <DetachedHeader.Container>
+            <DetachedHeader />
+          </DetachedHeader.Container>
+        </Animated.View>
+      </Animated.View>
+    ),
+    [],
+  );
+
   return (
     <View style={s.container}>
       <LightboxTransition
         measurements={payload as Measurements}
         source={item.uri}
-        targetDimensions={{
-          width: item.width,
-          height: item.height,
-        }}
-        onReady={onLightboxReady}
-        renderBackdropComponent={({ animatedStyles }) => (
-          <Animated.View
-            style={[StyleSheet.absoluteFill, customBackdropStyles]}
-          >
-            <Animated.View
-              style={[
-                animatedStyles,
-                {
-                  backgroundColor: theme.colors.background,
-                },
-              ]}
-            />
-          </Animated.View>
-        )}
-        renderOverlayComponent={() => (
-          <Animated.View style={controlsStyles}>
-            <DetachedHeader.Container>
-              <DetachedHeader />
-            </DetachedHeader.Container>
-          </Animated.View>
-        )}
+        targetDimensions={targetDimensions}
+        renderBackdropComponent={renderBackdropComponent}
+        renderOverlayComponent={renderOverlayComponent}
       >
         <Swipeout
           onActive={onSwipeActive}
@@ -215,9 +250,7 @@ export function LightboxSharedTransition() {
             <StandaloneGallery
               items={list}
               shouldPagerHandleGestureEvent={shouldHandleEvent}
-              onShouldHideControls={(shouldHide: boolean) => {
-                controlsHidden.value = shouldHide;
-              }}
+              onShouldHideControls={onShouldHideControls}
               initialIndex={payload.index}
               onPagerEnabledGesture={onGesture}
             />

@@ -97,7 +97,7 @@ export default function App() {
       screenOptions={{
         gestureEnabled: false,
       }}
-      initialRouteName="Lightbox Shared Transition"
+      initialRouteName="List"
       headerMode="screen"
     >
       <Stack.Screen component={Home} name="List" />
