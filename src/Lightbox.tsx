@@ -96,7 +96,7 @@ export function LightBoxItem<T>({
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 
-const timingConfig = {
+const defaultTimingConfig = {
   duration: 240,
   easing: Easing.bezier(0.33, 0.01, 0, 1),
 };
@@ -128,6 +128,7 @@ export interface LightboxTransitionProps {
   }) => JSX.Element;
   onReady?: () => void;
   renderImage?: (props: RenderLightboxImageProps) => JSX.Element;
+  timingConfig?: Animated.WithTimingConfig;
 }
 
 export interface LightboxImperativeHandlers {
@@ -176,6 +177,7 @@ export const LightboxTransition = forwardRef<
       renderBackdropComponent,
       renderOverlayComponent,
       onReady = workletNoop,
+      timingConfig = defaultTimingConfig,
     },
     ref,
   ) => {
