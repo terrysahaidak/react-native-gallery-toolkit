@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { ScrollView } from 'react-native-gesture-handler';
 import { generateImageList } from '../utils/generateImageList';
 import Animated, {
-  Easing,
   Extrapolate,
   interpolate,
   useAnimatedStyle,
@@ -30,6 +29,7 @@ import {
 } from '.';
 import { DetachedHeader } from '../DetachedHeader';
 import { useSharedValue } from '../../../src/utils';
+import { useControls } from './utils';
 
 const dimensions = Dimensions.get('window');
 
@@ -52,12 +52,12 @@ const LIST = generateImageList(10);
 interface ListItemProps {
   item: GalleryItemType;
   index: number;
-  onPress: (payload: LightboxItemPayloadType) => void;
+  onPress: (payload: LightboxItemPayloadType<GalleryItemType>) => void;
 }
 
 function ListItem({ item, onPress, index }: ListItemProps) {
   return (
-    <LightBoxItem index={index} onPress={onPress}>
+    <LightBoxItem item={item} index={index} onPress={onPress}>
       <AnimatedImage
         style={LIST.getContainerStyle(index)}
         source={{ uri: item.uri }}
@@ -73,7 +73,7 @@ export function LightboxSharedTransitionList() {
     LightboxSharedTransitionListNavigationProp
   >();
 
-  function onNavigate(payload: LightboxItemPayloadType) {
+  function onNavigate(payload: LightboxItemPayloadType<GalleryItemType>) {
     nav.navigate('LightboxSharedTransitionScreen', {
       payload,
       list: LIST.images,
@@ -96,47 +96,13 @@ export function LightboxSharedTransitionList() {
   );
 }
 
-function useControls() {
-  const controlsHidden = useSharedValue(false);
-
-  const translateYConfig = {
-    duration: 400,
-    easing: Easing.bezier(0.33, 0.01, 0, 1),
-  };
-
-  const controlsStyles = useAnimatedStyle(() => ({
-    opacity: controlsHidden.value ? withTiming(0) : withTiming(1),
-    transform: [
-      {
-        translateY: controlsHidden.value
-          ? withTiming(-100, translateYConfig)
-          : withTiming(0, translateYConfig),
-      },
-    ],
-    position: 'absolute',
-    top: 0,
-    width: '100%',
-    zIndex: 1,
-  }));
-
-  const onShouldHideControls = useCallback((shouldHide: boolean) => {
-    controlsHidden.value = shouldHide;
-  }, []);
-
-  return {
-    controlsHidden,
-    controlsStyles,
-    onShouldHideControls,
-  };
-}
-
 export function LightboxSharedTransition() {
   const nav = useNavigation();
   const theme = useTheme();
   const route = useRoute<LightboxSharedTransitionScreenRoute>();
 
   const { payload, list } = route.params;
-  const item = list[payload.index];
+  const {item} = payload;
   const targetDimensions = {
     width: item.width,
     height: item.height,

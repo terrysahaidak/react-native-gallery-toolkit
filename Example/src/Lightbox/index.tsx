@@ -17,18 +17,21 @@ import {
   GalleryItemType,
   LightboxItemPayloadType,
 } from '../../../src';
+import { LightboxModalExample } from './LightboxModalExample';
 
 const Stack = createStackNavigator();
 
 function Home() {
-  return <List items={['Lightbox Shared Transition']} />;
+  return (
+    <List items={['Lightbox Shared Transition', 'Lightbox Modal']} />
+  );
 }
 
 type RootStackParamList = {
   'Lightbox Shared Transition': undefined;
   LightboxSharedTransitionScreen: {
     list: GalleryItemType[];
-    payload: LightboxItemPayloadType;
+    payload: LightboxItemPayloadType<GalleryItemType>;
   };
 };
 
@@ -116,6 +119,10 @@ export default function App() {
           header: HeaderPropsScrapper,
         }}
         name="LightboxSharedTransitionScreen"
+      />
+      <Stack.Screen
+        component={LightboxModalExample}
+        name="Lightbox Modal"
       />
     </Stack.Navigator>
   );
