@@ -1,10 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from 'react';
 import {
-  Dimensions,
   Image,
   StyleSheet,
   View,
   ImageRequireSource,
+  Dimensions,
 } from 'react-native';
 import { TapGestureHandler } from 'react-native-gesture-handler';
 import Animated, {
@@ -25,26 +30,30 @@ export interface Measurements {
   y: number;
 }
 
-export interface LightboxItemPayloadType extends Measurements {
-  index: number;
+export interface LightboxItemPayloadType<T> extends Measurements {
+  index?: number;
+  item: T;
 }
 
-export interface LightBoxItemProps {
+export interface LightBoxItemProps<T> {
+  item: T;
   children: JSX.Element;
-  index: number;
-  onPress: (payload: LightboxItemPayloadType) => void;
+  index?: number;
+  onPress: (payload: LightboxItemPayloadType<T>) => void;
 }
 
-export function LightBoxItem({
+export function LightBoxItem<T>({
   children,
   onPress,
   index,
-}: LightBoxItemProps) {
+  item,
+}: LightBoxItemProps<T>) {
   const ref = useAnimatedRef<Animated.View>();
 
   function handlePress(measurements: Measurements) {
     onPress({
       ...measurements,
+      item,
       index,
     });
   }
@@ -92,24 +101,23 @@ const timingConfig = {
   easing: Easing.bezier(0.33, 0.01, 0, 1),
 };
 
-export interface RenderImageProps {
+export interface RenderLightboxImageProps {
   width: number;
   height: number;
   source: { uri: string } | ImageRequireSource;
   imageStyles: ReturnType<typeof useAnimatedStyle>;
 }
 
+interface DimensionsType {
+  width: number;
+  height: number;
+}
+
 export interface LightboxTransitionProps {
   source: ImageRequireSource | string;
   measurements: Measurements;
-  dimensions?: {
-    width: number;
-    height: number;
-  };
-  targetDimensions: {
-    width: number;
-    height: number;
-  };
+  dimensions?: DimensionsType;
+  targetDimensions: DimensionsType;
   children: JSX.Element;
   renderBackdropComponent?: (props: {
     animatedStyles: ReturnType<typeof useAnimatedStyle>;
@@ -119,159 +127,235 @@ export interface LightboxTransitionProps {
     animationProgress: Animated.SharedValue<number>;
   }) => JSX.Element;
   onReady?: () => void;
-  renderImage?: (props: RenderImageProps) => JSX.Element;
+  renderImage?: (props: RenderLightboxImageProps) => JSX.Element;
 }
 
-export function LightboxTransition({
-  source,
-  measurements,
-  dimensions = Dimensions.get('window'),
-  targetDimensions,
-  children,
-  renderImage,
-  renderBackdropComponent,
-  renderOverlayComponent,
-  onReady = workletNoop,
-}: LightboxTransitionProps) {
-  const [renderChildren, setRenderChildren] = useState<boolean>(
-    false,
+export interface LightboxImperativeHandlers {
+  hide: (cb: Function, shouldFade?: boolean) => void;
+}
+
+function resolveDimensions(
+  measurements: Measurements,
+  targetDimensions: DimensionsType,
+  dimensions: DimensionsType,
+) {
+  const x = useSharedValue(measurements.x, true);
+  const y = useSharedValue(measurements.y, true);
+  const width = useSharedValue(measurements.width, true);
+  const height = useSharedValue(measurements.height, true);
+
+  const targetWidth = useSharedValue(dimensions.width, true);
+  const scaleFactor = targetDimensions.width / targetWidth.value;
+  const targetHeight = useSharedValue(
+    targetDimensions.height / scaleFactor,
+    true,
   );
 
-  const { x, y, width, height } = measurements;
+  return {
+    x,
+    y,
+    width,
+    height,
+    targetWidth,
+    targetHeight,
+  };
+}
 
-  const imageSource =
-    typeof source === 'string'
-      ? {
-          uri: source,
-        }
-      : source;
+export const LightboxTransition = forwardRef<
+  LightboxImperativeHandlers,
+  LightboxTransitionProps
+>(
+  (
+    {
+      source,
+      measurements,
+      dimensions = Dimensions.get('window'),
+      targetDimensions,
+      children,
+      renderImage,
+      renderBackdropComponent,
+      renderOverlayComponent,
+      onReady = workletNoop,
+    },
+    ref,
+  ) => {
+    const [renderChildren, setRenderChildren] = useState<boolean>(
+      false,
+    );
 
-  const targetWidth = dimensions.width;
-  const scaleFactor = targetDimensions.width / targetWidth;
-  const targetHeight = targetDimensions.height / scaleFactor;
+    const {
+      x,
+      y,
+      width,
+      height,
+      targetWidth,
+      targetHeight,
+    } = resolveDimensions(measurements, targetDimensions, dimensions);
 
-  const animationProgress = useSharedValue(0);
+    const imageSource =
+      typeof source === 'string'
+        ? {
+            uri: source,
+          }
+        : source;
 
-  const opacity = useSharedValue(0);
-  const imageOpacity = useSharedValue(1);
-  const scale = useSharedValue(1);
+    const animationProgress = useSharedValue(0);
 
-  const targetX = useSharedValue(0);
-  const targetY = useSharedValue(
-    (dimensions.height - targetHeight) / 2,
-  );
+    const opacity = useSharedValue(0);
+    const imageOpacity = useSharedValue(1);
+    const scale = useSharedValue(1);
 
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
+    const targetX = useSharedValue(0);
+    const targetY = useSharedValue(
+      (dimensions.height - targetHeight.value) / 2,
+      true,
+    );
 
-  const imageStyles = useAnimatedStyle(() => {
-    const interpolateProgress = (range: [number, number]) =>
-      interpolate(animationProgress.value, [0, 1], range);
+    const translateX = useSharedValue(0);
+    const translateY = useSharedValue(0);
 
-    const top =
-      translateY.value + interpolateProgress([y, targetY.value]);
-    const left =
-      translateX.value + interpolateProgress([x, targetX.value]);
+    const imageStyles = useAnimatedStyle(() => {
+      const interpolateProgress = (range: [number, number]) =>
+        interpolate(animationProgress.value, [0, 1], range);
 
-    return {
-      opacity: imageOpacity.value,
-      position: 'absolute',
-      top,
-      left,
-      width: interpolateProgress([width, targetWidth]),
-      height: interpolateProgress([height, targetHeight]),
-      transform: [
-        {
-          scale: scale.value,
-        },
-      ],
-    };
-  });
+      const top =
+        translateY.value +
+        interpolateProgress([y.value, targetY.value]);
+      const left =
+        translateX.value +
+        interpolateProgress([x.value, targetX.value]);
 
-  useEffect(() => {
-    onReady();
-    animationProgress.value = withTiming(1, timingConfig, () => {
-      opacity.value = 1;
-      setRenderChildren(true);
+      return {
+        opacity: imageOpacity.value,
+        position: 'absolute',
+        top,
+        left,
+        width: interpolateProgress([width.value, targetWidth.value]),
+        height: interpolateProgress([
+          height.value,
+          targetHeight.value,
+        ]),
+        transform: [
+          {
+            scale: scale.value,
+          },
+        ],
+      };
     });
-  }, []);
 
-  // we need to hide lightbox component
-  // after children is rendered
-  function onChildrenLayout() {
-    if (imageOpacity.value === 0) {
-      return;
+    useEffect(() => {
+      onReady();
+      animationProgress.value = withTiming(1, timingConfig, () => {
+        opacity.value = 1;
+        setRenderChildren(true);
+      });
+    }, []);
+
+    function runHideAnimation(cb: Function) {
+      imageOpacity.value = 1;
+      opacity.value = 0;
+      animationProgress.value = withTiming(0, timingConfig, () => {
+        cb();
+      });
     }
 
-    requestAnimationFrame(() => {
-      imageOpacity.value = 0;
+    function runFadeOutAnimation(cb: Function) {
+      opacity.value = withTiming(0, timingConfig);
+      animationProgress.value = withTiming(0, timingConfig, () => {
+        cb();
+      });
+    }
+
+    useImperativeHandle(ref, () => ({
+      hide(cb, shouldFade) {
+        if (shouldFade) {
+          runFadeOutAnimation(cb);
+        } else {
+          runHideAnimation(cb);
+        }
+      },
+    }));
+
+    // we need to hide lightbox component
+    // after children is rendered
+    function onChildrenLayout() {
+      if (imageOpacity.value === 0) {
+        return;
+      }
+
+      requestAnimationFrame(() => {
+        imageOpacity.value = 0;
+      });
+    }
+
+    const backdropStyles = useAnimatedStyle(() => {
+      return {
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: 'black',
+        opacity: animationProgress.value,
+      };
     });
-  }
 
-  const backdropStyles = useAnimatedStyle(() => {
-    return {
-      position: 'absolute',
-      top: 0,
-      bottom: 0,
-      left: 0,
-      right: 0,
-      backgroundColor: 'black',
-      opacity: animationProgress.value,
-    };
-  });
+    const childrenAnimateStyle = useAnimatedStyle(
+      () => ({
+        opacity: opacity.value,
+      }),
+      [],
+    );
 
-  const childrenAnimateStyle = useAnimatedStyle(
-    () => ({
-      opacity: opacity.value,
-    }),
-    [],
-  );
+    return (
+      <View style={StyleSheet.absoluteFillObject}>
+        {renderBackdropComponent &&
+          renderBackdropComponent({
+            animatedStyles: backdropStyles,
+            animationProgress,
+          })}
 
-  return (
-    <View style={StyleSheet.absoluteFillObject}>
-      {renderBackdropComponent &&
-        renderBackdropComponent({
-          animatedStyles: backdropStyles,
-          animationProgress,
-        })}
-
-      <Animated.View style={StyleSheet.absoluteFillObject}>
-        {typeof renderImage === 'function' ? (
-          renderImage({
-            source: imageSource,
-            width: targetWidth,
-            height: targetHeight,
-            imageStyles,
-          })
-        ) : (
-          <AnimatedImage
-            source={imageSource}
-            style={[
-              {
-                width: targetWidth,
-                height: targetHeight,
-              },
+        <Animated.View style={StyleSheet.absoluteFillObject}>
+          {typeof renderImage === 'function' ? (
+            renderImage({
+              source: imageSource,
+              width: targetWidth.value,
+              height: targetHeight.value,
               imageStyles,
-            ]}
-          />
-        )}
-      </Animated.View>
+            })
+          ) : (
+            <AnimatedImage
+              source={imageSource}
+              style={[
+                {
+                  width: targetWidth.value,
+                  height: targetHeight.value,
+                },
+                imageStyles,
+              ]}
+            />
+          )}
+        </Animated.View>
 
-      <Animated.View
-        style={[StyleSheet.absoluteFillObject, childrenAnimateStyle]}
-      >
-        {renderChildren && (
-          <Animated.View
-            style={[StyleSheet.absoluteFillObject, ,]}
-            onLayout={onChildrenLayout}
-          >
-            {children}
-          </Animated.View>
-        )}
-      </Animated.View>
+        <Animated.View
+          style={[
+            StyleSheet.absoluteFillObject,
+            childrenAnimateStyle,
+          ]}
+        >
+          {renderChildren && (
+            <Animated.View
+              style={[StyleSheet.absoluteFillObject, ,]}
+              onLayout={onChildrenLayout}
+            >
+              {children}
+            </Animated.View>
+          )}
+        </Animated.View>
 
-      {renderOverlayComponent &&
-        renderOverlayComponent({ animationProgress })}
-    </View>
-  );
-}
+        {renderOverlayComponent &&
+          renderOverlayComponent({ animationProgress })}
+      </View>
+    );
+  },
+);

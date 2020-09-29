@@ -14,6 +14,7 @@ export * from './Pager';
 export * from './ScalableImage';
 export * from './Lightbox';
 export * from './Swipeout';
+export * from './utils';
 
 export {
   useInit as useGalleryInit,
