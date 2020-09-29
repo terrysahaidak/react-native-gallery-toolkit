@@ -331,7 +331,7 @@ export default function FullFeatured() {
           keyExtractor={(item) => item.id}
           gutterWidth={24}
           onIndexChange={onIndexChange}
-          renderImage={(props, index) => {
+          renderImage={(props, item, index) => {
             return <ImageRender index={index} {...props} />;
           }}
           renderPage={({ item, ...rest }) => {

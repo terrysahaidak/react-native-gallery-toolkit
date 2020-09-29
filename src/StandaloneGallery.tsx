@@ -64,7 +64,8 @@ export interface StandaloneGalleryProps<T, ItemT>
   ) => JSX.Element;
   renderImage?: (
     props: RenderImageProps,
-    index?: number,
+    item: ItemT,
+    index: number,
   ) => JSX.Element;
   keyExtractor?: (item: ItemT, index: number) => string;
   initialIndex?: number;
@@ -224,7 +225,7 @@ export class StandaloneGallery<
       onInteraction,
       renderImage: renderImage
         ? (props: RenderImageProps) => {
-            return renderImage(props, index);
+            return renderImage(props, pagerProps.item, index);
           }
         : undefined,
     };
