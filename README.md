@@ -103,7 +103,7 @@ Prop | Description | Type | Default
 ------ | ------ | ------ | ------
 `getTotalCount?` | If the type of `items` is not an array, then this method should be defined to provide the total count of items | `(data: T) => number` | Required when `items` is not an array
 `getItem?` | If the type of `items` is not an array, then this method should be defined to provide the current item based on the index. Can return either the `item` or `undefined`. | `(data: T, index: number) => ItemT or undefined` | Required when `items` is not an array
-`renderImage?` | Callback that can be used to render custom image component. As an example, it can be used to render custom loading/error states | `(props: RenderImageProps) => JSX.Element` | `() => Image`
+`renderImage?` | Callback that can be used to render custom image component. As an example, it can be used to render custom loading/error states | `(props: RenderImageProps, index: number) => JSX.Element` | `() => Image`
 `renderPage?` | Callback that can be used to render custom page. Can be used to display some non-image pages such as Video, for instance | `(props: ImageRendererProps<T>, index: number) => JSX.Element` | `ImageTransformer`
 
 ### Handlers
