@@ -15,7 +15,7 @@ import {
   StandaloneGallery,
   createAnimatedGestureHandler,
   RenderImageProps,
-} from 'react-native-gallery-toolkit';
+} from '../../../src';
 
 import {
   RectButton,
@@ -166,7 +166,10 @@ function ImageRender({
   height,
   source,
   onLoad,
-}: RenderImageProps) {
+  index,
+}: RenderImageProps & {
+  index: number;
+}) {
   const [isLoading, setLoadingState] = useState(true);
   const [isError, setErrorState] = useState(false);
 
@@ -191,6 +194,7 @@ function ImageRender({
         </View>
       )}
       <Image
+        testID={`image-${index}`}
         onError={() => {
           setErrorState(true);
         }}
@@ -299,13 +303,16 @@ export default function FullFeatured() {
     [],
   );
 
-  const translateStyles = useAnimatedStyle(() => ({
-    transform: [
-      {
-        translateY: translateY.value,
-      },
-    ],
-  }), []);
+  const translateStyles = useAnimatedStyle(
+    () => ({
+      transform: [
+        {
+          translateY: translateY.value,
+        },
+      ],
+    }),
+    [],
+  );
 
   return (
     <View style={{ flex: 1 }}>
@@ -324,8 +331,8 @@ export default function FullFeatured() {
           keyExtractor={(item) => item.id}
           gutterWidth={24}
           onIndexChange={onIndexChange}
-          renderImage={(props) => {
-            return <ImageRender {...props} />;
+          renderImage={(props, index) => {
+            return <ImageRender index={index} {...props} />;
           }}
           renderPage={({ item, ...rest }) => {
             if (item.type === 'image') {
@@ -408,7 +415,6 @@ function CustomHeader({
 }) {
   const style = useAnimatedStyle(
     () => ({
-
       zIndex: 1,
       transform: [
         {
