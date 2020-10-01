@@ -200,7 +200,7 @@ function LightboxModal({
   const {
     controlsHidden,
     controlsStyles,
-    onShouldHideControls,
+    setControlsHidden,
   } = useControls();
 
   const handleClose = useCallback(() => {
@@ -227,7 +227,7 @@ function LightboxModal({
     'worklet';
 
     if (Math.abs(translateY) > 8 && !controlsHidden.value) {
-      controlsHidden.value = true;
+      setControlsHidden(true);
     }
   }
 
@@ -240,7 +240,7 @@ function LightboxModal({
   function onSwipeFailure() {
     'worklet';
 
-    controlsHidden.value = false;
+    setControlsHidden(false);
   }
 
   const renderOverlayComponent = useCallback<
@@ -280,7 +280,7 @@ function LightboxModal({
             items={list}
             onIndexChange={onIndexChange}
             shouldPagerHandleGestureEvent={shouldHandleEvent}
-            onShouldHideControls={onShouldHideControls}
+            onShouldHideControls={setControlsHidden}
             initialIndex={selectedItem.index}
             onPagerEnabledGesture={onGesture}
           />

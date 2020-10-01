@@ -29,13 +29,15 @@ export function useControls() {
     zIndex: 1,
   }));
 
-  const onShouldHideControls = useCallback((shouldHide: boolean) => {
-    controlsHidden.value = shouldHide;
+  const setControlsHidden = useCallback((hidden: boolean) => {
+    'worklet';
+
+    controlsHidden.value = hidden;
   }, []);
 
   return {
     controlsHidden,
     controlsStyles,
-    onShouldHideControls,
+    setControlsHidden,
   };
 }

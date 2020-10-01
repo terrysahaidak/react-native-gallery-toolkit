@@ -25,7 +25,7 @@ export interface SwipeoutProps {
     ) => void;
     shouldHandleEvent: () => boolean;
   }) => JSX.Element;
-  onActive: (traslateY: number) => void;
+  onActive?: (traslateY: number) => void;
   toValue?: number;
   onSwipeSuccess?: () => void;
   onSwipeFailure?: () => void;
@@ -74,7 +74,9 @@ export function Swipeout({
 
         translateY.value = evt.translationY;
 
-        onActive(translateY.value);
+        if (onActive) {
+          onActive(translateY.value);
+        }
       },
 
       onEnd: (evt) => {
@@ -88,8 +90,8 @@ export function Swipeout({
           translateY.value = withSpring(
             invert ? -toValue - 20 : toValue + 20,
             {
-              stiffness: 1000,
-              damping: 500,
+              stiffness: 300,
+              damping: 300,
               mass: 2,
               overshootClamping: true,
               restDisplacementThreshold: 10,
@@ -99,9 +101,13 @@ export function Swipeout({
             },
             callback,
           );
-          onSwipeSuccess();
+          if (onSwipeSuccess) {
+            onSwipeSuccess();
+          }
         } else {
-          onSwipeFailure();
+          if (onSwipeFailure) {
+            onSwipeFailure();
+          }
           translateY.value = withSpring(0, {
             stiffness: 1000,
             damping: 500,

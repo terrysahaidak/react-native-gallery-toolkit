@@ -108,7 +108,7 @@ export function LightboxSharedTransition() {
   const {
     controlsHidden,
     controlsStyles,
-    onShouldHideControls,
+    setControlsHidden,
   } = useControls();
 
   const handleBack = useCallback(() => {
@@ -122,14 +122,14 @@ export function LightboxSharedTransition() {
     'worklet';
 
     if (Math.abs(translateY) > 8 && !controlsHidden.value) {
-      controlsHidden.value = true;
+      setControlsHidden(true);
     }
   }
 
   function onSwipeFailure() {
     'worklet';
 
-    controlsHidden.value = false;
+    setControlsHidden(false);
   }
 
   const renderOverlayComponent = useCallback<
@@ -168,7 +168,7 @@ export function LightboxSharedTransition() {
           <StandaloneGallery
             items={list}
             shouldPagerHandleGestureEvent={shouldHandleEvent}
-            onShouldHideControls={onShouldHideControls}
+            onShouldHideControls={setControlsHidden}
             initialIndex={payload.index}
             onPagerEnabledGesture={onGesture}
           />
