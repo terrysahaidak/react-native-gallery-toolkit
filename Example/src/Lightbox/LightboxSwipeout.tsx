@@ -119,7 +119,7 @@ export const LightboxSwipeout = forwardRef<
       >
         <Swipeout
           onActive={_onSwipeActive}
-          onSwipeSuccess={onSwipeSuccess}
+          onSwipeSuccess={_onSwipeSuccess}
           onSwipeFailure={_onSwipeFailure}
           callback={callback}
         >
