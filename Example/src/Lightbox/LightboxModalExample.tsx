@@ -1,17 +1,11 @@
 import React, {
   useCallback,
-  useEffect,
   useRef,
   useState,
 } from 'react';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 import { generateImageList } from '../utils/generateImageList';
-import Animated, {
-  Extrapolate,
-  interpolate,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import {
   Dimensions,
   Image,
@@ -27,16 +21,12 @@ import {
   LightboxItemPayloadType,
   Measurements,
   StandaloneGallery,
-  LightboxTransition,
-  Swipeout,
   LightboxTransitionProps,
   LightboxImperativeHandlers,
 } from '../../../src';
 import { useControls } from './utils';
-import {
-  normalizeDimensions,
-  useSharedValue,
-} from '../../../src/utils';
+import { normalizeDimensions } from '../../../src/utils';
+import { LightboxSwipeout } from './LightboxSwipeout';
 
 const dimensions = Dimensions.get('window');
 
@@ -235,18 +225,10 @@ function LightboxModal({
     StatusBar.setBarStyle('light-content');
   }
 
-  const backdropOpacity = useSharedValue(1);
   const toValue = dimensions.height;
 
   function onSwipeActive(translateY: number) {
     'worklet';
-
-    backdropOpacity.value = interpolate(
-      Math.abs(translateY),
-      [0, toValue],
-      [1, 0.7],
-      Extrapolate.CLAMP,
-    );
 
     if (Math.abs(translateY) > 8 && !controlsHidden.value) {
       controlsHidden.value = true;
@@ -257,44 +239,13 @@ function LightboxModal({
     'worklet';
 
     StatusBar.setBarStyle('dark-content');
-
-    backdropOpacity.value = withTiming(0, {
-      duration: 100,
-    });
   }
 
   function onSwipeFailure() {
     'worklet';
 
     controlsHidden.value = false;
-    backdropOpacity.value = withTiming(1);
   }
-
-  const customBackdropStyles = useAnimatedStyle(() => {
-    return {
-      opacity: backdropOpacity.value,
-    };
-  }, []);
-
-  const renderBackdropComponent = useCallback<
-    LightboxTransitionProps['renderBackdropComponent']
-  >(
-    ({ animatedStyles }) => (
-      <Animated.View
-        style={[StyleSheet.absoluteFill, customBackdropStyles]}
-      >
-        <Animated.View
-          style={[
-            animatedStyles,
-            {
-              // backgroundColor: 'white',
-            },
-          ]}
-        />
-      </Animated.View>
-    ),
-    [],
-  );
 
   const renderOverlayComponent = useCallback<
     LightboxTransitionProps['renderOverlayComponent']
@@ -315,33 +266,30 @@ function LightboxModal({
 
   return (
     <View style={s.container}>
-      <LightboxTransition
+      <LightboxSwipeout
         ref={lightboxRef}
         onReady={onReady}
         measurements={selectedItem as Measurements}
         source={selectedItem.item.uri}
         targetDimensions={targetDimensions}
-        renderBackdropComponent={renderBackdropComponent}
         renderOverlayComponent={renderOverlayComponent}
+        onActive={onSwipeActive}
+        onSwipeSuccess={onSwipeSuccess}
+        onSwipeFailure={onSwipeFailure}
+        callback={handleClose}
+        toValue={toValue}
       >
-        <Swipeout
-          onActive={onSwipeActive}
-          onSwipeSuccess={onSwipeSuccess}
-          onSwipeFailure={onSwipeFailure}
-          callback={handleClose}
-        >
-          {({ onGesture, shouldHandleEvent }) => (
-            <StandaloneGallery
-              items={list}
-              onIndexChange={onIndexChange}
-              shouldPagerHandleGestureEvent={shouldHandleEvent}
-              onShouldHideControls={onShouldHideControls}
-              initialIndex={selectedItem.index}
-              onPagerEnabledGesture={onGesture}
-            />
-          )}
-        </Swipeout>
-      </LightboxTransition>
+        {({ onGesture, shouldHandleEvent }) => (
+          <StandaloneGallery
+            items={list}
+            onIndexChange={onIndexChange}
+            shouldPagerHandleGestureEvent={shouldHandleEvent}
+            onShouldHideControls={onShouldHideControls}
+            initialIndex={selectedItem.index}
+            onPagerEnabledGesture={onGesture}
+          />
+        )}
+      </LightboxSwipeout>
     </View>
   );
 }
