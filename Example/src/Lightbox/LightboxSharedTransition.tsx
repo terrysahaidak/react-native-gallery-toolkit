@@ -21,7 +21,7 @@ import {
   LightboxSharedTransitionScreenRoute,
 } from '.';
 import { DetachedHeader } from '../DetachedHeader';
-import { useControls } from './utils';
+import { useControls } from '../hooks/useControls';
 import { LightboxSwipeout } from './LightboxSwipeout';
 
 const dimensions = Dimensions.get('window');

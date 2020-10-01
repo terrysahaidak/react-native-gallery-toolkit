@@ -1,8 +1,4 @@
-import React, {
-  useCallback,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 import { generateImageList } from '../utils/generateImageList';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
@@ -24,7 +20,7 @@ import {
   LightboxTransitionProps,
   LightboxImperativeHandlers,
 } from '../../../src';
-import { useControls } from './utils';
+import { useControls } from '../hooks/useControls';
 import { normalizeDimensions } from '../../../src/utils';
 import { LightboxSwipeout } from './LightboxSwipeout';
 
