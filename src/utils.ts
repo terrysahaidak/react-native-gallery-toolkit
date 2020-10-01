@@ -111,9 +111,8 @@ export function useAnimatedReaction<R>(
 }
 
 export function useSharedValue<T>(value: T, shouldRebuild = false) {
-  const ref = useRef<T>(null);
+  const ref = useRef<T | null>(null);
   if (ref.current === null || shouldRebuild) {
-    // @ts-ignore
     ref.current = value;
   }
 

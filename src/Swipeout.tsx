@@ -86,9 +86,13 @@ export function Swipeout({
           (evt.translationY < 0 && evt.velocityY < 0);
 
         if (enoughVelocity && rightDirection) {
-          const invert = evt.velocityY < 0;
+          const maybeInvert = (v: number) => {
+            const invert = evt.velocityY < 0;
+            return invert ? -v : v;
+          };
+
           translateY.value = withSpring(
-            invert ? -toValue - 20 : toValue + 20,
+            maybeInvert(toValue + 20),
             {
               stiffness: 300,
               damping: 300,
@@ -97,7 +101,9 @@ export function Swipeout({
               restDisplacementThreshold: 10,
               restSpeedThreshold: 10,
               velocity:
-                Math.abs(evt.velocityY) < 1500 ? 1500 : evt.velocityY,
+                Math.abs(evt.velocityY) < 1500
+                  ? maybeInvert(1500)
+                  : evt.velocityY,
             },
             callback,
           );
