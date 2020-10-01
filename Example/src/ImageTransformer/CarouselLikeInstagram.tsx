@@ -18,46 +18,21 @@ import Animated, {
   Extrapolate,
   interpolate,
   withTiming,
-  Easing,
   delay,
 } from 'react-native-reanimated';
 import { DetachedHeader } from '../DetachedHeader';
 import { useControls } from '../hooks/useControls';
+import { generateImageList } from '../utils/generateImageList';
 
 const { width } = Dimensions.get('window');
 
-const defaultTimingConfig = {
-  duration: 350,
-  easing: Easing.bezier(0.33, 0.01, 0, 1),
-};
-
-const images: GalleryItemType[] = [
-  {
-    id: '1',
-    width: 300,
-    height: 300,
-    uri: 'https://placekitten.com/300/300',
-  },
-  {
-    id: '2',
-    width: 400,
-    height: 200,
-    uri: 'https://placekitten.com/400/200',
-  },
-  {
-    id: '2',
-    width: 400,
-    height: 200,
-    uri: 'https://placekitten.com/300/200',
-  },
-];
-
+const images = generateImageList(10);
 const data = [
-  { id: '1', images },
-  { id: '2', images },
-  { id: '3', images },
-  { id: '4', images },
-  { id: '5', images },
+  { id: '1', ...images },
+  { id: '2', ...images },
+  { id: '3', ...images },
+  { id: '4', ...images },
+  { id: '5', ...images },
 ];
 
 const s = StyleSheet.create({
@@ -65,15 +40,13 @@ const s = StyleSheet.create({
     paddingTop: 89,
   },
   itemContainer: {
-    height: 500,
+    height: 470,
     backgroundColor: 'white',
   },
   itemHeader: {
     height: 30,
   },
-  itemPager: {
-    height: 400,
-  },
+  itemPager: {},
   footerItem: {
     height: 70,
     zIndex: -1,
@@ -151,22 +124,21 @@ function RenderItem({
     return id;
   }
 
-  function RenderPage({ item }) {
+  function RenderPage({ item, width: _width }) {
+    const localHeight = Math.min(_width, item.height); //for proper image dimensions
     return (
-      <Animated.View style={{ height: item.height, width }}>
-        <ScalableImage
-          windowDimensions={{
-            height: item.height,
-            width,
-          }}
-          width={item.width}
-          height={item.height}
-          source={item.uri}
-          onScale={onScale}
-          onGestureStart={() => onGestureStart(_index)}
-          onGestureRelease={onGestureRelease}
-        />
-      </Animated.View>
+      <ScalableImage
+        windowDimensions={{
+          height: localHeight,
+          width: _width,
+        }}
+        width={_width}
+        height={localHeight}
+        source={item.uri}
+        onScale={onScale}
+        onGestureStart={() => onGestureStart(_index)}
+        onGestureRelease={onGestureRelease}
+      />
     );
   }
   return (
@@ -175,7 +147,7 @@ function RenderItem({
         <Text>Some header info</Text>
       </View>
       <Animated.View pointerEvents="none" style={overlayStyles} />
-      <View style={s.itemPager}>
+      <View style={[s.itemPager, { height: width }]}>
         <Pager
           pages={images}
           totalCount={images.length}
@@ -197,11 +169,7 @@ function RenderItem({
 export default function CarouselLikeInstagramScreen() {
   const sIndex = useSharedValue(-1);
 
-  const {
-    controlsHidden,
-    controlsStyles,
-    setControlsHidden,
-  } = useControls();
+  const { controlsStyles, setControlsHidden } = useControls();
 
   return (
     <>
