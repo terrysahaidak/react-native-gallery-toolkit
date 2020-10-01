@@ -7,6 +7,7 @@ import { Pager, RenderPageProps, PagerProps } from './Pager';
 import {
   ImageTransformer,
   ImageTransformerProps,
+  RenderImageProps,
 } from './ImageTransformer';
 
 const dimensions = Dimensions.get('window');
@@ -34,7 +35,10 @@ export interface ImageRendererProps<T> extends Handlers<T> {
   pagerProps: RenderPageProps<T>;
   width: number;
   height: number;
-  renderImage?: ImageTransformerProps['renderImage'];
+  renderImage?: (
+    props: RenderImageProps,
+    index?: number,
+  ) => JSX.Element;
 }
 
 type UnpackItemT<T> = T extends (infer ItemT)[]
@@ -58,7 +62,11 @@ export interface StandaloneGalleryProps<T, ItemT>
     props: ImageRendererProps<ItemT>,
     index: number,
   ) => JSX.Element;
-  renderImage?: ImageTransformerProps['renderImage'];
+  renderImage?: (
+    props: RenderImageProps,
+    item: ItemT,
+    index: number,
+  ) => JSX.Element;
   keyExtractor?: (item: ItemT, index: number) => string;
   initialIndex?: number;
   width?: number;
@@ -215,7 +223,11 @@ export class StandaloneGallery<
       onDoubleTap,
       onTap,
       onInteraction,
-      renderImage,
+      renderImage: renderImage
+        ? (props: RenderImageProps) => {
+            return renderImage(props, pagerProps.item, index);
+          }
+        : undefined,
     };
 
     if (typeof renderPage === 'function') {
