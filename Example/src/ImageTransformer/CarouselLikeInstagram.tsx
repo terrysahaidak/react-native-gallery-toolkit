@@ -22,6 +22,7 @@ import Animated, {
   delay,
 } from 'react-native-reanimated';
 import { DetachedHeader } from '../DetachedHeader';
+import { useControls } from '../hooks/useControls';
 
 const { width } = Dimensions.get('window');
 
@@ -82,13 +83,13 @@ const s = StyleSheet.create({
 function RenderItem({
   index: _index,
   sIndex,
-  isScaling,
   item: { id, images },
+  setControlsHidden,
 }: {
   index: number;
   sIndex: Animated.SharedValue<number>;
-  isScaling: Animated.SharedValue<boolean>;
   item: { id: string; images: GalleryItemType[] };
+  setControlsHidden: (shouldHide: boolean) => void;
 }) {
   const opacity = useSharedValue(0);
   const saveScale = useSharedValue(0);
@@ -117,7 +118,7 @@ function RenderItem({
   const onGestureStart = (_index: number) => {
     'worklet';
 
-    isScaling.value = true;
+    setControlsHidden(true);
     StatusBar.setHidden(true);
     sIndex.value = _index;
   };
@@ -125,7 +126,7 @@ function RenderItem({
     'worklet';
 
     sIndex.value = delay(200, withTiming(-1)); //delay for smooth hiding background opacity
-    isScaling.value = false;
+    setControlsHidden(false);
     StatusBar.setHidden(false);
   };
 
@@ -195,33 +196,20 @@ function RenderItem({
 
 export default function CarouselLikeInstagramScreen() {
   const sIndex = useSharedValue(-1);
-  const isScaling = useSharedValue(false);
-  const headerTranslate = useSharedValue(0);
 
-  const animatedHeaderStyles = useAnimatedStyle(() => {
-    if (isScaling.value) {
-      headerTranslate.value = withTiming(-100, defaultTimingConfig);
-    } else {
-      headerTranslate.value = withTiming(0, defaultTimingConfig);
-    }
-
-    return {
-      zIndex: 1,
-      transform: [
-        {
-          translateY: headerTranslate.value,
-        },
-      ],
-    };
-  });
+  const {
+    controlsHidden,
+    controlsStyles,
+    setControlsHidden,
+  } = useControls();
 
   return (
     <>
-      <DetachedHeader.AnimatedContainer
-        animatedStyles={animatedHeaderStyles}
-      >
-        <DetachedHeader />
-      </DetachedHeader.AnimatedContainer>
+      <Animated.View style={controlsStyles}>
+        <DetachedHeader.Container>
+          <DetachedHeader />
+        </DetachedHeader.Container>
+      </Animated.View>
       <FlatList
         contentContainerStyle={s.containerStyle}
         data={data}
@@ -230,7 +218,7 @@ export default function CarouselLikeInstagramScreen() {
           <RenderItem
             {...item}
             sIndex={sIndex}
-            isScaling={isScaling}
+            setControlsHidden={setControlsHidden}
           />
         )}
         CellRendererComponent={({
