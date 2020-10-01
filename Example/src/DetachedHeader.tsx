@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useRoute } from '@react-navigation/native';
 import { Header, StackHeaderProps } from '@react-navigation/stack';
-import { View } from 'react-native';
-// import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { View, ViewStyle } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 const headerPropsMap = new Map<string, StackHeaderProps>();
 const subs: Array<() => void> = [];
@@ -50,37 +50,39 @@ DetachedHeader.Container = ({
   children: JSX.Element;
 }) => {
   return (
-    <View style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
+    <View
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+      }}
+    >
       {children}
     </View>
   );
 };
 
-// DetachedHeader.AnimatedContainer = ({
-//   children,
-//   sharedZIndex,
-// }: {
-//   children: JSX.Element;
-//   sharedZIndex: Animated.SharedValue<number>;
-// }) => {
-//   const animatedStyles = useAnimatedStyle(() => {
-//     return {
-//       zIndex: sharedZIndex.value,
-//     };
-//   });
-//   return (
-//     <Animated.View
-//       style={[
-//         {
-//           position: 'absolute',
-//           top: 0,
-//           left: 0,
-//           right: 0,
-//         },
-//         animatedStyles,
-//       ]}
-//     >
-//       {children}
-//     </Animated.View>
-//   );
-// };
+DetachedHeader.AnimatedContainer = ({
+  children,
+  animatedStyles,
+}: {
+  children: JSX.Element;
+  animatedStyles: ViewStyle;
+}) => {
+  return (
+    <Animated.View
+      style={[
+        {
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+        },
+        animatedStyles,
+      ]}
+    >
+      {children}
+    </Animated.View>
+  );
+};

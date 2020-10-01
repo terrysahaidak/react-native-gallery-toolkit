@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import {
   Dimensions,
   View,
@@ -17,9 +17,18 @@ import Animated, {
   useSharedValue,
   Extrapolate,
   interpolate,
+  withTiming,
+  Easing,
+  delay,
 } from 'react-native-reanimated';
+import { DetachedHeader } from '../DetachedHeader';
 
 const { width } = Dimensions.get('window');
+
+const defaultTimingConfig = {
+  duration: 350,
+  easing: Easing.bezier(0.33, 0.01, 0, 1),
+};
 
 const images: GalleryItemType[] = [
   {
@@ -43,14 +52,17 @@ const images: GalleryItemType[] = [
 ];
 
 const data = [
-  { id: 1, images },
-  { id: 2, images },
-  { id: 3, images },
-  { id: 4, images },
-  { id: 5, images },
+  { id: '1', images },
+  { id: '2', images },
+  { id: '3', images },
+  { id: '4', images },
+  { id: '5', images },
 ];
 
 const s = StyleSheet.create({
+  containerStyle: {
+    paddingTop: 89,
+  },
   itemContainer: {
     height: 500,
     backgroundColor: 'white',
@@ -67,17 +79,19 @@ const s = StyleSheet.create({
   },
 });
 
-export default function CarouselLikeInstagramScreen() {
-  function keyExtractor(item, index) {
-    return index.toString();
-  }
-
-  function onIndexChangeWorklet(nextIndex) {
-    'worklet';
-  }
-
-  const sIndex = useSharedValue(-1);
+function RenderItem({
+  index: _index,
+  sIndex,
+  isScaling,
+  item: { id, images },
+}: {
+  index: number;
+  sIndex: Animated.SharedValue<number>;
+  isScaling: Animated.SharedValue<boolean>;
+  item: { id: string; images: GalleryItemType[] };
+}) {
   const opacity = useSharedValue(0);
+  const saveScale = useSharedValue(0);
   const headerZindex = useSharedValue(1);
 
   const onScale = useCallback((scale: number) => {
@@ -86,7 +100,7 @@ export default function CarouselLikeInstagramScreen() {
     opacity.value = interpolate(
       scale,
       [1, 2],
-      [0, 0.3],
+      [0, 0.7],
       Extrapolate.CLAMP,
     );
 
@@ -96,13 +110,70 @@ export default function CarouselLikeInstagramScreen() {
       [1, 0],
       Extrapolate.CLAMP,
     );
+
+    saveScale.value = scale;
   }, []);
 
-  const renderItem = ({ index: _index }: { index: number }) => (
+  const onGestureStart = (_index: number) => {
+    'worklet';
+
+    isScaling.value = true;
+    StatusBar.setHidden(true);
+    sIndex.value = _index;
+  };
+  const onGestureRelease = (_index: number) => {
+    'worklet';
+
+    sIndex.value = delay(200, withTiming(-1)); //delay for smooth hiding background opacity
+    isScaling.value = false;
+    StatusBar.setHidden(false);
+  };
+
+  const overlayStyles = useAnimatedStyle(() => {
+    return {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      bottom: 0,
+      right: 0,
+      backgroundColor: 'black',
+      opacity: opacity.value,
+      transform: [
+        {
+          scale: saveScale.value > 1 ? 3 : 0,
+        },
+      ],
+    };
+  });
+
+  function keyExtractor({ id }: { id: string }) {
+    return id;
+  }
+
+  function RenderPage({ item }) {
+    return (
+      <Animated.View style={{ height: item.height, width }}>
+        <ScalableImage
+          windowDimensions={{
+            height: item.height,
+            width,
+          }}
+          width={item.width}
+          height={item.height}
+          source={item.uri}
+          onScale={onScale}
+          onGestureStart={() => onGestureStart(_index)}
+          onGestureRelease={onGestureRelease}
+        />
+      </Animated.View>
+    );
+  }
+  return (
     <Animated.View style={s.itemContainer}>
       <View style={s.itemHeader}>
         <Text>Some header info</Text>
       </View>
+      <Animated.View pointerEvents="none" style={overlayStyles} />
       <View style={s.itemPager}>
         <Pager
           pages={images}
@@ -111,29 +182,8 @@ export default function CarouselLikeInstagramScreen() {
           initialIndex={0}
           width={width}
           gutterWidth={0}
-          onIndexChange={onIndexChangeWorklet}
-          renderPage={({ width: _width, item }) => {
-            return (
-              <ScalableImage
-                windowDimensions={{
-                  height: item.height,
-                  width,
-                }}
-                width={item.width}
-                height={item.height}
-                source={item.uri}
-                onScale={onScale}
-                onGestureStart={() => {
-                  StatusBar.setHidden(true);
-                  sIndex.value = _index;
-                }}
-                onGestureRelease={() => {
-                  StatusBar.setHidden(false);
-                  console.log('onGestureRelease!');
-                }}
-              />
-            );
-          }}
+          verticallyEnabled={false}
+          renderPage={RenderPage}
         />
       </View>
       <View style={s.footerItem}>
@@ -141,13 +191,48 @@ export default function CarouselLikeInstagramScreen() {
       </View>
     </Animated.View>
   );
+}
+
+export default function CarouselLikeInstagramScreen() {
+  const sIndex = useSharedValue(-1);
+  const isScaling = useSharedValue(false);
+  const headerTranslate = useSharedValue(0);
+
+  const animatedHeaderStyles = useAnimatedStyle(() => {
+    if (isScaling.value) {
+      headerTranslate.value = withTiming(-100, defaultTimingConfig);
+    } else {
+      headerTranslate.value = withTiming(0, defaultTimingConfig);
+    }
+
+    return {
+      zIndex: 1,
+      transform: [
+        {
+          translateY: headerTranslate.value,
+        },
+      ],
+    };
+  });
+
   return (
-    <View style={{ zIndex: 1, flex: 1 }}>
+    <>
+      <DetachedHeader.AnimatedContainer
+        animatedStyles={animatedHeaderStyles}
+      >
+        <DetachedHeader />
+      </DetachedHeader.AnimatedContainer>
       <FlatList
-        contentContainerStyle={{ paddingVertical: 89 }}
+        contentContainerStyle={s.containerStyle}
         data={data}
         keyExtractor={({ id }) => `${id}`}
-        renderItem={renderItem}
+        renderItem={(item) => (
+          <RenderItem
+            {...item}
+            sIndex={sIndex}
+            isScaling={isScaling}
+          />
+        )}
         CellRendererComponent={({
           children,
           index,
@@ -155,11 +240,7 @@ export default function CarouselLikeInstagramScreen() {
           ...props
         }) => {
           const animatedStyles = useAnimatedStyle(() => {
-            if (
-              sIndex.value !== -1 &&
-              sIndex.value === index &&
-              opacity.value > 0
-            ) {
+            if (sIndex.value !== -1 && sIndex.value === index) {
               return {
                 zIndex: 1,
               };
@@ -179,6 +260,6 @@ export default function CarouselLikeInstagramScreen() {
           );
         }}
       />
-    </View>
+    </>
   );
 }
