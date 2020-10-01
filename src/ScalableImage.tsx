@@ -264,8 +264,8 @@ export const ScalableImage = React.memo<ScalableImageProps>(
           onGestureEvent={onScaleEvent}
           simultaneousHandlers={[...outerGestureHandlerRefs]}
         >
-          <Animated.View style={[styles.wrapper]}>
-            <Animated.View style={[animatedStyles]}>
+          <Animated.View style={styles.wrapper}>
+            <Animated.View style={animatedStyles}>
               {typeof renderImage === 'function' ? (
                 renderImage({
                   source: imageSource,
