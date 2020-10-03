@@ -94,6 +94,7 @@ export const ScalableImage = React.memo<ScalableImageProps>(
     renderImage,
 
     windowDimensions = Dimensions.get('window'),
+    canvasDimensions = windowDimensions,
     outerGestureHandlerActive,
 
     style,
@@ -138,11 +139,14 @@ export const ScalableImage = React.memo<ScalableImageProps>(
     const scaleTranslation = vec.useSharedVector(0, 0);
 
     const canvas = vec.create(
-      windowDimensions.width,
-      windowDimensions.height,
+      canvasDimensions.width,
+      canvasDimensions.height,
     );
+
+    const scaleFactorY = height / windowDimensions.height;
+    const scaleFactorX = width / windowDimensions.width;
     const targetWidth = windowDimensions.width;
-    const scaleFactor = width / targetWidth;
+    const scaleFactor = Math.max(scaleFactorY, scaleFactorX);
     const targetHeight = height / scaleFactor;
 
     const onScaleEvent = useAnimatedGestureHandler<
@@ -280,7 +284,9 @@ export const ScalableImage = React.memo<ScalableImageProps>(
                   style={{
                     width: targetWidth,
                     height: targetHeight,
+                    flex:1
                   }}
+                  resizeMode="contain"
                 />
               )}
             </Animated.View>
