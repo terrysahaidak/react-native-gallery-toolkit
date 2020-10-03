@@ -1,5 +1,10 @@
 import React, { useCallback } from 'react';
-import { Dimensions, View, StyleSheet, StatusBar } from 'react-native';
+import {
+  Dimensions,
+  View,
+  StyleSheet,
+  StatusBar,
+} from 'react-native';
 import { useHeaderHeight } from '@react-navigation/stack';
 import {
   GalleryItemType,
@@ -17,9 +22,9 @@ const { height, width } = Dimensions.get('window');
 
 const image: GalleryItemType = {
   id: '4',
-  width: 400,
-  height: 400,
-  uri: 'https://placekitten.com/400/400',
+  width: 200,
+  height: 700,
+  uri: 'https://placekitten.com/200/700',
 };
 
 export default function StandaloneGalleryBasicScreen() {
@@ -61,8 +66,12 @@ export default function StandaloneGalleryBasicScreen() {
         }}
       >
         <ScalableImage
+          canvasDimensions={{
+            height,
+            width,
+          }}
           windowDimensions={{
-            height: height - headerHeight,
+            height: height - 89 * 2,
             width,
           }}
           width={image.width}

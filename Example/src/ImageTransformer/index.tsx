@@ -6,7 +6,7 @@ import {
 
 import ImageTransformerTest from './ImageTransformerTest';
 import InstagramLikeImageTransformer from './InstagramLikeImageTransformer';
-import CarouselLikeInstagram from './CarouselLikeInstagram';
+import CarouselLikeInstagram from './CarouselLikeInstagram/CarouselLikeInstagram';
 
 import { List } from '../Navigation';
 import { HeaderPropsScrapper } from '../DetachedHeader';
