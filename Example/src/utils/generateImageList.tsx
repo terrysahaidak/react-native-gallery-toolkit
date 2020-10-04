@@ -18,18 +18,18 @@ const IMAGE_SIZE =
 export function generateImageList(
   length: number,
   countFrom: number = 10,
-  isRandomHeight: boolean = false,
+  height?: number,
 ) {
   const images = Array.from({ length }, (_, index) => {
-    const height =
-      heights[getRandomIntInclusive(0, heights.length - 1)];
+    const heightToUse =
+      height ?? heights[getRandomIntInclusive(0, heights.length - 1)];
 
     return {
       id: index.toString(),
       uri: `https://picsum.photos/id/${index +
-        countFrom}/${height}/400`,
-      width: height,
-      height: isRandomHeight ? height : dimensions.width,
+        countFrom}/400/${heightToUse}`,
+      width: 400,
+      height: heightToUse,
     };
   });
 
