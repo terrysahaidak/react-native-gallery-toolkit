@@ -22,6 +22,7 @@ import {
   clamp,
   workletNoop,
   useSharedValue,
+  normalizeDimensions,
 } from './utils';
 
 const styles = StyleSheet.create({
@@ -69,9 +70,9 @@ export interface ScalableImageProps
   onStateChange?: (isActive: boolean) => void;
   onScale?: (scale: number) => void;
 
-  onGestureStart: () => void;
-  onGestureRelease: () => void;
-  onEnd: () => void;
+  onGestureStart?: () => void;
+  onGestureRelease?: () => void;
+  onEnd?: () => void;
 
   outerGestureHandlerActive?: Animated.SharedValue<boolean>;
 
@@ -94,7 +95,6 @@ export const ScalableImage = React.memo<ScalableImageProps>(
     renderImage,
 
     windowDimensions = Dimensions.get('window'),
-    canvasDimensions = windowDimensions,
     outerGestureHandlerActive,
 
     style,
@@ -139,15 +139,17 @@ export const ScalableImage = React.memo<ScalableImageProps>(
     const scaleTranslation = vec.useSharedVector(0, 0);
 
     const canvas = vec.create(
-      canvasDimensions.width,
-      canvasDimensions.height,
+      windowDimensions.width,
+      windowDimensions.height,
     );
 
-    const scaleFactorY = height / windowDimensions.height;
-    const scaleFactorX = width / windowDimensions.width;
-    const targetWidth = windowDimensions.width;
-    const scaleFactor = Math.max(scaleFactorY, scaleFactorX);
-    const targetHeight = height / scaleFactor;
+    const { targetWidth, targetHeight } = normalizeDimensions(
+      {
+        width,
+        height,
+      },
+      windowDimensions.width,
+    );
 
     const onScaleEvent = useAnimatedGestureHandler<
       PinchGestureHandlerGestureEvent,
@@ -284,9 +286,7 @@ export const ScalableImage = React.memo<ScalableImageProps>(
                   style={{
                     width: targetWidth,
                     height: targetHeight,
-                    flex:1
                   }}
-                  resizeMode="contain"
                 />
               )}
             </Animated.View>

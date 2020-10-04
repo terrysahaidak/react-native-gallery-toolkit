@@ -1,11 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 const s = StyleSheet.create({
-  containerStyle: {
-    paddingTop: 89,
-  },
   itemContainer: {
-    height: 470,
     backgroundColor: 'white',
   },
   itemHeader: {

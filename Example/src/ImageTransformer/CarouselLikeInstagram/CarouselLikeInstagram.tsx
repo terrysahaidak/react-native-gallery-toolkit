@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   Dimensions,
   View,
@@ -11,6 +11,7 @@ import {
   GalleryItemType,
   ScalableImage,
   Pager,
+  RenderPageProps,
 } from '../../../../src';
 import Animated, {
   useAnimatedStyle,
@@ -23,7 +24,9 @@ import Animated, {
 import { DetachedHeader } from '../../DetachedHeader';
 import { useControls } from '../../hooks/useControls';
 import { generateImageList } from '../../utils/generateImageList';
+import { getConstants } from '../../utils/getConstants';
 import s from './styles';
+import { normalizeDimensions } from '../../../../src/utils';
 
 const { width } = Dimensions.get('window');
 
@@ -31,28 +34,32 @@ const data = [
   {
     id: '1',
     name: 'Spock',
-    images: generateImageList(1, 256).images,
+    images: generateImageList(1, 256, 300).images,
   },
   {
     id: '2',
     name: 'Kirk',
-    images: generateImageList(12, 200).images,
+    images: generateImageList(12, 200, 400).images,
   },
   {
     id: '3',
     name: 'Leonard',
-    images: generateImageList(4, 50, true).images,
+    images: generateImageList(4, 50, 350).images,
   },
-  { id: '4', name: 'James', images: generateImageList(1, 20).images },
+  {
+    id: '4',
+    name: 'James',
+    images: generateImageList(1, 20, 300).images,
+  },
   {
     id: '5',
     name: 'Hikaru',
-    images: generateImageList(5, 213, true).images,
+    images: generateImageList(5, 213, 400).images,
   },
   {
     id: '6',
     name: 'Scotty',
-    images: generateImageList(5, 14, true).images,
+    images: generateImageList(5, 14, 450).images,
   },
 ];
 
@@ -98,6 +105,22 @@ function RenderItem({
 }) {
   const opacity = useSharedValue(0);
   const backgroundScale = useSharedValue(0);
+
+  const normalizedImages = useMemo(
+    () =>
+      images.map((item) => {
+        const { targetWidth, targetHeight } = normalizeDimensions(
+          item,
+        );
+
+        return {
+          ...item,
+          width: targetWidth,
+          height: targetHeight,
+        };
+      }),
+    [images],
+  );
 
   const onScale = useCallback((scale: number) => {
     'worklet';
@@ -154,12 +177,19 @@ function RenderItem({
     return id;
   }
 
-  function RenderPage({ item, width: _width }) {
+  const canvasHeight = Math.max(
+    ...normalizedImages.map((item) => item.height),
+  );
+
+  function RenderPage({
+    item,
+    width,
+  }: RenderPageProps<GalleryItemType>) {
     return (
       <ScalableImage
         windowDimensions={{
-          height: _width,
-          width: _width,
+          height: canvasHeight,
+          width: width,
         }}
         source={item.uri}
         width={item.width}
@@ -175,12 +205,12 @@ function RenderItem({
     <Animated.View style={s.itemContainer}>
       <Header uri={images[0].uri} name={name} />
       <Animated.View pointerEvents="none" style={overlayStyles} />
-      <View style={[s.itemPager, { height: width }]}>
+      <View style={[s.itemPager, { height: canvasHeight }]}>
         {images.length === 1 ? (
           <ScalableImage
             windowDimensions={{
-              height: width,
-              width: width,
+              height: canvasHeight,
+              width: width, //normalizeDimensions(images[0]).targetWidth,
             }}
             source={images[0].uri}
             width={images[0].width}
@@ -212,6 +242,8 @@ export default function CarouselLikeInstagramScreen() {
 
   const { controlsStyles, setControlsHidden } = useControls();
 
+  const { APPBAR_HEIGHT, STATUSBAR_HEIGHT } = getConstants();
+
   return (
     <>
       <Animated.View style={controlsStyles}>
@@ -220,7 +252,8 @@ export default function CarouselLikeInstagramScreen() {
         </DetachedHeader.Container>
       </Animated.View>
       <FlatList
-        contentContainerStyle={s.containerStyle}
+        contentInset={{ top: APPBAR_HEIGHT }}
+        contentContainerStyle={{ paddingTop: STATUSBAR_HEIGHT }}
         data={data}
         keyExtractor={({ id }) => `${id}`}
         renderItem={(item) => (

@@ -6,10 +6,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { useHeaderHeight } from '@react-navigation/stack';
-import {
-  GalleryItemType,
-  ScalableImage,
-} from 'react-native-gallery-toolkit';
+import { GalleryItemType, ScalableImage } from '../../../src';
 import Animated, {
   Extrapolate,
   useAnimatedStyle,
@@ -22,9 +19,9 @@ const { height, width } = Dimensions.get('window');
 
 const image: GalleryItemType = {
   id: '4',
-  width: 200,
-  height: 700,
-  uri: 'https://placekitten.com/200/700',
+  width: 300,
+  height: 400,
+  uri: 'https://placekitten.com/300/400',
 };
 
 export default function StandaloneGalleryBasicScreen() {
@@ -66,12 +63,8 @@ export default function StandaloneGalleryBasicScreen() {
         }}
       >
         <ScalableImage
-          canvasDimensions={{
-            height,
-            width,
-          }}
           windowDimensions={{
-            height: height - 89 * 2,
+            height: height,
             width,
           }}
           width={image.width}
