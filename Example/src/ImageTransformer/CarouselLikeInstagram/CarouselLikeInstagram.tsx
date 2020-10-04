@@ -85,25 +85,49 @@ const Header = ({ uri, name }) => (
 const Footer = () => (
   <View style={s.footerItem}>
     <View style={s.row}>
-      <Image
-        source={heart}
-        style={{ height: 22, width: 22, marginLeft: 10 }}
-      />
+      <Image source={heart} style={s.icon} />
       <Image
         source={bubble}
-        style={{ height: 22, width: 22, marginLeft: 10 }}
+        style={s.icon}
       />
       <Image
         source={airplane}
-        style={{ height: 22, width: 22, marginLeft: 10 }}
+        style={s.icon}
       />
     </View>
     <Image
       source={bookmark}
-      style={{ height: 22, width: 22, marginRight: 10 }}
+      style={s.iconBookmark}
     />
   </View>
 );
+
+const Pagination = ({ length, activeIndexInPager, canvasHeight }) => {
+  const dots = Array.from({ length: length }, (v, i) => {
+    const animatedDotStyle = useAnimatedStyle(() => {
+      const color =
+        activeIndexInPager.value === i ? '#178EED' : '#A7A7A7';
+      const dimensions = activeIndexInPager.value === i ? 6 : 4.5;
+
+      return {
+        backgroundColor: color,
+        width: dimensions,
+        height: dimensions,
+        borderRadius: 3,
+        marginHorizontal: 1.5,
+      };
+    }, []);
+    return (
+      <Animated.View style={animatedDotStyle} key={i}></Animated.View>
+    );
+  });
+
+  return (
+    <View style={[s.paginationContainer, { top: canvasHeight + 16 }]}>
+      {dots}
+    </View>
+  );
+};
 
 interface RenderItemProps {
   index: number;
@@ -125,6 +149,7 @@ function RenderItem({
 }: RenderItemProps) {
   const opacity = useSharedValue(0);
   const backgroundScale = useSharedValue(0);
+  const activeIndexInPager = useSharedValue(0);
 
   const normalizedImages = useMemo(
     () =>
@@ -224,6 +249,12 @@ function RenderItem({
     );
   }
 
+  function onIndexChangeWorklet(nextIndex: number) {
+    'worklet';
+
+    activeIndexInPager.value = nextIndex;
+  }
+
   return (
     <Animated.View style={s.itemContainer}>
       <Header uri={images[0].uri} name={name} />
@@ -244,17 +275,26 @@ function RenderItem({
             onGestureRelease={onGestureRelease}
           />
         ) : (
-          <Pager
-            pages={images}
-            totalCount={images.length}
-            keyExtractor={keyExtractor}
-            initialIndex={0}
-            width={width}
-            gutterWidth={0}
-            outerGestureHandlerRefs={[scrollViewRef]}
-            verticallyEnabled={false}
-            renderPage={RenderPage}
-          />
+          <>
+            <Pager
+              pages={images}
+              totalCount={images.length}
+              keyExtractor={keyExtractor}
+              initialIndex={0}
+              width={width}
+              gutterWidth={0}
+              outerGestureHandlerRefs={[scrollViewRef]}
+              verticallyEnabled={false}
+              renderPage={RenderPage}
+              onIndexChange={onIndexChangeWorklet}
+            />
+
+            <Pagination
+              length={images.length}
+              canvasHeight={canvasHeight}
+              activeIndexInPager={activeIndexInPager}
+            />
+          </>
         )}
       </View>
       <Footer />
