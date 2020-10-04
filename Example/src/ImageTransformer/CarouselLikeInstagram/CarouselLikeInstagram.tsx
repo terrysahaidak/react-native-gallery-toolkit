@@ -30,6 +30,11 @@ import { normalizeDimensions } from '../../../../src/utils';
 
 const { width } = Dimensions.get('window');
 
+const heart = require('../../../assets/images/Heart.svg');
+const bubble = require('../../../assets/images/Bubble.svg');
+const airplane = require('../../../assets/images/Airplane.svg');
+const bookmark = require('../../../assets/images/Bookmark.svg');
+
 const data = [
   {
     id: '1',
@@ -72,20 +77,23 @@ const Header = ({ uri, name }) => (
 const Footer = () => (
   <View style={s.footerItem}>
     <View style={s.row}>
-      <View style={s.pacman} />
-      <View style={s.talkBubble}>
-        <View style={s.talkBubbleSquare} />
-        <View style={s.talkBubbleTriangle} />
-      </View>
-      <View style={s.coneContainer}>
-        <View style={s.cone} />
-        <View style={s.coneBottom} />
-      </View>
+      <Image
+        source={heart}
+        style={{ height: 22, width: 22, marginLeft: 10 }}
+      />
+      <Image
+        source={bubble}
+        style={{ height: 22, width: 22, marginLeft: 10 }}
+      />
+      <Image
+        source={airplane}
+        style={{ height: 22, width: 22, marginLeft: 10 }}
+      />
     </View>
-    <View style={s.flag}>
-      <View style={s.flagTop} />
-      <View style={s.flagBottom} />
-    </View>
+    <Image
+      source={bookmark}
+      style={{ height: 22, width: 22, marginRight: 10 }}
+    />
   </View>
 );
 
