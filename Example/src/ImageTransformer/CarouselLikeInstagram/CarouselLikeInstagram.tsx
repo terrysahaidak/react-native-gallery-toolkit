@@ -102,7 +102,7 @@ const Footer = () => (
   </View>
 );
 
-const Pagination = ({ length, activeIndexInPager, canvasHeight }) => {
+const Pagination = ({ length, activeIndexInPager }) => {
   const dots = Array.from({ length: length }, (v, i) => {
     const animatedDotStyle = useAnimatedStyle(() => {
       const color =
@@ -123,7 +123,7 @@ const Pagination = ({ length, activeIndexInPager, canvasHeight }) => {
   });
 
   return (
-    <View style={[s.paginationContainer, { top: canvasHeight + 16 }]}>
+    <View style={[s.paginationContainer]}>
       {dots}
     </View>
   );
@@ -291,7 +291,6 @@ function RenderItem({
 
             <Pagination
               length={images.length}
-              canvasHeight={canvasHeight}
               activeIndexInPager={activeIndexInPager}
             />
           </>
