@@ -46,32 +46,32 @@ interface ListItemT {
 const data: ListItemT[] = [
   {
     id: '1',
-    name: 'Spock',
+    name: 'spock',
     images: generateImageList(1, 256, 300).images,
   },
   {
     id: '2',
-    name: 'Kirk',
-    images: generateImageList(12, 200, 400).images,
+    name: 'kirk',
+    images: generateImageList(12, 180, 400).images,
   },
   {
     id: '3',
-    name: 'Leonard',
+    name: 'leonard',
     images: generateImageList(4, 50, 350).images,
   },
   {
     id: '4',
-    name: 'James',
+    name: 'james',
     images: generateImageList(1, 20, 300).images,
   },
   {
     id: '5',
-    name: 'Hikaru',
+    name: 'hikaru',
     images: generateImageList(5, 213, 400).images,
   },
   {
     id: '6',
-    name: 'Scotty',
+    name: 'scotty',
     images: generateImageList(5, 14, 450).images,
   },
 ];
@@ -79,26 +79,17 @@ const data: ListItemT[] = [
 const Header = ({ uri, name }) => (
   <View style={s.itemHeader}>
     <Image source={{ uri }} style={s.image} />
-    <Text style={{ paddingLeft: 10 }}>{name}</Text>
+    <Text style={s.itemText}>{name}</Text>
   </View>
 );
 const Footer = () => (
   <View style={s.footerItem}>
     <View style={s.row}>
       <Image source={heart} style={s.icon} />
-      <Image
-        source={bubble}
-        style={s.icon}
-      />
-      <Image
-        source={airplane}
-        style={s.icon}
-      />
+      <Image source={bubble} style={s.icon} />
+      <Image source={airplane} style={s.icon} />
     </View>
-    <Image
-      source={bookmark}
-      style={s.iconBookmark}
-    />
+    <Image source={bookmark} style={s.iconBookmark} />
   </View>
 );
 
@@ -122,11 +113,7 @@ const Pagination = ({ length, activeIndexInPager }) => {
     );
   });
 
-  return (
-    <View style={[s.paginationContainer]}>
-      {dots}
-    </View>
-  );
+  return <View style={[s.paginationContainer]}>{dots}</View>;
 };
 
 interface RenderItemProps {
