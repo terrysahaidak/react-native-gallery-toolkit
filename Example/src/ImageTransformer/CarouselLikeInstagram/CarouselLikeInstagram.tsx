@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import {
   Dimensions,
   View,
@@ -6,12 +6,14 @@ import {
   StatusBar,
   FlatList,
   Image,
+  FlatListProps,
 } from 'react-native';
 import {
   GalleryItemType,
   ScalableImage,
   Pager,
   RenderPageProps,
+  normalizeDimensions,
 } from '../../../../src';
 import Animated, {
   useAnimatedStyle,
@@ -21,16 +23,22 @@ import Animated, {
   withTiming,
   delay,
 } from 'react-native-reanimated';
+import { ScrollView } from 'react-native-gesture-handler';
 import { DetachedHeader } from '../../DetachedHeader';
 import { useControls } from '../../hooks/useControls';
 import { generateImageList } from '../../utils/generateImageList';
 import { getConstants } from '../../utils/getConstants';
 import s from './styles';
-import { normalizeDimensions } from '../../../../src/utils';
 
 const { width } = Dimensions.get('window');
 
-const data = [
+interface ListItemT {
+  id: string;
+  name: string;
+  images: GalleryItemType[];
+}
+
+const data: ListItemT[] = [
   {
     id: '1',
     name: 'Spock',
@@ -89,12 +97,7 @@ const Footer = () => (
   </View>
 );
 
-function RenderItem({
-  index: _index,
-  activeItemIndex,
-  item: { images, name },
-  setControlsHidden,
-}: {
+interface RenderItemProps {
   index: number;
   activeItemIndex: Animated.SharedValue<number>;
   item: {
@@ -102,7 +105,16 @@ function RenderItem({
     images: GalleryItemType[];
   };
   setControlsHidden: (shouldHide: boolean) => void;
-}) {
+  scrollViewRef: React.Ref<ScrollView>;
+}
+
+function RenderItem({
+  index: _index,
+  activeItemIndex,
+  item: { images, name },
+  setControlsHidden,
+  scrollViewRef,
+}: RenderItemProps) {
   const opacity = useSharedValue(0);
   const backgroundScale = useSharedValue(0);
 
@@ -173,9 +185,10 @@ function RenderItem({
     };
   });
 
-  function keyExtractor({ id }: { id: string }) {
-    return id;
-  }
+  const keyExtractor = useCallback(
+    ({ id }: { id: string }) => id,
+    [],
+  );
 
   const canvasHeight = Math.max(
     ...normalizedImages.map((item) => item.height),
@@ -184,9 +197,11 @@ function RenderItem({
   function RenderPage({
     item,
     width,
+    pagerRefs,
   }: RenderPageProps<GalleryItemType>) {
     return (
       <ScalableImage
+        outerGestureHandlerRefs={[...pagerRefs, scrollViewRef]}
         windowDimensions={{
           height: canvasHeight,
           width: width,
@@ -210,12 +225,13 @@ function RenderItem({
           <ScalableImage
             windowDimensions={{
               height: canvasHeight,
-              width: width, //normalizeDimensions(images[0]).targetWidth,
+              width: width,
             }}
             source={images[0].uri}
             width={images[0].width}
             height={images[0].height}
             onScale={onScale}
+            outerGestureHandlerRefs={[scrollViewRef]}
             onGestureStart={onGestureStart}
             onGestureRelease={onGestureRelease}
           />
@@ -227,6 +243,7 @@ function RenderItem({
             initialIndex={0}
             width={width}
             gutterWidth={0}
+            outerGestureHandlerRefs={[scrollViewRef]}
             verticallyEnabled={false}
             renderPage={RenderPage}
           />
@@ -238,11 +255,42 @@ function RenderItem({
 }
 
 export default function CarouselLikeInstagramScreen() {
+  const scrollViewRef = useRef<ScrollView | null>(null);
   const activeItemIndex = useSharedValue(-1);
 
   const { controlsStyles, setControlsHidden } = useControls();
 
   const { APPBAR_HEIGHT, STATUSBAR_HEIGHT } = getConstants();
+
+  const CellRendererComponent = useMemo<
+    FlatListProps<ListItemT>['CellRendererComponent']
+  >(
+    () => ({ children, index, style, ...props }) => {
+      const animatedStyles = useAnimatedStyle(() => {
+        if (
+          activeItemIndex.value !== -1 &&
+          activeItemIndex.value === index
+        ) {
+          return {
+            zIndex: 1,
+          };
+        }
+        return {
+          zIndex: 0,
+        };
+      });
+      return (
+        <Animated.View
+          style={[animatedStyles]}
+          index={index}
+          {...props}
+        >
+          {children}
+        </Animated.View>
+      );
+    },
+    [],
+  );
 
   return (
     <>
@@ -252,46 +300,24 @@ export default function CarouselLikeInstagramScreen() {
         </DetachedHeader.Container>
       </Animated.View>
       <FlatList
-        contentInset={{ top: APPBAR_HEIGHT }}
-        contentContainerStyle={{ paddingTop: STATUSBAR_HEIGHT }}
+        contentContainerStyle={{
+          paddingTop: APPBAR_HEIGHT + STATUSBAR_HEIGHT,
+        }}
         data={data}
-        keyExtractor={({ id }) => `${id}`}
+        keyExtractor={({ id }) => id}
         renderItem={(item) => (
           <RenderItem
             {...item}
+            scrollViewRef={scrollViewRef}
             activeItemIndex={activeItemIndex}
             setControlsHidden={setControlsHidden}
           />
         )}
-        CellRendererComponent={({
-          children,
-          index,
-          style,
-          ...props
-        }) => {
-          const animatedStyles = useAnimatedStyle(() => {
-            if (
-              activeItemIndex.value !== -1 &&
-              activeItemIndex.value === index
-            ) {
-              return {
-                zIndex: 1,
-              };
-            }
-            return {
-              zIndex: 0,
-            };
-          });
-          return (
-            <Animated.View
-              style={[animatedStyles]}
-              index={index}
-              {...props}
-            >
-              {children}
-            </Animated.View>
-          );
-        }}
+        renderScrollComponent={(props) => (
+          // @ts-ignore
+          <ScrollView {...props} ref={scrollViewRef} />
+        )}
+        CellRendererComponent={CellRendererComponent}
       />
     </>
   );
