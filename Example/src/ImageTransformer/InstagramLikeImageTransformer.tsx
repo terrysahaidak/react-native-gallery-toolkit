@@ -5,7 +5,6 @@ import {
   StyleSheet,
   StatusBar,
 } from 'react-native';
-import { useHeaderHeight } from '@react-navigation/stack';
 import { GalleryItemType, ScalableImage } from '../../../src';
 import Animated, {
   Extrapolate,
@@ -14,18 +13,19 @@ import Animated, {
 } from 'react-native-reanimated';
 import { DetachedHeader } from '../DetachedHeader';
 import { useSharedValue } from '../../../src/utils';
+import { useControls } from '../hooks/useControls';
 
 const { height, width } = Dimensions.get('window');
 
 const image: GalleryItemType = {
   id: '4',
-  width: 300,
-  height: 400,
-  uri: 'https://placekitten.com/300/400',
+  width: 250,
+  height: 250,
+  uri: 'https://placekitten.com/250/250',
 };
 
 export default function StandaloneGalleryBasicScreen() {
-  const headerHeight = useHeaderHeight();
+  const { controlsStyles, setControlsHidden } = useControls();
 
   const opacity = useSharedValue(0);
 
@@ -47,14 +47,16 @@ export default function StandaloneGalleryBasicScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: 'transparent' }}>
-      <DetachedHeader.Container>
-        <DetachedHeader />
-      </DetachedHeader.Container>
-
       <Animated.View
         pointerEvents="none"
         style={[StyleSheet.absoluteFill, overlayStyles]}
       />
+
+      <Animated.View style={controlsStyles}>
+        <DetachedHeader.Container>
+          <DetachedHeader />
+        </DetachedHeader.Container>
+      </Animated.View>
 
       <View
         style={{
@@ -72,9 +74,11 @@ export default function StandaloneGalleryBasicScreen() {
           source={image.uri}
           onScale={onScale}
           onGestureStart={() => {
+            setControlsHidden(true);
             StatusBar.setHidden(true);
           }}
           onGestureRelease={() => {
+            setControlsHidden(false);
             StatusBar.setHidden(false);
           }}
         />
