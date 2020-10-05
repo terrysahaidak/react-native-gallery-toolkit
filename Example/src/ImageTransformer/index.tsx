@@ -6,7 +6,7 @@ import {
 
 import ImageTransformerTest from './ImageTransformerTest';
 import InstagramLikeImageTransformer from './InstagramLikeImageTransformer';
-import CarouselLikeInstagram from './CarouselLikeInstagram/CarouselLikeInstagram';
+import InstagramFeed from './InstagramFeed/InstagramFeed';
 
 import { List } from '../Navigation';
 import { HeaderPropsScrapper } from '../DetachedHeader';
@@ -19,7 +19,7 @@ function Home() {
       items={[
         'Image Transformer',
         'Scalable image',
-        'Instagram Like Feed',
+        'Instagram Feed',
       ]}
     />
   );
@@ -31,10 +31,10 @@ export default function App() {
       screenOptions={{
         gestureEnabled: false,
       }}
-      initialRouteName="List"
+      initialRouteName="Transformer"
       headerMode="screen"
     >
-      <Stack.Screen component={Home} name="List" />
+      <Stack.Screen component={Home} name="Transformer" />
       <Stack.Screen
         component={ImageTransformerTest}
         name="Image Transformer"
@@ -49,9 +49,11 @@ export default function App() {
       <Stack.Screen
         options={{
           header: HeaderPropsScrapper,
+          headerBackTitleVisible: false,
+          title: 'Instagram',
         }}
-        component={CarouselLikeInstagram}
-        name="Instagram Like Feed"
+        component={InstagramFeed}
+        name="Instagram Feed"
       />
     </Stack.Navigator>
   );

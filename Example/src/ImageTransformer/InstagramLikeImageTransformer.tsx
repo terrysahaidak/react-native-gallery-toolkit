@@ -1,10 +1,5 @@
-import React, { useCallback } from 'react';
-import {
-  Dimensions,
-  View,
-  StyleSheet,
-  StatusBar,
-} from 'react-native';
+import React, { useCallback, useMemo } from 'react';
+import { View, StyleSheet, StatusBar } from 'react-native';
 import { GalleryItemType, ScalableImage } from '../../../src';
 import Animated, {
   Extrapolate,
@@ -12,10 +7,11 @@ import Animated, {
   interpolate,
 } from 'react-native-reanimated';
 import { DetachedHeader } from '../DetachedHeader';
-import { useSharedValue } from '../../../src/utils';
+import {
+  normalizeDimensions,
+  useSharedValue,
+} from '../../../src/utils';
 import { useControls } from '../hooks/useControls';
-
-const { height, width } = Dimensions.get('window');
 
 const image: GalleryItemType = {
   id: '4',
@@ -52,23 +48,14 @@ export default function StandaloneGalleryBasicScreen() {
         style={[StyleSheet.absoluteFill, overlayStyles]}
       />
 
-      <Animated.View style={controlsStyles}>
-        <DetachedHeader.Container>
-          <DetachedHeader />
-        </DetachedHeader.Container>
-      </Animated.View>
-
       <View
         style={{
           zIndex: 0,
           flex: 1,
+          justifyContent: 'center',
         }}
       >
         <ScalableImage
-          windowDimensions={{
-            height: height,
-            width,
-          }}
           width={image.width}
           height={image.height}
           source={image.uri}
@@ -83,6 +70,12 @@ export default function StandaloneGalleryBasicScreen() {
           }}
         />
       </View>
+
+      <Animated.View style={controlsStyles}>
+        <DetachedHeader.Container>
+          <DetachedHeader />
+        </DetachedHeader.Container>
+      </Animated.View>
     </View>
   );
 }

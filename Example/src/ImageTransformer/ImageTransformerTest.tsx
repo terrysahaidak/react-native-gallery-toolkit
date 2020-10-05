@@ -1,9 +1,6 @@
 import React from 'react';
 import { Dimensions } from 'react-native';
-import {
-  GalleryItemType,
-  ImageTransformer,
-} from 'react-native-gallery-toolkit';
+import { GalleryItemType, ImageTransformer } from '../../../src';
 import { useHeaderHeight } from '@react-navigation/stack';
 
 const { height, width } = Dimensions.get('window');
