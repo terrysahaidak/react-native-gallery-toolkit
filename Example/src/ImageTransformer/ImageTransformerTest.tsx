@@ -8,8 +8,8 @@ const { height, width } = Dimensions.get('window');
 const image: GalleryItemType = {
   id: '4',
   width: 400,
-  height: 200,
-  uri: 'https://placekitten.com/400/200',
+  height: 300,
+  uri: 'https://placekitten.com/400/300',
 };
 
 export default function StandaloneGalleryBasicScreen() {
