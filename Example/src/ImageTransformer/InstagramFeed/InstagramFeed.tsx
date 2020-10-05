@@ -120,10 +120,7 @@ const Pagination = ({ length, activeIndexInPager }) => {
 interface RenderItemProps {
   index: number;
   activeItemIndex: Animated.SharedValue<number>;
-  item: {
-    name: string;
-    images: GalleryItemType[];
-  };
+  item: ListItemT;
   setControlsHidden: (shouldHide: boolean) => void;
   scrollViewRef: React.Ref<ScrollView>;
 }
@@ -184,19 +181,14 @@ function RenderItem({
   const onGestureRelease = useCallback(() => {
     'worklet';
 
-    activeItemIndex.value = delay(200, withTiming(-1)); //delay for smooth hiding background opacity
+    //delay for smooth hiding background opacity
+    activeItemIndex.value = delay(200, withTiming(-1));
     setControlsHidden(false);
     StatusBar.setHidden(false);
   }, []);
 
   const overlayStyles = useAnimatedStyle(() => {
     return {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      bottom: 0,
-      right: 0,
-      backgroundColor: 'black',
       opacity: opacity.value,
       transform: [
         {
@@ -216,14 +208,6 @@ function RenderItem({
     [normalizedImages],
   );
 
-  const windowDimensions = useMemo(
-    () => ({
-      height: canvasHeight,
-      width: width,
-    }),
-    [],
-  );
-
   function RenderPage({
     item,
     pagerRefs,
@@ -231,7 +215,6 @@ function RenderItem({
     return (
       <ScalableImage
         outerGestureHandlerRefs={[...pagerRefs, scrollViewRef]}
-        windowDimensions={windowDimensions}
         source={item.uri}
         width={item.width}
         height={item.height}
@@ -252,7 +235,6 @@ function RenderItem({
     if (images.length === 1) {
       return (
         <ScalableImage
-          windowDimensions={windowDimensions}
           source={images[0].uri}
           width={images[0].width}
           height={images[0].height}
@@ -290,16 +272,22 @@ function RenderItem({
   return (
     <Animated.View style={s.itemContainer}>
       <Header uri={images[0].uri} name={name} />
-      <Animated.View pointerEvents="none" style={overlayStyles} />
+
+      <Animated.View
+        pointerEvents="none"
+        style={[s.overlay, overlayStyles]}
+      />
+
       <View style={[s.itemPager, { height: canvasHeight }]}>
         {content}
       </View>
+
       <Footer />
     </Animated.View>
   );
 }
 
-export default function CarouselLikeInstagramScreen() {
+export default function InstagramFeed() {
   const scrollViewRef = useRef<ScrollView | null>(null);
   const activeItemIndex = useSharedValue(-1);
 
@@ -312,24 +300,16 @@ export default function CarouselLikeInstagramScreen() {
   >(
     () => ({ children, index, style, ...props }) => {
       const animatedStyles = useAnimatedStyle(() => {
-        if (
+        const isActive =
           activeItemIndex.value !== -1 &&
-          activeItemIndex.value === index
-        ) {
-          return {
-            zIndex: 1,
-          };
-        }
+          activeItemIndex.value === index;
+
         return {
-          zIndex: 0,
+          zIndex: isActive ? 1 : 0,
         };
       });
       return (
-        <Animated.View
-          style={[animatedStyles]}
-          index={index}
-          {...props}
-        >
+        <Animated.View {...props} style={animatedStyles}>
           {children}
         </Animated.View>
       );
@@ -339,15 +319,12 @@ export default function CarouselLikeInstagramScreen() {
 
   return (
     <>
-      <Animated.View style={controlsStyles}>
-        <DetachedHeader.Container>
-          <DetachedHeader />
-        </DetachedHeader.Container>
-      </Animated.View>
       <FlatList
         contentContainerStyle={{
           paddingTop: APPBAR_HEIGHT + STATUSBAR_HEIGHT,
         }}
+        initialNumToRender={2}
+        maxToRenderPerBatch={2}
         data={data}
         keyExtractor={({ id }) => id}
         renderItem={(item) => (
@@ -364,6 +341,12 @@ export default function CarouselLikeInstagramScreen() {
         )}
         CellRendererComponent={CellRendererComponent}
       />
+
+      <Animated.View style={controlsStyles}>
+        <DetachedHeader.Container>
+          <DetachedHeader />
+        </DetachedHeader.Container>
+      </Animated.View>
     </>
   );
 }
