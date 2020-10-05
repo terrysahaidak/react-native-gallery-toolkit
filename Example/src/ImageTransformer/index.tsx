@@ -18,7 +18,7 @@ function Home() {
     <List
       items={[
         'Image Transformer',
-        'Instagram Like Transformer',
+        'Scalable image',
         'Instagram Like Feed',
       ]}
     />
@@ -44,7 +44,7 @@ export default function App() {
           header: HeaderPropsScrapper,
         }}
         component={InstagramLikeImageTransformer}
-        name="Instagram Like Transformer"
+        name="Scalable image"
       />
       <Stack.Screen
         options={{

@@ -52,7 +52,7 @@ const data: ListItemT[] = [
   {
     id: '2',
     name: 'kirk',
-    images: generateImageList(12, 180, 400).images,
+    images: generateImageList(6, 180, 400).images,
   },
   {
     id: '3',
@@ -62,7 +62,7 @@ const data: ListItemT[] = [
   {
     id: '4',
     name: 'james',
-    images: generateImageList(1, 20, 300).images,
+    images: generateImageList(1, 20, 250).images,
   },
   {
     id: '5',
@@ -94,20 +94,21 @@ const Footer = () => (
 );
 
 const Pagination = ({ length, activeIndexInPager }) => {
-  const dots = Array.from({ length: length }, (v, i) => {
+  const dots = Array.from({ length: length }, (_, i) => {
     const animatedDotStyle = useAnimatedStyle(() => {
       const color =
         activeIndexInPager.value === i ? '#178EED' : '#A7A7A7';
-      const dimensions = activeIndexInPager.value === i ? 6 : 4.5;
+      const size = activeIndexInPager.value === i ? 6 : 4.5;
 
       return {
         backgroundColor: color,
-        width: dimensions,
-        height: dimensions,
+        width: size,
+        height: size,
         borderRadius: 3,
         marginHorizontal: 1.5,
       };
     }, []);
+
     return (
       <Animated.View style={animatedDotStyle} key={i}></Animated.View>
     );
@@ -210,22 +211,27 @@ function RenderItem({
     [],
   );
 
-  const canvasHeight = Math.max(
-    ...normalizedImages.map((item) => item.height),
+  const canvasHeight = useMemo(
+    () => Math.max(...normalizedImages.map((item) => item.height)),
+    [normalizedImages],
+  );
+
+  const windowDimensions = useMemo(
+    () => ({
+      height: canvasHeight,
+      width: width,
+    }),
+    [],
   );
 
   function RenderPage({
     item,
-    width,
     pagerRefs,
   }: RenderPageProps<GalleryItemType>) {
     return (
       <ScalableImage
         outerGestureHandlerRefs={[...pagerRefs, scrollViewRef]}
-        windowDimensions={{
-          height: canvasHeight,
-          width: width,
-        }}
+        windowDimensions={windowDimensions}
         source={item.uri}
         width={item.width}
         height={item.height}
@@ -242,46 +248,51 @@ function RenderItem({
     activeIndexInPager.value = nextIndex;
   }
 
+  const content = (() => {
+    if (images.length === 1) {
+      return (
+        <ScalableImage
+          windowDimensions={windowDimensions}
+          source={images[0].uri}
+          width={images[0].width}
+          height={images[0].height}
+          onScale={onScale}
+          outerGestureHandlerRefs={[scrollViewRef]}
+          onGestureStart={onGestureStart}
+          onGestureRelease={onGestureRelease}
+        />
+      );
+    } else {
+      return (
+        <>
+          <Pager
+            pages={images}
+            totalCount={images.length}
+            keyExtractor={keyExtractor}
+            initialIndex={0}
+            width={width}
+            gutterWidth={0}
+            outerGestureHandlerRefs={[scrollViewRef]}
+            verticallyEnabled={false}
+            renderPage={RenderPage}
+            onIndexChange={onIndexChangeWorklet}
+          />
+
+          <Pagination
+            length={images.length}
+            activeIndexInPager={activeIndexInPager}
+          />
+        </>
+      );
+    }
+  })();
+
   return (
     <Animated.View style={s.itemContainer}>
       <Header uri={images[0].uri} name={name} />
       <Animated.View pointerEvents="none" style={overlayStyles} />
       <View style={[s.itemPager, { height: canvasHeight }]}>
-        {images.length === 1 ? (
-          <ScalableImage
-            windowDimensions={{
-              height: canvasHeight,
-              width: width,
-            }}
-            source={images[0].uri}
-            width={images[0].width}
-            height={images[0].height}
-            onScale={onScale}
-            outerGestureHandlerRefs={[scrollViewRef]}
-            onGestureStart={onGestureStart}
-            onGestureRelease={onGestureRelease}
-          />
-        ) : (
-          <>
-            <Pager
-              pages={images}
-              totalCount={images.length}
-              keyExtractor={keyExtractor}
-              initialIndex={0}
-              width={width}
-              gutterWidth={0}
-              outerGestureHandlerRefs={[scrollViewRef]}
-              verticallyEnabled={false}
-              renderPage={RenderPage}
-              onIndexChange={onIndexChangeWorklet}
-            />
-
-            <Pagination
-              length={images.length}
-              activeIndexInPager={activeIndexInPager}
-            />
-          </>
-        )}
+        {content}
       </View>
       <Footer />
     </Animated.View>
