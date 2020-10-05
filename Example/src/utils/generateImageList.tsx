@@ -15,16 +15,21 @@ const IMAGE_SIZE =
   (dimensions.width - GUTTER_WIDTH * (NUMBER_OF_IMAGES - 1)) /
   NUMBER_OF_IMAGES;
 
-export function generateImageList(length: number) {
+export function generateImageList(
+  length: number,
+  countFrom: number = 10,
+  height?: number,
+) {
   const images = Array.from({ length }, (_, index) => {
-    const height =
-      heights[getRandomIntInclusive(0, heights.length - 1)];
+    const heightToUse =
+      height ?? heights[getRandomIntInclusive(0, heights.length - 1)];
 
     return {
       id: index.toString(),
-      uri: `https://picsum.photos/id/${index + 10}/${height}/400`,
-      width: height,
-      height: dimensions.width,
+      uri: `https://picsum.photos/id/${index +
+        countFrom}/400/${heightToUse}`,
+      width: 400,
+      height: heightToUse,
     };
   });
 

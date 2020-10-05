@@ -9,8 +9,9 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { Text, StatusBar } from 'react-native';
 import { useGalleryInit } from 'react-native-gallery-toolkit';
 
-import Standalone from './Standalone/Standalone';
-import ImageTransformer from './ImageTransformer';
+import Standalone from './StandaloneGalleryExamples/Standalone';
+import ImageTransformer from './ImageTransformerExamples';
+import ScalableImage from './ScalableImageExamples';
 import Lightbox from './Lightbox';
 
 const Stack = createStackNavigator();
@@ -49,7 +50,14 @@ export function List({ items }: { items: string[] }) {
 
 function Home() {
   return (
-    <List items={['Standalone', 'Image Transformer', 'Lightbox']} />
+    <List
+      items={[
+        'Standalone Gallery',
+        'Image Transformer',
+        'Scalable Image',
+        'Lightbox',
+      ]}
+    />
   );
 }
 
@@ -60,28 +68,36 @@ export default function App() {
       <StatusBar translucent showHideTransition="fade" />
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="Home"
+          initialRouteName="Examples"
           screenOptions={{
             gestureEnabled: false,
+            headerShown: false,
+            headerBackTitleVisible: false,
           }}
           headerMode="screen"
         >
-          <Stack.Screen component={Home} name="Home" />
           <Stack.Screen
-            options={{ headerShown: false }}
-            component={Standalone}
-            name="Standalone"
+            options={{
+              headerShown: true,
+            }}
+            component={Home}
+            name="Examples"
           />
           <Stack.Screen
-            options={{ headerShown: false }}
+            component={Standalone}
+            name="Standalone Gallery"
+          />
+          <Stack.Screen
             component={ImageTransformer}
             name="Image Transformer"
           />
+
           <Stack.Screen
-            options={{ headerShown: false }}
-            component={Lightbox}
-            name="Lightbox"
+            component={ScalableImage}
+            name="Scalable Image"
           />
+
+          <Stack.Screen component={Lightbox} name="Lightbox" />
         </Stack.Navigator>
       </NavigationContainer>
     </>

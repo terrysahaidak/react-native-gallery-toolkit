@@ -6,19 +6,21 @@ import {
   // eslint-disable-next-line import/no-unresolved
 } from 'react-native-reanimated';
 import React, { useState, useEffect, useRef } from 'react';
-import { GalleryItemType } from './types';
 
 const dimensions = Dimensions.get('window');
 
 export function normalizeDimensions(
-  item: GalleryItemType,
-  targetWidth = dimensions.width,
+  item: {
+    width: number;
+    height: number;
+  },
+  resultWidth = dimensions.width,
 ) {
-  const scaleFactor = item.width / targetWidth;
+  const scaleFactor = item.width / resultWidth;
   const targetHeight = item.height / scaleFactor;
 
   return {
-    targetWidth,
+    targetWidth: resultWidth,
     targetHeight,
   };
 }

@@ -22,6 +22,7 @@ import {
   clamp,
   workletNoop,
   useSharedValue,
+  normalizeDimensions,
 } from './utils';
 
 const styles = StyleSheet.create({
@@ -30,8 +31,8 @@ const styles = StyleSheet.create({
   },
   wrapper: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
+    // justifyContent: 'center',
+    // alignItems: 'center',
   },
   container: {
     flex: 1,
@@ -62,16 +63,16 @@ export interface ScalableImageProps
   source?: ImageRequireSource | string;
   width: number;
   height: number;
-  windowDimensions: {
+  canvasDimensions?: {
     width: number;
     height: number;
   };
   onStateChange?: (isActive: boolean) => void;
   onScale?: (scale: number) => void;
 
-  onGestureStart: () => void;
-  onGestureRelease: () => void;
-  onEnd: () => void;
+  onGestureStart?: () => void;
+  onGestureRelease?: () => void;
+  onEnd?: () => void;
 
   outerGestureHandlerActive?: Animated.SharedValue<boolean>;
 
@@ -93,7 +94,7 @@ export const ScalableImage = React.memo<ScalableImageProps>(
     onStateChange = workletNoop,
     renderImage,
 
-    windowDimensions = Dimensions.get('window'),
+    canvasDimensions,
     outerGestureHandlerActive,
 
     style,
@@ -137,13 +138,18 @@ export const ScalableImage = React.memo<ScalableImageProps>(
     const scaleOffset = useSharedValue(1);
     const scaleTranslation = vec.useSharedVector(0, 0);
 
-    const canvas = vec.create(
-      windowDimensions.width,
-      windowDimensions.height,
+    const { targetWidth, targetHeight } = normalizeDimensions(
+      {
+        width,
+        height,
+      },
+      canvasDimensions?.width ?? Dimensions.get('window').width,
     );
-    const targetWidth = windowDimensions.width;
-    const scaleFactor = width / targetWidth;
-    const targetHeight = height / scaleFactor;
+
+    const canvas = vec.create(
+      canvasDimensions?.width ?? targetWidth,
+      canvasDimensions?.height ?? targetHeight,
+    );
 
     const onScaleEvent = useAnimatedGestureHandler<
       PinchGestureHandlerGestureEvent,
@@ -256,7 +262,7 @@ export const ScalableImage = React.memo<ScalableImageProps>(
 
     return (
       <Animated.View
-        style={[styles.container, { width: targetWidth }, style]}
+        style={[{ width: targetWidth, height: targetHeight }, style]}
       >
         <PinchGestureHandler
           enabled={enabled}
