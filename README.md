@@ -5,6 +5,7 @@
 
 <p align="center">
   <img width="200" height="400" src="gifs/promo.gif" alt="Gallery in action gif">
+  <img width="200" height="400" src="gifs/promo_2.gif" alt="Instagram feed clone">
 </p>
 
 [![npm](https://img.shields.io/npm/v/react-native-gallery-toolkit.svg?style=plastic)](https://npmjs.com/package/react-native-gallery-toolkit)
