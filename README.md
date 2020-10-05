@@ -18,9 +18,11 @@
   - [Methods](#methods)
 - [Pager](#pager)
 - [Transformer](#transformer)
+- [Scalable Image](#scalable-image)
 - [Examples](#examples)
   - [Running on iOS](#running-on-ios)
   - [Running on Android](#running-on-android)
+- [TODOs](#todos)
 - [LICENSE](#license)
 
 **Important!**
@@ -36,13 +38,9 @@ Use npm or yarn to install the library
 npm i --save react-native-gallery-toolkit
 ```
 
-> Also, you need to install [react-native-reanimated@alpha.6](https://github.com/software-mansion/react-native-reanimated) (then new 2 version) and [react-native-gesture-handler](https://github.com/software-mansion/react-native-gesture-handler), and follow their installation instructions.
+> Also, you need to install [react-native-reanimated@alpha.7](https://github.com/software-mansion/react-native-reanimated) (then new 2 version) and [react-native-gesture-handler](https://github.com/software-mansion/react-native-gesture-handler), and follow their installation instructions.
 
-Expo is not currently supported because it doesn't support Reanimated 2.
-
-**Important!**
-
-There is a bug in *react-native-reanimated@alpha.6* that causes gesture event handlers to reattach on each render. You can apply [this patch](./Example/patches/react-native-reanimated+2.0.0-alpha.6.patch) to workaround it.
+Expo is not currently supported because this library uses the latest version of Reanimated 2 (expo supports right now only alpha.6.1).
 
 ## Standalone gallery
 
@@ -128,11 +126,15 @@ Name | Description | Type
 
 ## Pager
 
-WIP
+TODO
 
 ## Transformer
 
-WIP
+TODO
+
+## Scalable Image
+
+TODO
 
 ## Examples
 
@@ -162,6 +164,14 @@ npm run ios
 ```bash
 npm run android
 ```
+
+## TODOs
+
+- [ ] Add invariants to all the required props
+- [ ] Finish documentation
+- [ ] Lightbox with examples
+- [ ] Lightbox Gallery with examples
+- [ ] Try to use react-native-shared-element
 
 ## LICENSE
 
