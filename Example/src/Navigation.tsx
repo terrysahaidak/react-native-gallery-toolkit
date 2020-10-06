@@ -12,6 +12,7 @@ import { useGalleryInit } from 'react-native-gallery-toolkit';
 import Standalone from './StandaloneGalleryExamples/Standalone';
 import ImageTransformer from './ImageTransformerExamples';
 import ScalableImage from './ScalableImageExamples';
+import PagerExamples from './PagerExamples';
 
 const Stack = createStackNavigator();
 
@@ -52,6 +53,7 @@ function Home() {
       items={[
         'Standalone Gallery',
         'Image Transformer',
+        'Pager',
         'Scalable Image',
       ]}
     />
@@ -88,6 +90,7 @@ export default function App() {
             component={ImageTransformer}
             name="Image Transformer"
           />
+          <Stack.Screen component={PagerExamples} name="Pager" />
 
           <Stack.Screen
             component={ScalableImage}
