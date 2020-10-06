@@ -97,7 +97,12 @@ export function LightBoxItem<T>({
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 
 const defaultTimingConfig = {
-  duration: 240,
+  duration: 300,
+  easing: Easing.bezier(0.33, 0.01, 0, 1),
+};
+
+const defaultFadeTimingConfig = {
+  duration: 500,
   easing: Easing.bezier(0.33, 0.01, 0, 1),
 };
 
@@ -129,6 +134,7 @@ export interface LightboxTransitionProps {
   onReady?: () => void;
   renderImage?: (props: RenderLightboxImageProps) => JSX.Element;
   timingConfig?: Animated.WithTimingConfig;
+  fadeTimingConfig?: Animated.WithTimingConfig;
 }
 
 export interface LightboxImperativeHandlers {
@@ -178,6 +184,7 @@ export const LightboxTransition = forwardRef<
       renderOverlayComponent,
       onReady = workletNoop,
       timingConfig = defaultTimingConfig,
+      fadeTimingConfig = defaultFadeTimingConfig,
     },
     ref,
   ) => {
@@ -262,10 +269,14 @@ export const LightboxTransition = forwardRef<
     }
 
     function runFadeOutAnimation(cb: Function) {
-      opacity.value = withTiming(0, timingConfig);
-      animationProgress.value = withTiming(0, timingConfig, () => {
-        cb();
-      });
+      opacity.value = withTiming(0, fadeTimingConfig);
+      animationProgress.value = withTiming(
+        0,
+        fadeTimingConfig,
+        () => {
+          cb();
+        },
+      );
     }
 
     useImperativeHandle(ref, () => ({
