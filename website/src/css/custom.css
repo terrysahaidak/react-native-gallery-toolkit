@@ -15,6 +15,7 @@
   --ifm-color-primary-lighter: rgb(102, 212, 189);
   --ifm-color-primary-lightest: rgb(146, 224, 208);
   --ifm-code-font-size: 95%;
+  --ifm-table-cell-padding: 0.50rem
 }
 
 .docusaurus-highlight-code-line {
@@ -22,4 +23,12 @@
   display: block;
   margin: 0 calc(-1 * var(--ifm-pre-padding));
   padding: 0 var(--ifm-pre-padding);
+}
+
+article table {
+  display: table;
+}
+article table thead th {
+  text-align: left;
+  text-transform: uppercase;
 }
