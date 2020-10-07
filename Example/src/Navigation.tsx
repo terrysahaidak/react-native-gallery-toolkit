@@ -8,6 +8,7 @@ import {
 import { createStackNavigator } from '@react-navigation/stack';
 import { Text, StatusBar } from 'react-native';
 import { useGalleryInit } from 'react-native-gallery-toolkit';
+import { Host } from 'react-native-portalize';
 
 import Standalone from './StandaloneGalleryExamples/Standalone';
 import ImageTransformer from './ImageTransformerExamples';
@@ -64,7 +65,7 @@ function Home() {
 export default function App() {
   useGalleryInit();
   return (
-    <>
+    <Host>
       <StatusBar translucent showHideTransition="fade" />
       <NavigationContainer>
         <Stack.Navigator
@@ -100,6 +101,6 @@ export default function App() {
           <Stack.Screen component={Lightbox} name="Lightbox" />
         </Stack.Navigator>
       </NavigationContainer>
-    </>
+    </Host>
   );
 }

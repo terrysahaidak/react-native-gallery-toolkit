@@ -52,7 +52,7 @@ static void InitializeFlipper(UIApplication *application) {
   InitializeFlipper(application);
 #endif
 
-  RCTEnableTurboModule(YES);
+  // RCTEnableTurboModule(YES);
 
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   

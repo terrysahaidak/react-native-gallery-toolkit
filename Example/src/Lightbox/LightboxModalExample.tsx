@@ -23,6 +23,7 @@ import {
 import { useControls } from '../hooks/useControls';
 import { normalizeDimensions } from '../../../src/utils';
 import { LightboxSwipeout } from './LightboxSwipeout';
+import { Portal } from 'react-native-portalize';
 
 const dimensions = Dimensions.get('window');
 
@@ -38,14 +39,15 @@ const s = StyleSheet.create({
     top: StatusBar.currentHeight || 20,
   },
   backButtonContainer: {
-    padding: 4,
-    margin: 8,
+    padding: 7,
+    marginVertical: 8,
+    marginHorizontal: 7,
     backgroundColor: 'white',
     borderRadius: 20,
   },
   backButton: {
-    width: 30,
-    height: 30,
+    width: 24,
+    height: 24,
   },
 
   text: {
@@ -142,19 +144,15 @@ export function LightboxModalExample() {
         />
       </ScrollView>
 
-      <Modal
-        animationType="none"
-        transparent
-        visible={!!selectedItem}
-      >
-        {selectedItem && (
+      {selectedItem && (
+        <Portal>
           <LightboxModal
             onClose={onClose}
             selectedItem={selectedItem}
             list={LIST.images}
           />
-        )}
-      </Modal>
+        </Portal>
+      )}
     </View>
   );
 }
