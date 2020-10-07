@@ -43,43 +43,58 @@ export default function App() {
 
 The array of items to render. But can also accept `Map`, `Set`, or `Object` with keys. If the type is not array, then `getTotalCount` and `getItem` should be defined too.
 
-> `required:` YES | `type:` Array<[GalleryItemType](./types/gallery-item-type)> | `default:` undefined
+type | default | required
+------ | ------ | ------
+Array\<[GalleryItemType](./types/gallery-item-type)> | `undefined` | Yes
+
 
 ### `width`
 
 Viewport width, usually it will be the window width.
 
-> `required:` NO | `type:` number | `default:` Dimensions.get('window').width
+type | default | required
+------ | ------ | ------
+number | Dimensions.get('window').width | NO
 
 ### `height`
 
 Viewport height, usually it will be the window height.
 
-> `required:` NO | `type:` number | `default:` Dimensions.get('window').height
+type | default | required
+------ | ------ | ------
+number | Dimensions.get('window').height | NO
 
 ### `numToRender`
 
 How many pages should be rendered at the same time.
 
-> `required:` NO | `type:` number | `default:` 2
+type | default | required
+------ | ------ | ------
+number | 2 | NO
 
 ### `gutterWidth`
 
 The width of the gutter between pages.
 
-> `required:` NO | `type:` number | `default:` 0
+type | default | required
+------ | ------ | ------
+number | 0 | NO
 
 ### `initialIndex`
 
 The initial page index.
 
-> `required:` NO | `type:` number | `default:` 0
+type | default | required
+------ | ------ | ------
+number | 0 | NO
 
 ### `keyExtractor`
 
 Callback which extract the key of the page. Receives current item of the provided items as well as current index.
 
-> `required:` NO | `type:` (item: T, index: number) => string | `default:` Uses index as a key by default
+type | default | required
+------ | ------ | ------
+(item: T, index: number) => string | Uses index as a key by default | NO
 
 ## Advance Props
 
@@ -87,25 +102,33 @@ Callback which extract the key of the page. Receives current item of the provide
 
 If the type of `items` is not an array, then this method should be defined to provide the total count of items	
 
-> `required:` NO* | `type:` (data: T) => number	 | `default:` undefined | \* Required when items is not an array
+type | default | required
+------ | ------ | ------
+(data: T) => number	 | undefined |  Required when items is not an array
 
 ### `getItem`
 
 If the type of `items` is not an array, then this method should be defined to provide the current item based on the index. Can return either the `item` or `undefined`.	
 
-> `required:` NO* | `type:` (data: T, index: number) => ItemT or undefined | `default:` undefined | \* Required when items is not an array
+type | default | required
+------ | ------ | ------
+(data: T, index: number) => ItemT or undefined | undefined | Required when items is not an array 
 
 ### `renderImage`
 
 Callback that can be used to render custom image component. As an example, it can be used to render custom loading/error states.
 
-> `required:` NO | `type:` (props: RenderImageProps, item: ItemT, index: number) => JSX.Element	 | `default:` undefined
+type | default | required
+------ | ------ | ------
+(props: RenderImageProps, item: ItemT, index: number) => JSX.Element	 | undefined | NO
 
 ### `renderPage`
 
 Callback that can be used to render custom page. Can be used to display some non-image pages such as Video, for instance.
 
-> `required:` NO | `type:` (props: ImageRendererProps<\T>, index: number) => JSX.Element | `default:` ImageRenderer
+type | default | required
+------ | ------ | ------
+(props: ImageRendererProps<\T>, index: number) => JSX.Element | ImageRenderer | NO
 
 ## Handlers
 
@@ -113,61 +136,86 @@ Callback that can be used to render custom page. Can be used to display some non
 
 Fires when active index changes, this could be a **Worklet or Function**.
 
-> `required:` NO | `type:` (nextIndex: number) => void | `default:` undefined 
+type | default | required
+------ | ------ | ------
+(nextIndex: number) => void | undefined  | NO
 
 ### `onTap`
 
 Executes when tap image transformer receives tap, this could be a **Worklet or Function**.
 
-> `required:` NO | `type:` () => void | `default:` undefined 
+type | default | required
+------ | ------ | ------
+() => void | undefined  | NO
 
 ### `onDoubleTap`
 
 Executes when tap image transformer receives double-tap, this could be a **Worklet or Function**.
 
-> `required:` NO | `type:` () => void | `default:` undefined 
+type | default | required
+------ | ------ | ------
+() => void | undefined  | NO
 
 ### `onInteraction`
 
 Is called when either pan or scale has happened, this could be a **Worklet or Function**.
 
-> `required:` NO | `type:` (type: 'scale' | 'pan') => void | `default:` undefined 
+type | default | required
+------ | ------ | ------
+(type: 'scale' | 'pan') => void | undefined  | NO
 
 ### `onPagerTranslateChange`
 
 Executes on pager's horizontal pan, this could be a **Worklet or Function**.
 
-> `required:` NO | `type:` (translateX: number) => void	 | `default:` undefined 
+type | default | required
+------ | ------ | ------
+(translateX: number) => void	 | undefined  | NO
 
 ### `onGesture`
 
 Executes on pager's gesture, this could be a **Worklet or Function**.
 
-> `required:` NO | `type:` (event: PanGestureHandlerGestureEvent, isActive: SharedValue<\boolean>) => void | `default:` undefined 
+type | default | required
+------ | ------ | ------
+(event: PanGestureHandlerGestureEvent, isActive: SharedValue<\boolean>) => void | undefined  | NO
 
 ### `shouldPagerHandleGestureEvent`
 
 Worklet that will be passed to pager's `shouldHandleEvent` to determine should pager handle this event. Can be used to handle "swipe down to close", this could be **only Worklet**.
 
-> `required:` NO | `type:` (event: PanGestureHandlerGestureEvent) => boolean | `default:` undefined 
+type | default | required
+------ | ------ | ------
+(event: PanGestureHandlerGestureEvent) => boolean | undefined  | NO
 
 ## Methods
 
 ### `goNext`
 
+```tsx
+goNext()
+```
 Changes the active index forward.
-
-> `type:` () => void 
 
 ### `goBack`
 
-Changes the active index backward.
+```tsx
+goBack()
+```
 
-> `type:` () => void 
+Changes the active index backward.
 
 ### `setIndex`
 
+```tsx
+setIndex(params)
+```
+
 Sets the active index.
 
-> `type:` (nextIndex: number) => void
+#### Parameters
+
+name | type | required
+------ | ------ | ------
+nextIndex | number | Yes 
 

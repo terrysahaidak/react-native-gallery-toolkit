@@ -42,74 +42,98 @@ export default function App() {
 
 Image source, this could be a local or remote image.
 
-> `required:` YES | `type:` ImageRequireSource | string | `default:` undefined
+type | default | required
+------ | ------ | ------
+ImageRequireSource | string | undefined | YES
 
 
 ### `width`
 
 Image width.
 
-> `required:` YES | `type:` number | `default:` undefined
+type | default | required
+------ | ------ | ------
+number | undefined | YES
 
 ### `height`
 
 Image height.
 
-> `required:` YES | `type:` number | `default:` undefined
+type | default | required
+------ | ------ | ------
+number | undefined | YES
 
 ### `canvasDimensions`
 
 , usually it will be the window dimensions.
 
-> `required:` NO | `type:` { width?: number; height?: number; } | `default:` Dimensions.get('window')
+type | default | required
+------ | ------ | ------
+{ width?: number; height?: number; } | Dimensions.get('window') | NO
 
 ### `enabled` 
 
 Enable gesture interaction.
 
-> `required:` NO | `type:` boolean | `default:` true
+type | default | required
+------ | ------ | ------
+boolean | true | NO
 
 ### `timingConfig` 
 
 Animation `duration` and `easing` configs.
 
-> `required:` NO | `type:` { duration: number, easing: Easing } | `default:` { duration: 250, easing: Easing.bezier(0.33, 0.01, 0, 1) }
+type | default | required
+------ | ------ | ------
+{ duration: number, easing: Easing } | { duration: 250, easing: Easing.bezier(0.33, 0.01, 0, 1) } | NO
 
 ### `outerGestureHandlerRefs`
 
 Array of gesture handler references that should work simultaneously with inner gesture handler.
 
-> `required:` NO | `type:` Array<\React.Ref<\GestureHandler>> | `default:` []
+type | default | required
+------ | ------ | ------
+Array<\React.Ref<\GestureHandler>> | [] | NO
 
 ### `outerGestureHandlerActive`
 
 a Reanimated shared value to indicate out gesture active state.
 
-> `required:` NO | `type:` Animated.SharedValue<\boolean> | `default:` undefined
+type | default | required
+------ | ------ | ------
+Animated.SharedValue<\boolean> | undefined | NO
 
 ### `style`
 
 View style that will be applied to the image container.
 
-> `required:` NO | `type:` ViewStyle | `default:` undefined
+type | default | required
+------ | ------ | ------
+ViewStyle | undefined | NO
 
 ### `MAX_SCALE`
 
 Maximum scale value.
 
-> `required:` NO | `type:` number | `default:` 3
+type | default | required
+------ | ------ | ------
+number | 3 | NO
 
 ### `MIN_SCALE`
 
 Minimum scale value.
 
-> `required:` NO | `type:` number | `default:` 1
+type | default | required
+------ | ------ | ------
+number | 1 | NO
 
 ### `renderImage`
 
 Callback method to handle image rendering.
 
-> `required:` NO | `type:` (props: RenderScalableImageProps) => JSX.Element | `default:` undefined
+type | default | required
+------ | ------ | ------
+(props: RenderScalableImageProps) => JSX.Element | undefined | NO
 
 ## Handlers
 
@@ -117,28 +141,38 @@ Callback method to handle image rendering.
 
 Fires when internal gesture become active, this could be a **Worklet or Function**.
 
-> `required:` NO | `type:` (isActive: boolean) => void | `default:` undefined
+type | default | required
+------ | ------ | ------
+(isActive: boolean) => void | undefined | NO
 
 ### `onScale`
 
 Fires when image scale changes, this could be a **Worklet or Function**.
 
-> `required:` NO | `type:` (scale: number) => void | `default:` undefined
+type | default | required
+------ | ------ | ------
+(scale: number) => void | undefined | NO
 
 ### `onGestureStart`
 
 Fires when internal gesture starts, this could be a **Worklet or Function**.
 
-> `required:` NO | `type:` () => void | `default:` undefined
+type | default | required
+------ | ------ | ------
+() => void | undefined | NO
 
 ### `onGestureRelease`
 
 Fires when internal gesture releases, this could be a **Worklet or Function**.
 
-> `required:` NO | `type:` () => void | `default:` undefined
+type | default | required
+------ | ------ | ------
+() => void | undefined | NO
 
 ### `onEnd`
 
 Fires when animation ends, this could be a **Worklet or Function**.
 
-> `required:` NO | `type:` () => void | `default:` undefined
+type | default | required
+------ | ------ | ------
+() => void | undefined | NO
