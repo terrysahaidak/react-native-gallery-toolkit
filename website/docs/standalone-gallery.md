@@ -116,7 +116,9 @@ type | default | required
 
 ### `renderImage`
 
-Callback that can be used to render custom image component. As an example, it can be used to render custom loading/error states.
+Callback that can be used to render custom image component. As an example, it can be used to render custom loading/error states or if you want to use custom Image component (`FastImage`, for example).
+
+By default it uses Image component provided by React Native.
 
 type | default | required
 ------ | ------ | ------

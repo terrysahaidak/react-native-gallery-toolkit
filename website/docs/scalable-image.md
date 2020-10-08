@@ -66,7 +66,7 @@ type | default | required
 
 ### `canvasDimensions`
 
-, usually it will be the window dimensions.
+The size of the canvas image should be rendered in. Usually, it will be the window dimensions.
 
 type | default | required
 ------ | ------ | ------
@@ -98,7 +98,7 @@ type | default | required
 
 ### `outerGestureHandlerActive`
 
-a Reanimated shared value to indicate out gesture active state.
+A Reanimated shared value to indicate outer gesture is in active state. Can be used to disable gesture handlers.
 
 type | default | required
 ------ | ------ | ------

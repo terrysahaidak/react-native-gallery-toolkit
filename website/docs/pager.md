@@ -79,7 +79,9 @@ type | default | required
 
 ### `initialDiffValue`
 
-@todo
+renders initially only a visible page. If the value is 1 and the index is 0 - renders only 2 pages, but if the index, for example, 1 - renders the first, second (active), and the third page.
+
+Can be used to avoid some flickering on some high-end devices.
 
 type | default | required
 ------ | ------ | ------
@@ -95,7 +97,9 @@ type | default | required
 
 ### `pages`
 
-Pages @todo
+The array of items to render. But can also accept `Map`, `Set`, or `Object` with keys. If the type is not an array, then `getItem` should be defined too.
+
+Each element of the collection will be passed to the `renderPage` callback.
 
 type | default | required
 ------ | ------ | ------
@@ -119,7 +123,7 @@ type | default | required
 
 ### `numToRender`
 
-Number of pages to be render.
+Number of pages to be rendered at the same time.
 
 type | default | required
 ------ | ------ | ------
@@ -192,6 +196,8 @@ type | default | required
 ### `shouldHandleGestureEvent`
 
 Callback method to decide whether gesture should be handled or ignored, this could be a **Worklet or Function**.
+
+Useful when we need to disable the pager's pan gesture handler on some interaction.
 
 type | default | required
 ------ | ------ | ------
