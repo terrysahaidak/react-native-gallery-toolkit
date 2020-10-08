@@ -27,6 +27,7 @@
 
 article table {
   display: table;
+  width: 100%;
 }
 article table thead th {
   text-align: left;

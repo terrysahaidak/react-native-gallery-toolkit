@@ -44,8 +44,7 @@ Image source, this could be a local or remote image.
 
 type | default | required
 ------ | ------ | ------
-ImageRequireSource | string | undefined | YES
-
+`ImageRequireSource` | string | `undefined` | YES
 
 ### `width`
 
@@ -53,7 +52,7 @@ Image width.
 
 type | default | required
 ------ | ------ | ------
-number | undefined | YES
+`number` | `undefined` | YES
 
 ### `height`
 
@@ -61,7 +60,7 @@ Image height.
 
 type | default | required
 ------ | ------ | ------
-number | undefined | YES
+`number` | `undefined` | YES
 
 ### `canvasDimensions`
 
@@ -69,9 +68,9 @@ number | undefined | YES
 
 type | default | required
 ------ | ------ | ------
-{ width?: number; height?: number; } | Dimensions.get('window') | NO
+`{ width?: number; height?: number; }` | `Dimensions.get('window')` | NO
 
-### `enabled` 
+### `enabled`
 
 Enable gesture interaction.
 
@@ -79,13 +78,13 @@ type | default | required
 ------ | ------ | ------
 boolean | true | NO
 
-### `timingConfig` 
+### `timingConfig`
 
 Animation `duration` and `easing` configs.
 
 type | default | required
 ------ | ------ | ------
-{ duration: number, easing: Easing } | { duration: 250, easing: Easing.bezier(0.33, 0.01, 0, 1) } | NO
+`{ duration: number, easing: Easing }` | `{ duration: 250, easing: Easing.bezier(0.33, 0.01, 0, 1) }` | NO
 
 ### `outerGestureHandlerRefs`
 
@@ -93,7 +92,7 @@ Array of gesture handler references that should work simultaneously with inner g
 
 type | default | required
 ------ | ------ | ------
-Array<\React.Ref<\GestureHandler>> | [] | NO
+`Array<React.Ref<GestureHandler>>` | [] | NO
 
 ### `outerGestureHandlerActive`
 
@@ -101,7 +100,7 @@ a Reanimated shared value to indicate out gesture active state.
 
 type | default | required
 ------ | ------ | ------
-Animated.SharedValue<\boolean> | undefined | NO
+`SharedValue<boolean>` | `undefined` | NO
 
 ### `style`
 
@@ -109,7 +108,7 @@ View style that will be applied to the image container.
 
 type | default | required
 ------ | ------ | ------
-ViewStyle | undefined | NO
+ViewStyle | `undefined` | NO
 
 ### `MAX_SCALE`
 
@@ -117,7 +116,7 @@ Maximum scale value.
 
 type | default | required
 ------ | ------ | ------
-number | 3 | NO
+`number` | 3 | NO
 
 ### `MIN_SCALE`
 
@@ -125,7 +124,7 @@ Minimum scale value.
 
 type | default | required
 ------ | ------ | ------
-number | 1 | NO
+`number` | 1 | NO
 
 ### `renderImage`
 
@@ -133,7 +132,7 @@ Callback method to handle image rendering.
 
 type | default | required
 ------ | ------ | ------
-(props: RenderScalableImageProps) => JSX.Element | undefined | NO
+`(props: RenderScalableImageProps) => JSX.Element` | `undefined` | NO
 
 ## Handlers
 
@@ -143,7 +142,7 @@ Fires when internal gesture become active, this could be a **Worklet or Function
 
 type | default | required
 ------ | ------ | ------
-(isActive: boolean) => void | undefined | NO
+`(isActive: boolean) => void` | `undefined` | NO
 
 ### `onScale`
 
@@ -151,7 +150,7 @@ Fires when image scale changes, this could be a **Worklet or Function**.
 
 type | default | required
 ------ | ------ | ------
-(scale: number) => void | undefined | NO
+`(scale: number) => void` | `undefined` | NO
 
 ### `onGestureStart`
 
@@ -159,7 +158,7 @@ Fires when internal gesture starts, this could be a **Worklet or Function**.
 
 type | default | required
 ------ | ------ | ------
-() => void | undefined | NO
+`() => void` | `undefined` | NO
 
 ### `onGestureRelease`
 
@@ -167,7 +166,7 @@ Fires when internal gesture releases, this could be a **Worklet or Function**.
 
 type | default | required
 ------ | ------ | ------
-() => void | undefined | NO
+`() => void` | `undefined` | NO
 
 ### `onEnd`
 
@@ -175,4 +174,4 @@ Fires when animation ends, this could be a **Worklet or Function**.
 
 type | default | required
 ------ | ------ | ------
-() => void | undefined | NO
+`() => void` | `undefined` | NO

@@ -32,7 +32,6 @@ type | default | required
 ------ | ------ | ------
 number | 0 | YES
 
-
 ### `totalCount`
 
 Total pages count.
@@ -47,7 +46,7 @@ Pages @todo
 
 type | default | required
 ------ | ------ | ------
-Array<\GalleryItemType> | undefined | YES
+`Array<GalleryItemType>` | undefined | YES
 
 ### `width`
 
@@ -57,7 +56,7 @@ type | default | required
 ------ | ------ | ------
 number | Dimensions.get('window').width | NO
 
-### `gutterWidth` 
+### `gutterWidth`
 
 Page gutter width.
 
@@ -73,10 +72,9 @@ type | default | required
 ------ | ------ | ------
 number | 2 | NO
 
-
 ### `shouldRenderGutter`
 
-Should page gutter be render. 
+Should page gutter be render.
 
 type | default | required
 ------ | ------ | ------
@@ -96,7 +94,7 @@ Array of gesture handler references that should work simultaneously with inner g
 
 type | default | required
 ------ | ------ | ------
-Array<\React.Ref<\GestureHandler>> | [] | NO
+`Array<React.Ref<GestureHandler>>` | [] | NO
 
 ### `springConfig`
 
@@ -122,7 +120,7 @@ type | default | required
 ------ | ------ | ------
 (props: RenderPageProps, index: number) => JSX.Element | undefined | NO
 
-### `getItem` 
+### `getItem`
 
 Callback method to get item for a given item at the specified index.
 
@@ -165,10 +163,10 @@ type | default | required
 ------ | ------ | ------
 (translateX: number) => void | undefined  | NO
 
-### `onGesture` 
+### `onGesture`
 
 Executes on pager's gesture, this could be a **Worklet or Function**.
 
 type | default | required
 ------ | ------ | ------
-(event: PanGestureHandlerGestureEvent, isActive: SharedValue<\boolean>) => void | undefined  | NO
+(event: PanGestureHandlerGestureEvent, isActive: `SharedValue<boolean>`) => void | undefined  | NO
