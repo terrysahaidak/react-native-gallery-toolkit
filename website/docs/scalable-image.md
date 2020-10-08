@@ -11,6 +11,8 @@ slug: /apis/scalable-image
 ## Usage
 
 ```tsx
+import React from 'react';
+import { View } from 'react-native';
 import {
   ScalableImage,
   GalleryItemType
@@ -25,7 +27,7 @@ const image: GalleryItemType = {
 
 export default function App() {
   return (
-    <View style={{flex: 1}}>
+    <View style={{ flex: 1 }}>
       <ScalableImage
         width={image.width}
         height={image.height}
@@ -44,7 +46,7 @@ Image source, this could be a local or remote image.
 
 type | default | required
 ------ | ------ | ------
-`ImageRequireSource` | string | `undefined` | YES
+`ImageRequireSource` or `string` | `undefined` | YES
 
 ### `width`
 

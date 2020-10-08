@@ -1,7 +1,9 @@
 module.exports = {
   title: 'React Native Gallery Toolkit',
-  tagline: 'Reanimated 2 and Gesturer Handler powered Gallery implementation',
-  url: 'https://github.com/terrysahaidak/react-native-gallery-toolkit/',
+  tagline:
+    'Reanimated 2 and Gesturer Handler powered Gallery implementation',
+  url:
+    'https://github.com/terrysahaidak/react-native-gallery-toolkit/',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   favicon: 'img/favicon.ico',
@@ -27,7 +29,8 @@ module.exports = {
         },
         // {to: 'blog', label: 'Blog', position: 'left'},
         {
-          href: 'https://github.com/terrysahaidak/react-native-gallery-toolkit',
+          href:
+            'https://github.com/terrysahaidak/react-native-gallery-toolkit',
           label: 'GitHub',
           position: 'right',
         },

@@ -11,6 +11,7 @@ slug: /apis/standalone-gallery
 ## Usage
 
 ```tsx
+import React from 'react';
 import {
   StandaloneGallery,
   GalleryItemType,

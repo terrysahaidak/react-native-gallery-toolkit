@@ -32,4 +32,6 @@ article table {
 article table thead th {
   text-align: left;
   text-transform: uppercase;
+  color: #6e6d6d;
+  background-color: #ececec;
 }
