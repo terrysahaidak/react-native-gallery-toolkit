@@ -13,12 +13,12 @@ The library uses `React Native Reanimated 2` alpha. It means that it may be unst
 :::
 
 ## Features
+
 > TODO
 
 ## TODOs
 
-- Add invariants to all the required props.
-- Finish documentation.
-- Lightbox with examples.
-- Lightbox Gallery with examples.
-- Try to use react-native-shared-element.
+- [ ] Add invariants to all the required props.
+- [ ] Lightbox with examples.
+- [ ] Lightbox Gallery with examples.
+- [ ] Try to use react-native-shared-element.

@@ -69,7 +69,7 @@ How many pages should be rendered at the same time.
 
 type | default | required
 ------ | ------ | ------
-`number` | 2 | NO
+`number` | `2` | NO
 
 ### `gutterWidth`
 
@@ -77,7 +77,7 @@ The width of the gutter between pages.
 
 type | default | required
 ------ | ------ | ------
-`number` | 0 | NO
+`number` | `0` | NO
 
 ### `initialIndex`
 
@@ -85,7 +85,7 @@ The initial page index.
 
 type | default | required
 ------ | ------ | ------
-`number` | 0 | NO
+`number` | `0` | NO
 
 ### `keyExtractor`
 
@@ -103,7 +103,7 @@ If the type of `items` is not an array, then this method should be defined to pr
 
 type | default | required
 ------ | ------ | ------
-`(data: T) => number` | undefined |  Required when items is not an array
+`(data: T) => number` | `undefined` |  Required when items is not an array
 
 ### `getItem`
 
@@ -111,7 +111,7 @@ If the type of `items` is not an array, then this method should be defined to pr
 
 type | default | required
 ------ | ------ | ------
-`(data: T, index: number) => ItemT or undefined` | undefined | Required when items is not an array
+`(data: T, index: number) => ItemT or undefined` | `undefined` | Required when items is not an array
 
 ### `renderImage`
 
@@ -119,7 +119,7 @@ Callback that can be used to render custom image component. As an example, it ca
 
 type | default | required
 ------ | ------ | ------
-`(props: RenderImageProps, item: ItemT, index: number) => JSX.Element` | undefined | NO
+`(props: RenderImageProps, item: ItemT, index: number) => JSX.Element` | `undefined` | NO
 
 ### `renderPage`
 
@@ -127,7 +127,7 @@ Callback that can be used to render custom page. Can be used to display some non
 
 type | default | required
 ------ | ------ | ------
-`(props: ImageRendererProps<T>, index: number) => JSX.Element` | StandaloneGallery.ImageRenderer | NO
+`(props: ImageRendererProps<T>, index: number) => JSX.Element` | `StandaloneGallery.ImageRenderer` | NO
 
 ## Handlers
 
@@ -137,7 +137,7 @@ Fires when active index changes, this could be a **Worklet or Function**.
 
 type | default | required
 ------ | ------ | ------
-`(nextIndex: number) => void` | undefined  | NO
+`(nextIndex: number) => void` | `undefined`  | NO
 
 ### `onTap`
 
@@ -145,7 +145,7 @@ Executes when tap image transformer receives tap, this could be a **Worklet or F
 
 type | default | required
 ------ | ------ | ------
-`() => void` | undefined  | NO
+`() => void` | `undefined`  | NO
 
 ### `onDoubleTap`
 
@@ -153,7 +153,7 @@ Executes when tap image transformer receives double-tap, this could be a **Workl
 
 type | default | required
 ------ | ------ | ------
-`() => void` | undefined  | NO
+`() => void` | `undefined`  | NO
 
 ### `onInteraction`
 
@@ -161,7 +161,7 @@ Is called when either pan or scale has happened, this could be a **Worklet or Fu
 
 type | default | required
 ------ | ------ | ------
-`(type: 'scale' | 'pan') => void` | undefined  | NO
+`(type: 'scale' or 'pan') => void` | `undefined`  | NO
 
 ### `onPagerTranslateChange`
 
@@ -169,7 +169,7 @@ Executes on pager's horizontal pan, this could be a **Worklet or Function**.
 
 type | default | required
 ------ | ------ | ------
-`(translateX: number) => void` | undefined  | NO
+`(translateX: number) => void` | `undefined`  | NO
 
 ### `onGesture`
 
@@ -177,7 +177,7 @@ Executes on pager's gesture, this could be a **Worklet or Function**.
 
 type | default | required
 ------ | ------ | ------
-`(event: PanGestureHandlerGestureEvent, isActive: SharedValue<boolean>) => void` | undefined  | NO
+`(event: PanGestureHandlerGestureEvent, isActive: SharedValue<boolean>) => void` | `undefined`  | NO
 
 ### `shouldPagerHandleGestureEvent`
 
@@ -185,7 +185,7 @@ Worklet that will be passed to pager's `shouldHandleEvent` to determine should p
 
 type | default | required
 ------ | ------ | ------
-`(event: PanGestureHandlerGestureEvent) => boolean` | undefined  | NO
+`(event: PanGestureHandlerGestureEvent) => boolean` | `undefined`  | NO
 
 ## Methods
 

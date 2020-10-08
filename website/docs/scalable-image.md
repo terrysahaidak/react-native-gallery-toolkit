@@ -76,7 +76,7 @@ Enable gesture interaction.
 
 type | default | required
 ------ | ------ | ------
-boolean | true | NO
+`boolean` | `true` | NO
 
 ### `timingConfig`
 
@@ -92,7 +92,7 @@ Array of gesture handler references that should work simultaneously with inner g
 
 type | default | required
 ------ | ------ | ------
-`Array<React.Ref<GestureHandler>>` | [] | NO
+`Array<React.Ref<GestureHandler>>` | `[]` | NO
 
 ### `outerGestureHandlerActive`
 
@@ -108,7 +108,7 @@ View style that will be applied to the image container.
 
 type | default | required
 ------ | ------ | ------
-ViewStyle | `undefined` | NO
+`ViewStyle` | `undefined` | NO
 
 ### `MAX_SCALE`
 
@@ -116,7 +116,7 @@ Maximum scale value.
 
 type | default | required
 ------ | ------ | ------
-`number` | 3 | NO
+`number` | `3` | NO
 
 ### `MIN_SCALE`
 
@@ -124,7 +124,7 @@ Minimum scale value.
 
 type | default | required
 ------ | ------ | ------
-`number` | 1 | NO
+`number` | `1` | NO
 
 ### `renderImage`
 
