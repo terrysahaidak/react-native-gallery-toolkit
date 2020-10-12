@@ -59,7 +59,7 @@ export function LightBoxItem<T>({
   }
 
   const handler = useAnimatedGestureHandler({
-    onFinish: (evt, ctx, isCanceledOrFailed) => {
+    onFinish: (_evt, _ctx, isCanceledOrFailed) => {
       if (isCanceledOrFailed) {
         return;
       }
