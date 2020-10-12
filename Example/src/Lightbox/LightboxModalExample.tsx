@@ -19,10 +19,10 @@ import {
   StandaloneGallery,
   LightboxTransitionProps,
   LightboxImperativeHandlers,
+  LightboxSwipeout,
 } from '../../../src';
 import { useControls } from '../hooks/useControls';
 import { normalizeDimensions } from '../../../src/utils';
-import { LightboxSwipeout } from './LightboxSwipeout';
 import { Portal } from 'react-native-portalize';
 
 const dimensions = Dimensions.get('window');

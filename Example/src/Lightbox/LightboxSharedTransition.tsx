@@ -15,6 +15,7 @@ import {
   Measurements,
   StandaloneGallery,
   LightboxTransitionProps,
+  LightboxSwipeout,
 } from '../../../src';
 import {
   LightboxSharedTransitionListNavigationProp,
@@ -22,7 +23,6 @@ import {
 } from '.';
 import { DetachedHeader } from '../DetachedHeader';
 import { useControls } from '../hooks/useControls';
-import { LightboxSwipeout } from './LightboxSwipeout';
 
 const dimensions = Dimensions.get('window');
 

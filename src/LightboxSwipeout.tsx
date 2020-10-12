@@ -1,5 +1,5 @@
 import React, { forwardRef, useCallback } from 'react';
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import Animated, {
   Extrapolate,
   interpolate,
@@ -13,11 +13,13 @@ import {
   LightboxTransition,
   Swipeout,
   LightboxImperativeHandlers,
-} from '../../../src';
+} from './';
+
+type NonNullable<U> = Exclude<U, undefined | null>;
 
 type LightboxSwipeoutProps = SwipeoutProps &
   Omit<LightboxTransitionProps, 'children'> & {
-    toValue: number;
+    toValue?: number;
     backdropColor?: string;
   };
 
@@ -27,7 +29,7 @@ export const LightboxSwipeout = forwardRef<
 >(
   (
     {
-      toValue,
+      toValue = Dimensions.get('window').height,
       onSwipeFailure,
       onActive,
       backdropColor = 'black',
@@ -38,7 +40,9 @@ export const LightboxSwipeout = forwardRef<
       targetDimensions,
       children,
       onSwipeSuccess,
+      renderImage,
       onReady,
+      ...rest
     },
     ref,
   ) => {
@@ -67,7 +71,7 @@ export const LightboxSwipeout = forwardRef<
       }
 
       backdropOpacity.value = withTiming(0, {
-        duration: 100,
+        duration: 200,
       });
     }
 
@@ -88,7 +92,7 @@ export const LightboxSwipeout = forwardRef<
     }, []);
 
     const renderBackdropComponent = useCallback<
-      LightboxTransitionProps['renderBackdropComponent']
+      NonNullable<LightboxTransitionProps['renderBackdropComponent']>
     >(
       ({ animatedStyles }) => (
         <Animated.View
@@ -107,17 +111,44 @@ export const LightboxSwipeout = forwardRef<
       [],
     );
 
+    const _renderOverlayComponent = useCallback<
+      NonNullable<LightboxTransitionProps['renderOverlayComponent']>
+    >((props) => {
+      const animatedStyles = useAnimatedStyle(
+        () => ({
+          opacity: backdropOpacity.value,
+        }),
+        [],
+      );
+
+      return (
+        <Animated.View
+          style={[
+            { top: 0, bottom: 0, position: 'absolute' },
+            animatedStyles,
+          ]}
+        >
+          {renderOverlayComponent!(props)}
+        </Animated.View>
+      );
+    }, []);
+
     return (
       <LightboxTransition
+        {...rest}
         ref={ref}
         measurements={measurements}
         source={source}
         targetDimensions={targetDimensions}
         renderBackdropComponent={renderBackdropComponent}
-        renderOverlayComponent={renderOverlayComponent}
+        renderOverlayComponent={
+          renderOverlayComponent ? _renderOverlayComponent : undefined
+        }
         onReady={onReady}
+        renderImage={renderImage}
       >
         <Swipeout
+          toValue={toValue}
           onActive={_onSwipeActive}
           onSwipeSuccess={_onSwipeSuccess}
           onSwipeFailure={_onSwipeFailure}
