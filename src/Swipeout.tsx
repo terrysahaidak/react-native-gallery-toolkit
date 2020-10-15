@@ -6,11 +6,16 @@ import {
   PanGestureHandlerGestureEvent,
 } from 'react-native-gesture-handler';
 import Animated, {
+  cancelAnimation,
   useAnimatedStyle,
   withSpring,
 } from 'react-native-reanimated';
 import { createAnimatedGestureHandler } from './useAnimatedGestureHandler';
-import { useSharedValue, workletNoop } from './utils';
+import {
+  useAnimatedReaction,
+  useSharedValue,
+  workletNoop,
+} from './utils';
 
 const dimensions = Dimensions.get('window');
 
@@ -25,7 +30,8 @@ export interface SwipeoutProps {
     ) => void;
     shouldHandleEvent: () => boolean;
   }) => JSX.Element;
-  onActive?: (traslateY: number) => void;
+  onActive?: (translateY: number) => void;
+  onTranslateChange?: (translateY: number) => void;
   toValue?: number;
   onSwipeSuccess?: () => void;
   onSwipeFailure?: () => void;
@@ -38,6 +44,7 @@ export function Swipeout({
   toValue = dimensions.height,
   onSwipeSuccess = workletNoop,
   onSwipeFailure = workletNoop,
+  onTranslateChange = workletNoop,
   callback,
 }: SwipeoutProps) {
   const translateY = useSharedValue(0);
@@ -57,6 +64,17 @@ export function Swipeout({
 
     return translateY.value === 0;
   }
+
+  useAnimatedReaction(
+    () => translateY.value,
+    (value) => {
+      onTranslateChange(value);
+
+      if (Math.abs(value) >= toValue + 100) {
+        cancelAnimation(translateY);
+      }
+    },
+  );
 
   const handler = useCallback(
     createAnimatedGestureHandler<PanGestureHandlerGestureEvent, {}>({
@@ -94,15 +112,13 @@ export function Swipeout({
           translateY.value = withSpring(
             maybeInvert(toValue * 2),
             {
-              stiffness: 1000,
-              damping: 500,
-              mass: 20,
+              stiffness: 50,
+              damping: 30,
+              mass: 1,
               overshootClamping: true,
-              restDisplacementThreshold: toValue,
-              restSpeedThreshold: 3000,
               velocity:
-                Math.abs(evt.velocityY) < 1500
-                  ? maybeInvert(1500)
+                Math.abs(evt.velocityY) < 1200
+                  ? maybeInvert(1200)
                   : evt.velocityY,
             },
             callback,

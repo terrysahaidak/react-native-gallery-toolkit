@@ -4,7 +4,6 @@ import Animated, {
   Extrapolate,
   interpolate,
   useAnimatedStyle,
-  withTiming,
 } from 'react-native-reanimated';
 import {
   SwipeoutProps,
@@ -48,41 +47,13 @@ export const LightboxSwipeout = forwardRef<
   ) => {
     const backdropOpacity = useSharedValue(1);
 
-    function _onSwipeActive(translateY: number) {
-      'worklet';
-
+    function onTranslateChange(translateY: number) {
       backdropOpacity.value = interpolate(
         Math.abs(translateY),
-        [0, toValue],
-        [1, 0.7],
+        [0, toValue + 100],
+        [1, 0],
         Extrapolate.CLAMP,
       );
-
-      if (onActive) {
-        onActive(translateY);
-      }
-    }
-
-    function _onSwipeSuccess() {
-      'worklet';
-
-      if (onSwipeSuccess) {
-        onSwipeSuccess();
-      }
-
-      backdropOpacity.value = withTiming(0, {
-        duration: 200,
-      });
-    }
-
-    function _onSwipeFailure() {
-      'worklet';
-
-      if (onSwipeFailure) {
-        onSwipeFailure();
-      }
-
-      backdropOpacity.value = withTiming(1);
     }
 
     const customBackdropStyles = useAnimatedStyle(() => {
@@ -149,9 +120,10 @@ export const LightboxSwipeout = forwardRef<
       >
         <Swipeout
           toValue={toValue}
-          onActive={_onSwipeActive}
-          onSwipeSuccess={_onSwipeSuccess}
-          onSwipeFailure={_onSwipeFailure}
+          onActive={onActive}
+          onTranslateChange={onTranslateChange}
+          onSwipeSuccess={onSwipeSuccess}
+          onSwipeFailure={onSwipeFailure}
           callback={callback}
         >
           {children}
