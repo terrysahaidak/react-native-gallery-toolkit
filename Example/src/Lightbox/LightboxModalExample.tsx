@@ -7,7 +7,6 @@ import {
   Image,
   StyleSheet,
   View,
-  Modal,
   StatusBar,
   Text,
 } from 'react-native';

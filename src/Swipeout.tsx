@@ -92,14 +92,14 @@ export function Swipeout({
           };
 
           translateY.value = withSpring(
-            maybeInvert(toValue + 20),
+            maybeInvert(toValue * 2),
             {
-              stiffness: 500,
-              damping: 300,
-              mass: 2,
+              stiffness: 1000,
+              damping: 500,
+              mass: 20,
               overshootClamping: true,
-              restDisplacementThreshold: 20,
-              restSpeedThreshold: 20,
+              restDisplacementThreshold: toValue,
+              restSpeedThreshold: 3000,
               velocity:
                 Math.abs(evt.velocityY) < 1500
                   ? maybeInvert(1500)

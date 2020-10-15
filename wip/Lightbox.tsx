@@ -512,6 +512,8 @@ export function ImagePager({ gallery }: IImagePager) {
               easing,
             },
             () => {
+              'worklet';
+
               onClose();
             },
           );
@@ -526,6 +528,8 @@ export function ImagePager({ gallery }: IImagePager) {
           translate.y.value = withTiming(0, config);
           backdropOpacity.value = withTiming(1, config);
           scale.value = withTiming(1, config, () => {
+            'worklet';
+
             setPagerVisible(true);
           });
         }

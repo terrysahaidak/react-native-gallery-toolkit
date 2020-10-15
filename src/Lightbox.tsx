@@ -255,6 +255,8 @@ export const LightboxTransition = forwardRef<
     useEffect(() => {
       onReady();
       animationProgress.value = withTiming(1, timingConfig, () => {
+        'worklet';
+
         opacity.value = 1;
         setRenderChildren(true);
       });
@@ -264,6 +266,8 @@ export const LightboxTransition = forwardRef<
       imageOpacity.value = 1;
       opacity.value = 0;
       animationProgress.value = withTiming(0, timingConfig, () => {
+        'worklet';
+
         cb();
       });
     }
@@ -274,6 +278,8 @@ export const LightboxTransition = forwardRef<
         0,
         fadeTimingConfig,
         () => {
+          'worklet';
+
           cb();
         },
       );

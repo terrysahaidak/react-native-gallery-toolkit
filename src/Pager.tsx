@@ -324,6 +324,8 @@ export const Pager = typedMemo(function Pager<
       toValueAnimation.value,
       configToUse as Animated.WithSpringConfig,
       (isCanceled) => {
+        'worklet';
+
         if (!isCanceled) {
           velocity.value = 0;
         }

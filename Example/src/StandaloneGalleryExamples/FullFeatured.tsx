@@ -152,6 +152,8 @@ export function useToggleOpacity(
 
     return {
       opacity: withTiming(0, undefined, () => {
+        'worklet';
+
         translateY.value = -99999;
       }),
       transform: [{ translateY: translateY.value }],

@@ -116,8 +116,7 @@ export function LightboxSharedTransition() {
     nav.goBack();
   }, []);
 
-  const toValue = dimensions.height;
-
+  const toValue = dimensions.height; // over the screen
   function onSwipeActive(translateY: number) {
     'worklet';
 
