@@ -1,9 +1,6 @@
 import { useRef, useCallback } from 'react';
 import { Platform } from 'react-native';
-import {
-  makeRemote,
-  useEvent,
-} from 'react-native-reanimated';
+import { makeRemote, useEvent } from 'react-native-reanimated';
 import { GestureHandlerGestureEvent } from 'react-native-gesture-handler';
 
 function useRemoteContext<T extends object>(initialValue: T) {
@@ -45,6 +42,11 @@ type Handler<T, TContext extends Context> = (
   event: T,
   context: TContext,
 ) => void;
+type onEndHandler<T, TContext extends Context> = (
+  event: T,
+  context: TContext,
+  isCanceled: boolean,
+) => void;
 type ReturnHandler<T, TContext extends Context, R> = (
   event: T,
   context: TContext,
@@ -54,12 +56,13 @@ interface GestureHandlers<T, TContext extends Context> {
   onInit?: Handler<T, TContext>;
   onEvent?: Handler<T, TContext>;
   shouldHandleEvent?: ReturnHandler<T, TContext, boolean>;
+  shouldCancel?: ReturnHandler<T, TContext, boolean>;
   onGesture?: Handler<T, TContext>;
   beforeEach?: Handler<T, TContext>;
   afterEach?: Handler<T, TContext>;
   onStart?: Handler<T, TContext>;
   onActive?: Handler<T, TContext>;
-  onEnd?: Handler<T, TContext>;
+  onEnd?: onEndHandler<T, TContext>;
   onFail?: Handler<T, TContext>;
   onCancel?: Handler<T, TContext>;
   onFinish?: (
@@ -69,7 +72,9 @@ interface GestureHandlers<T, TContext extends Context> {
   ) => void;
 }
 
-type OnGestureEvent<T extends GestureHandlerGestureEvent> = (event: T) => void;
+type OnGestureEvent<T extends GestureHandlerGestureEvent> = (
+  event: T,
+) => void;
 
 export function createAnimatedGestureHandler<
   T extends GestureHandlerGestureEvent,
@@ -121,9 +126,18 @@ export function createAnimatedGestureHandler<
       return;
     }
 
-    if (!context._shouldSkip) {
+    if (!context._shouldSkip && !context._shouldCancel) {
       if (handlers.onEvent) {
         handlers.onEvent(event, context);
+      }
+
+      if (handlers.shouldCancel) {
+        context._shouldCancel = handlers.shouldCancel(event, context);
+
+        if (context._shouldCancel) {
+          if (handlers.onEnd) handlers.onEnd(event, context, true);
+          return;
+        }
       }
 
       if (handlers.beforeEach) {
@@ -143,7 +157,11 @@ export function createAnimatedGestureHandler<
         event.state === END &&
         handlers.onEnd
       ) {
-        handlers.onEnd(event, context);
+        if (event.state === ACTIVE && handlers.onActive) {
+          handlers.onActive(event, context);
+        }
+
+        handlers.onEnd(event, context, false);
       }
       if (
         // @ts-ignore
@@ -176,9 +194,11 @@ export function createAnimatedGestureHandler<
         handlers.afterEach(event, context);
       }
     }
+    // clean up context
     // @ts-ignore
     if (event.oldState === ACTIVE) {
       context._shouldSkip = undefined;
+      context._shouldCancel = undefined;
     }
   };
 

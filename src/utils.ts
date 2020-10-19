@@ -122,3 +122,17 @@ export function useSharedValue<T>(value: T, shouldRebuild = false) {
 }
 
 export const typedMemo: <T>(c: T) => T = React.memo;
+
+export function clampVelocity(
+  velocity: number,
+  minVelocity: number,
+  maxVelocity: number,
+) {
+  'worklet';
+
+  if (velocity > 0) {
+    return Math.min(Math.max(velocity, minVelocity), maxVelocity);
+  } else {
+    return Math.max(Math.min(velocity, -minVelocity), -maxVelocity);
+  }
+}

@@ -32,6 +32,7 @@ import {
   workletNoop,
   useAnimatedReaction,
   useSharedValue,
+  clampVelocity,
 } from './utils';
 
 const styles = StyleSheet.create({
@@ -47,6 +48,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+
+const MIN_VELOCITY = 700;
+const MAX_VELOCITY = 3000;
 
 const defaultSpringConfig = {
   stiffness: 1000,
@@ -261,7 +265,11 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
           scale.value <= MAX_SCALE
         ) {
           offset.x.value = withDecay({
-            velocity: panVelocity.x.value,
+            velocity: clampVelocity(
+              panVelocity.x.value,
+              MIN_VELOCITY,
+              MAX_VELOCITY,
+            ),
             clamp: [minVector.x, maxVector.x],
             deceleration,
           });
@@ -278,7 +286,11 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
           offset.y.value !== maxVector.y
         ) {
           offset.y.value = withDecay({
-            velocity: panVelocity.y.value,
+            velocity: clampVelocity(
+              panVelocity.y.value,
+              MIN_VELOCITY,
+              MAX_VELOCITY,
+            ),
             clamp: [minVector.y, maxVector.y],
             deceleration,
           });
@@ -385,6 +397,7 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
       onInit: (_, ctx) => {
         ctx.origin = vec.create(0, 0);
         ctx.gestureScale = 1;
+        ctx.adjustFocal = vec.create(0, 0);
       },
 
       shouldHandleEvent: (evt) => {
@@ -417,9 +430,12 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
         const focal = vec.create(evt.focalX, evt.focalY);
         const CENTER = vec.divide(canvas, 2);
 
-        // focal with translate offset
-        // it alow us to scale into different point even then we pan the image
-        ctx.adjustFocal = vec.sub(focal, vec.add(CENTER, offset));
+        // since it works even when you release one finger
+        if (evt.numberOfPointers === 2) {
+          // focal with translate offset
+          // it alow us to scale into different point even then we pan the image
+          ctx.adjustFocal = vec.sub(focal, vec.add(CENTER, offset));
+        }
       },
 
       afterEach: (evt, ctx) => {

@@ -69,7 +69,7 @@ export default function App() {
       <StatusBar translucent showHideTransition="fade" />
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="Examples"
+          // initialRouteName="Standalone Gallery"
           screenOptions={{
             gestureEnabled: false,
             headerShown: false,

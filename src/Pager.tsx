@@ -30,6 +30,7 @@ import {
   workletNoop,
   useSharedValue,
   typedMemo,
+  clampVelocity,
 } from './utils';
 
 const dimensions = Dimensions.get('window');
@@ -206,6 +207,9 @@ function workletNoopTrue() {
   return true;
 }
 
+const MIN_VELOCITY = 700;
+const MAX_VELOCITY = 3000;
+
 export const Pager = typedMemo(function Pager<
   TPages,
   ItemT = UnpackItemT<TPages>
@@ -297,24 +301,36 @@ export const Pager = typedMemo(function Pager<
     onIndexChangeCb(initialIndex);
   }, [initialIndex]);
 
-  const onChangePageAnimation = (noVelocity?: boolean) => {
+  function getSpringConfig(noVelocity?: boolean) {
     'worklet';
+
+    const ratio = 1.1;
+    const mass = 0.4;
+    const stiffness = 100.0;
+    const damping = ratio * 2.0 * Math.sqrt(mass * stiffness);
 
     const configToUse =
       typeof springConfig !== 'undefined'
         ? springConfig
         : {
-            stiffness: 1000,
-            damping: 500,
-            mass: 3,
-            overshootClamping: true,
-            restDisplacementThreshold: 10,
-            restSpeedThreshold: 10,
+            stiffness,
+            mass,
+            damping,
+            restDisplacementThreshold: 1,
+            restSpeedThreshold: 5,
           };
 
     // @ts-ignore
     // cannot use merge and spread here :(
     configToUse.velocity = noVelocity ? 0 : velocity.value;
+
+    return configToUse;
+  }
+
+  const onChangePageAnimation = (noVelocity?: boolean) => {
+    'worklet';
+
+    const config = getSpringConfig(noVelocity);
 
     if (offsetX.value === toValueAnimation.value) {
       return;
@@ -322,7 +338,7 @@ export const Pager = typedMemo(function Pager<
 
     offsetX.value = withSpring(
       toValueAnimation.value,
-      configToUse as Animated.WithSpringConfig,
+      config,
       (isCanceled) => {
         'worklet';
 
@@ -394,6 +410,7 @@ export const Pager = typedMemo(function Pager<
     PanGestureHandlerGestureEvent,
     {
       pagerActive: boolean;
+      offsetX: null | number;
     }
   >({
     onGesture: (evt) => {
@@ -402,6 +419,10 @@ export const Pager = typedMemo(function Pager<
       if (isActive.value && !isPagerInProgress.value) {
         onEnabledGesture(evt);
       }
+    },
+
+    onInit: (_, ctx) => {
+      ctx.offsetX = null;
     },
 
     shouldHandleEvent: (evt) => {
@@ -415,27 +436,42 @@ export const Pager = typedMemo(function Pager<
     },
 
     onEvent: (evt) => {
-      velocity.value = evt.velocityX;
+      velocity.value = clampVelocity(evt.velocityX, MIN_VELOCITY, MAX_VELOCITY);
     },
 
-    onActive: (evt) => {
-      const canSwipe = getCanSwipe(evt.translationX);
-      pagerX.value = canSwipe
-        ? evt.translationX
-        : friction(evt.translationX);
+    onStart: (_, ctx) => {
+      ctx.offsetX = null;
     },
 
-    onEnd: (evt) => {
+    onActive: (evt, ctx) => {
+      // workaround alert
+      // the event triggers with a delay and first frame value jumps
+      // we capture that value and subtract from the actual one
+      // so the translate happens on a second frame
+      if (ctx.offsetX === null) {
+        ctx.offsetX =
+          evt.translationX < 0 ? evt.translationX : -evt.translationX;
+      }
+
+      const val = evt.translationX - ctx.offsetX;
+
+      const canSwipe = getCanSwipe(val);
+      pagerX.value = canSwipe ? val : friction(val);
+    },
+
+    onEnd: (evt, ctx) => {
+      const val = evt.translationX - ctx.offsetX!;
+
+      const canSwipe = getCanSwipe(val);
+
       offsetX.value += pagerX.value;
       pagerX.value = 0;
-
-      const canSwipe = getCanSwipe();
 
       const nextIndex = getNextIndex(evt.velocityX);
 
       const vx = Math.abs(evt.velocityX);
 
-      const translation = Math.abs(evt.translationX);
+      const translation = Math.abs(val);
       const isHalf = width / 2 < translation;
 
       const shouldMoveToNextPage = (vx > 10 || isHalf) && canSwipe;
@@ -528,6 +564,7 @@ export const Pager = typedMemo(function Pager<
 
     return temp;
   }, [
+    activeIndex,
     keyExtractor,
     getItem,
     totalCount,
@@ -549,7 +586,9 @@ export const Pager = typedMemo(function Pager<
       <Animated.View style={[StyleSheet.absoluteFill]}>
         <PanGestureHandler
           ref={pagerRef}
-          activeOffsetX={[-4, 4]}
+          minDist={0.1}
+          minVelocityX={0.1}
+          activeOffsetX={[-0.1, 0.1]}
           activeOffsetY={verticallyEnabled ? [-4, 4] : undefined}
           simultaneousHandlers={[tapRef, ...outerGestureHandlerRefs]}
           onGestureEvent={onPan}

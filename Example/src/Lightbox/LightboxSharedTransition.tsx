@@ -40,7 +40,7 @@ const AnimatedImage = Animated.createAnimatedComponent(
   Image,
 ) as typeof Image;
 
-const LIST = generateImageList(10);
+const LIST = generateImageList(3);
 
 interface ListItemProps {
   item: GalleryItemType;
@@ -166,6 +166,7 @@ export function LightboxSharedTransition() {
         {({ onGesture, shouldHandleEvent }) => (
           <StandaloneGallery
             items={list}
+            numToRender={10}
             shouldPagerHandleGestureEvent={shouldHandleEvent}
             onShouldHideControls={setControlsHidden}
             initialIndex={payload.index}

@@ -18,7 +18,7 @@ export default function App() {
       screenOptions={{
         gestureEnabled: false,
       }}
-      // initialRouteName="Full Featured"
+      // initialRouteName="Basic"
       headerMode="screen"
     >
       <Stack.Screen component={StandaloneHome} name="Standalone" />
