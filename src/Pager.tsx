@@ -436,7 +436,11 @@ export const Pager = typedMemo(function Pager<
     },
 
     onEvent: (evt) => {
-      velocity.value = clampVelocity(evt.velocityX, MIN_VELOCITY, MAX_VELOCITY);
+      velocity.value = clampVelocity(
+        evt.velocityX,
+        MIN_VELOCITY,
+        MAX_VELOCITY,
+      );
     },
 
     onStart: (_, ctx) => {

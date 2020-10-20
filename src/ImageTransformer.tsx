@@ -1,4 +1,9 @@
-import React, { useRef, useCallback } from 'react';
+import React, {
+  useRef,
+  useCallback,
+  useState,
+  useEffect,
+} from 'react';
 import {
   StyleSheet,
   Image,
@@ -32,7 +37,6 @@ import {
   workletNoop,
   useAnimatedReaction,
   useSharedValue,
-  clampVelocity,
 } from './utils';
 
 const styles = StyleSheet.create({
@@ -48,9 +52,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-
-const MIN_VELOCITY = 700;
-const MAX_VELOCITY = 3000;
 
 const defaultSpringConfig = {
   stiffness: 1000,
@@ -164,6 +165,20 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
       setInteractionsEnabled(true);
     }, []);
 
+    // HACK ALERT
+    // we disable pinch handler in order to trigger onFinish
+    // in case user releases one finger
+    const [pinchEnabled, setPinchEnabledState] = useState(true);
+    useEffect(() => {
+      if (!pinchEnabled) {
+        setPinchEnabledState(true);
+      }
+    }, [pinchEnabled]);
+    const disablePinch = useCallback(() => {
+      setPinchEnabledState(false);
+    }, []);
+    // HACK ALERT END
+
     const pinchRef = useRef(null);
     const panRef = useRef(null);
     const tapRef = useRef(null);
@@ -232,7 +247,10 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
       }
 
       // we should handle this only if pan or pinch handlers has been used already
-      if (checkIsNotUsed(panState) || checkIsNotUsed(pinchState)) {
+      if (
+        (checkIsNotUsed(panState) || checkIsNotUsed(pinchState)) &&
+        pinchState.value !== State.CANCELLED
+      ) {
         return;
       }
 
@@ -265,11 +283,7 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
           scale.value <= MAX_SCALE
         ) {
           offset.x.value = withDecay({
-            velocity: clampVelocity(
-              panVelocity.x.value,
-              MIN_VELOCITY,
-              MAX_VELOCITY,
-            ),
+            velocity: panVelocity.x.value,
             clamp: [minVector.x, maxVector.x],
             deceleration,
           });
@@ -286,11 +300,7 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
           offset.y.value !== maxVector.y
         ) {
           offset.y.value = withDecay({
-            velocity: clampVelocity(
-              panVelocity.y.value,
-              MIN_VELOCITY,
-              MAX_VELOCITY,
-            ),
+            velocity: panVelocity.y.value,
             clamp: [minVector.y, maxVector.y],
             deceleration,
           });
@@ -435,11 +445,19 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
           // focal with translate offset
           // it alow us to scale into different point even then we pan the image
           ctx.adjustFocal = vec.sub(focal, vec.add(CENTER, offset));
+        } else if (
+          evt.state === State.ACTIVE &&
+          evt.numberOfPointers !== 2
+        ) {
+          disablePinch();
         }
       },
 
       afterEach: (evt, ctx) => {
-        if (evt.state === 5) {
+        if (
+          evt.state === State.END ||
+          evt.state === State.CANCELLED
+        ) {
           return;
         }
 
@@ -467,7 +485,7 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
         vec.set(scaleTranslation, nextTranslation);
       },
 
-      onEnd: (evt, ctx) => {
+      onFinish: (evt, ctx) => {
         // reset gestureScale value
         ctx.gestureScale = 1;
         pinchState.value = evt.state;
@@ -481,7 +499,7 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
           // make sure we don't add stuff below the 1
           scaleOffset.value = 1;
 
-          // this runs the spring animation
+          // this runs the timing animation
           scale.value = withTiming(1, timingConfig);
         } else if (scaleOffset.value > MAX_SCALE) {
           scaleOffset.value = MAX_SCALE;
@@ -615,7 +633,7 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
         style={[styles.container, { width: targetWidth }, style]}
       >
         <PinchGestureHandler
-          enabled={enabled}
+          enabled={enabled && pinchEnabled}
           ref={pinchRef}
           onGestureEvent={onScaleEvent}
           simultaneousHandlers={[
