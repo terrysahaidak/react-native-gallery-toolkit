@@ -17,109 +17,37 @@ import {
   GalleryItemType,
   LightboxItemPayloadType,
 } from '../../../src';
-import { LightboxModalExample } from './LightboxModalExample';
 
 const Stack = createStackNavigator();
 
 function Home() {
-  return (
-    <List items={['Lightbox Shared Transition', 'Lightbox Modal']} />
-  );
+  return <List items={['Photos List']} />;
 }
-
-type RootStackParamList = {
-  'Lightbox Shared Transition': undefined;
-  LightboxSharedTransitionScreen: {
-    list: GalleryItemType[];
-    payload: LightboxItemPayloadType<GalleryItemType>;
-  };
-};
-
-export type LightboxSharedTransitionScreenRoute = RouteProp<
-  RootStackParamList,
-  'LightboxSharedTransitionScreen'
->;
-export type LightboxSharedTransitionListNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'Lightbox Shared Transition'
->;
-
-const sharedTransitionNavigationConfig: StackNavigationOptions = {
-  transitionSpec: {
-    // disable open animation
-    open: {
-      animation: 'timing',
-      config: {
-        duration: 0,
-        easing: Easing.step0,
-      },
-    },
-    // iOS slide animation
-    close: {
-      animation: 'spring',
-      config: {
-        stiffness: 1000,
-        damping: 500,
-        mass: 3,
-        overshootClamping: true,
-        restDisplacementThreshold: 10,
-        restSpeedThreshold: 10,
-      },
-    },
-  },
-  // animate only card slide
-  cardStyleInterpolator: ({
-    current,
-    layouts: { screen },
-  }: StackCardInterpolationProps) => {
-    const translateFocused = current.progress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [screen.width, 0],
-      extrapolate: 'clamp',
-    });
-
-    return {
-      cardStyle: {
-        transform: [{ translateX: translateFocused }],
-      },
-    };
-  },
-  // make sure to enable animation
-  // we disable it when we do swipeout
-  animationEnabled: true,
-  // make sure card is transparent
-  cardOverlayEnabled: false,
-  cardStyle: {
-    backgroundColor: 'transparent',
-  },
-};
 
 export default function App() {
   return (
-    <Stack.Navigator
-      screenOptions={{
-        gestureEnabled: false,
-      }}
-      initialRouteName="List"
-      headerMode="screen"
-    >
-      <Stack.Screen component={Home} name="List" />
-      <Stack.Screen
-        component={LightboxSharedTransitionList}
-        name="Google Photos"
-      />
-      {/* <Stack.Screen
-        component={LightboxSharedTransition}
-        options={{
-          title: '',
-          ...sharedTransitionNavigationConfig,
-          headerStyle: {
-            elevation: 0,
-          },
-          header: HeaderPropsScrapper,
+    <GalleryProvider>
+      <Stack.Navigator
+        screenOptions={{
+          gestureEnabled: false,
         }}
-        name="LightboxSharedTransitionScreen"
-      /> */}
-    </Stack.Navigator>
+        initialRouteName="List"
+        headerMode="screen"
+      >
+        <Stack.Screen component={Home} name="List" />
+        <Stack.Screen
+          component={PhotosListScreen}
+          name="Google Photos"
+        />
+        <Stack.Screen
+          component={PhotoViewScreen}
+          options={{
+            title: '',
+            animationEnabled: false,
+          }}
+          name="LightboxSharedTransitionScreen"
+        />
+      </Stack.Navigator>
+    </GalleryProvider>
   );
 }

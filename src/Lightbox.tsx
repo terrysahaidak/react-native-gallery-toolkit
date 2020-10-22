@@ -263,6 +263,8 @@ export const LightboxTransition = forwardRef<
     }, []);
 
     function runHideAnimation(cb: Function) {
+      "worklet";
+
       imageOpacity.value = 1;
       opacity.value = 0;
       animationProgress.value = withTiming(0, timingConfig, () => {
@@ -273,6 +275,8 @@ export const LightboxTransition = forwardRef<
     }
 
     function runFadeOutAnimation(cb: Function) {
+      "worklet";
+
       opacity.value = withTiming(0, fadeTimingConfig);
       animationProgress.value = withTiming(
         0,
