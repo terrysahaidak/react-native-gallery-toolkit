@@ -1,17 +1,16 @@
 {
   "name": "react-native-gallery-toolkit",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.1.1",
   "private": false,
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
-  "react-native": "src/index.ts",
-  "types": "lib/typescript/src/index.d.ts",
+  "react-native": "lib/module/index.js",
+  "types": "lib/typescript/index.d.ts",
   "files": [
     "lib/",
     "src/"
   ],
   "scripts": {
-    "postinstall": "npx patch-package",
     "prepare": "bob build",
     "initialize": "npm i && cd Example && npm i && npx pod-install"
   },
