@@ -1,6 +1,6 @@
 {
   "name": "react-native-gallery-toolkit",
-  "version": "1.0.0-alpha.1.1",
+  "version": "1.0.0-alpha.1.2",
   "private": false,
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
@@ -15,10 +15,10 @@
     "initialize": "npm i && cd Example && npm i && npx pod-install"
   },
   "peerDependencies": {
-    "react-native-reanimated": "^2.0.0-alpha.7",
-    "react-native": "*",
     "react": "*",
-    "react-native-gesture-handler": "*"
+    "react-native": "*",
+    "react-native-gesture-handler": "*",
+    "react-native-reanimated": "^2.0.0-alpha.7"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
