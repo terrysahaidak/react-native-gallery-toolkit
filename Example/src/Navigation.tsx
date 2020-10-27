@@ -14,6 +14,7 @@ import Standalone from './StandaloneGalleryExamples/Standalone';
 import ImageTransformer from './ImageTransformerExamples';
 import ScalableImage from './ScalableImageExamples';
 import Lightbox from './Lightbox';
+import Gallery from './Gallery';
 
 const Stack = createStackNavigator();
 
@@ -57,6 +58,7 @@ function Home() {
         'Image Transformer',
         'Scalable Image',
         'Lightbox',
+        'Gallery',
       ]}
     />
   );
@@ -99,6 +101,8 @@ export default function App() {
           />
 
           <Stack.Screen component={Lightbox} name="Lightbox" />
+
+          <Stack.Screen component={Gallery} name="Gallery" />
         </Stack.Navigator>
       </NavigationContainer>
     </Host>

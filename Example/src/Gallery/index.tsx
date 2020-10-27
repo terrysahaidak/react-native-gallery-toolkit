@@ -7,22 +7,37 @@ import {
   StackNavigationOptions,
 } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
-import {
-  LightboxSharedTransition,
-  LightboxSharedTransitionList,
-} from './LightboxSharedTransition';
+
 import { List } from '../Navigation';
 import { HeaderPropsScrapper } from '../DetachedHeader';
 import {
   GalleryItemType,
   LightboxItemPayloadType,
 } from '../../../src';
+import {
+  PhotosListScreen,
+  GalleryProvider,
+} from './PhotosListScreen';
+import { PhotoViewScreen } from './PhotoViewScreen';
 
 const Stack = createStackNavigator();
 
-function Home() {
-  return <List items={['Photos List']} />;
-}
+type RootStackParamList = {
+  'Photo List': undefined;
+  'Photo View': {
+    list: GalleryItemType[];
+    index: number;
+  };
+};
+
+export type PhotoViewScreenRoute = RouteProp<
+  RootStackParamList,
+  'Photo View'
+>;
+export type PhotoListNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  'Photo List'
+>;
 
 export default function App() {
   return (
@@ -31,13 +46,12 @@ export default function App() {
         screenOptions={{
           gestureEnabled: false,
         }}
-        initialRouteName="List"
+        initialRouteName="Photo List"
         headerMode="screen"
       >
-        <Stack.Screen component={Home} name="List" />
         <Stack.Screen
           component={PhotosListScreen}
-          name="Google Photos"
+          name="Photo List"
         />
         <Stack.Screen
           component={PhotoViewScreen}
@@ -45,7 +59,7 @@ export default function App() {
             title: '',
             animationEnabled: false,
           }}
-          name="LightboxSharedTransitionScreen"
+          name="Photo View"
         />
       </Stack.Navigator>
     </GalleryProvider>
