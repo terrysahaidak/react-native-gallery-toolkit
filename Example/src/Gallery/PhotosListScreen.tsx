@@ -13,6 +13,8 @@ import Animated, {
   measure,
   useAnimatedRef,
   useAnimatedStyle,
+  makeMutable,
+  runOnUI,
 } from 'react-native-reanimated';
 import {
   Dimensions,
@@ -30,6 +32,7 @@ import {
   useSharedValue,
 } from '../../../src';
 import { PhotoListNavigationProp } from '.';
+import { useHeaderHeight } from '@react-navigation/stack';
 
 const dimensions = Dimensions.get('window');
 
@@ -43,7 +46,7 @@ const s = StyleSheet.create({
   },
 });
 
-const LIST = generateImageList(3);
+const LIST = generateImageList(10);
 
 const AnimatedImage = Animated.createAnimatedComponent(
   Image,
@@ -52,15 +55,15 @@ const AnimatedImage = Animated.createAnimatedComponent(
 export interface GalleryManagerItem {
   index: number;
   ref: React.Ref<unknown>;
-  sharedValues: {
-    width: Animated.SharedValue<number>;
-    height: Animated.SharedValue<number>;
-    targetWidth: Animated.SharedValue<number>;
-    targetHeight: Animated.SharedValue<number>;
-    x: Animated.SharedValue<number>;
-    y: Animated.SharedValue<number>;
-    opacity: Animated.SharedValue<number>;
-  };
+}
+
+export interface GalleryManagerSharedValues {
+  width: Animated.SharedValue<number>;
+  height: Animated.SharedValue<number>;
+  x: Animated.SharedValue<number>;
+  y: Animated.SharedValue<number>;
+  opacity: Animated.SharedValue<number>;
+  activeIndex: Animated.SharedValue<number>;
 }
 
 export interface GalleryManagerItems {
@@ -73,56 +76,84 @@ interface GalleryManagerInitProps {
 
 class GalleryManager {
   private _isInitialized = false;
-  private _sv: Animated.SharedValue<null | GalleryManagerItems>;
+  private refsByIndexSV: Animated.SharedValue<null | GalleryManagerItems> = makeMutable(
+    {},
+  );
+  public sharedValues: GalleryManagerSharedValues = {
+    width: makeMutable(0),
+    height: makeMutable(0),
+    x: makeMutable(0),
+    y: makeMutable(0),
+    opacity: makeMutable(1),
+    activeIndex: makeMutable(0),
+  };
 
-  public items: GalleryManagerItems = {};
+  public items = new Map<number, any>();
 
   public get isInitialized() {
     return this._isInitialized;
   }
 
-  public get measurementsByIndex() {
-    return this._sv;
-  }
-
   public resolveItem(index: number) {
-    return this.items[index];
+    return this.items.get(index);
   }
 
   public init({ sv }: GalleryManagerInitProps) {
-    this._sv = sv;
-
     this._isInitialized = true;
   }
 
   public reset() {
     this._isInitialized = false;
-    this.items = {};
-    this._sv.value = null;
+    this.items.clear();
+    this.refsByIndexSV.value = null;
   }
 
-  public registerItem(index: number, ref, sharedValues) {
-    const exists = !!this.items[index];
+  public resetSharedValues() {
+    const {
+      width,
+      height,
+      opacity,
+      activeIndex,
+      x,
+      y,
+    } = this.sharedValues;
+    runOnUI(() => {
+      width.value = 0;
+      height.value = 0;
+      opacity.value = 1;
+      activeIndex.value = -1;
+      x.value = 0;
+      y.value = 0;
+    })();
+  }
 
-    if (exists) {
+  public registerItem(index: number, ref) {
+    if (this.items.has(index)) {
       return;
     }
 
-    this._addItem(index, ref, sharedValues);
+    this._addItem(index, ref);
   }
 
-  private _addItem(
-    index: number,
-    ref: GalleryManagerItem['ref'],
-    sharedValues: GalleryManagerItem['sharedValues'],
-  ) {
-    this.items[index] = {
+  private _addItem(index: number, ref: GalleryManagerItem['ref']) {
+    this.items.set(index, {
       index,
       ref,
-      sharedValues,
-    };
+    });
 
-    this._sv.value = this.items;
+    console.log('register', index, this.items);
+
+    this.refsByIndexSV.value = this._convertMapToObject(this.items);
+  }
+
+  private _convertMapToObject<
+    T extends Map<string | number, unknown>
+  >(map: T) {
+    const obj = {};
+    for (let [key, value] of map) {
+      obj[key] = value;
+    }
+    return obj;
   }
 }
 
@@ -155,58 +186,37 @@ interface DimensionsType {
   height: number;
 }
 
-function measureItem(
-  item: DimensionsType,
+export function measureItem(
   ref: React.RefObject<any>,
-  sharedValues: GalleryManagerItem['sharedValues'],
-  windowDimensions: ScaledSize,
+  sharedValues: GalleryManagerSharedValues,
 ) {
   'worklet';
 
   const measurements = measure(ref);
 
+  console.log(measurements);
+
   sharedValues.x.value = measurements.pageX;
   sharedValues.y.value = measurements.pageY;
   sharedValues.width.value = measurements.width;
   sharedValues.height.value = measurements.height;
-
-  sharedValues.targetWidth.value = windowDimensions.width;
-  const scaleFactor = item.width / sharedValues.targetWidth.value;
-  sharedValues.targetHeight.value = item.height / scaleFactor;
 }
 
 function useGalleryItem(
   index: number,
-  item: GalleryItemType,
   onPress: (itemIndex: number) => void,
-  windowDimensions: ScaledSize,
 ) {
+  const galleryManager = useGalleryManager();
   const ref = useAnimatedRef<any>();
 
-  const opacity = useSharedValue(1);
+  const { opacity, activeIndex } = galleryManager.sharedValues;
+
   const styles = useAnimatedStyle(() => ({
-    opacity: opacity.value,
+    opacity: activeIndex.value === index ? opacity.value : 1,
   }));
 
-  const x = useSharedValue(0);
-  const y = useSharedValue(0);
-  const width = useSharedValue(0);
-  const height = useSharedValue(0);
-  const targetWidth = useSharedValue(0);
-  const targetHeight = useSharedValue(0);
-
-  const galleryManager = useGalleryManager();
-
   useEffect(() => {
-    galleryManager.registerItem(index, ref, {
-      x,
-      y,
-      width,
-      height,
-      targetWidth,
-      targetHeight,
-      opacity,
-    });
+    galleryManager.registerItem(index, ref);
   }, []);
 
   const onGestureEvent = useAnimatedGestureHandler({
@@ -217,20 +227,9 @@ function useGalleryItem(
 
       // measure the image
       // width/height and position to animate from it to the full screen one
-      measureItem(
-        item,
-        ref,
-        {
-          x,
-          y,
-          width,
-          height,
-          targetWidth,
-          targetHeight,
-          opacity,
-        },
-        windowDimensions,
-      );
+      measureItem(ref, galleryManager.sharedValues);
+
+      activeIndex.value = index;
 
       onPress(index);
     },
@@ -251,11 +250,10 @@ interface ListItemProps {
 
 function ListItem({ item, onPress, index }: ListItemProps) {
   const dimensions = useWindowDimensions();
+  const headerHeight = useHeaderHeight();
   const { ref, onGestureEvent, styles } = useGalleryItem(
     index,
-    item,
     onPress,
-    dimensions,
   );
 
   return (

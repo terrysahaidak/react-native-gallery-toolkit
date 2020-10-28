@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import Animated from 'react-native-reanimated';
 import { useRoute } from '@react-navigation/native';
 import { Header, StackHeaderProps } from '@react-navigation/stack';
-import { View } from 'react-native';
+import { View, ViewStyle } from 'react-native';
 
 const headerPropsMap = new Map<string, StackHeaderProps>();
 const subs: Array<() => void> = [];
@@ -47,12 +48,19 @@ export function DetachedHeader() {
 
 DetachedHeader.Container = ({
   children,
+  style,
 }: {
   children: JSX.Element;
+  style?: ViewStyle;
 }) => {
   return (
-    <View style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
+    <Animated.View
+      style={[
+        { position: 'absolute', top: 0, left: 0, right: 0 },
+        style,
+      ]}
+    >
       {children}
-    </View>
+    </Animated.View>
   );
 };

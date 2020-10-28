@@ -58,6 +58,13 @@ export default function App() {
           options={{
             title: '',
             animationEnabled: false,
+            header: HeaderPropsScrapper,
+            cardStyle: {
+              backgroundColor: 'transparent',
+            },
+            headerStyle: {
+              backgroundColor: 'white',
+            },
           }}
           name="Photo View"
         />

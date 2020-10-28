@@ -32,6 +32,10 @@ export function useControls() {
   const setControlsHidden = useCallback((hidden: boolean) => {
     'worklet';
 
+    if (controlsHidden.value === hidden) {
+      return;
+    }
+
     controlsHidden.value = hidden;
   }, []);
 
