@@ -136,3 +136,12 @@ export function clampVelocity(
     return Math.max(Math.min(velocity, -minVelocity), -maxVelocity);
   }
 }
+
+export function runOnce(fn: Function) {
+  const ref = useRef<null | true>(null);
+
+  if (!ref.current) {
+    fn();
+    ref.current = true;
+  }
+}

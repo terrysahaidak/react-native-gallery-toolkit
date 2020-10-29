@@ -12,12 +12,10 @@ import { List } from '../Navigation';
 import { HeaderPropsScrapper } from '../DetachedHeader';
 import {
   GalleryItemType,
+  GalleryProvider,
   LightboxItemPayloadType,
 } from '../../../src';
-import {
-  PhotosListScreen,
-  GalleryProvider,
-} from './PhotosListScreen';
+import { PhotosListScreen } from './PhotosListScreen';
 import { PhotoViewScreen } from './PhotoViewScreen';
 
 const Stack = createStackNavigator();

@@ -16,6 +16,9 @@ export * from './Lightbox';
 export * from './Swipeout';
 export * from './LightboxSwipeout';
 export * from './utils';
+export * from './Gallery/GalleryManager';
+export * from './Gallery/GalleryView';
+export * from './Gallery/GalleryList';
 
 export {
   useInit as useGalleryInit,
