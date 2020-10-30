@@ -13,12 +13,10 @@ import {
   useGalleryItem,
 } from '../../../src';
 import { PhotoListNavigationProp } from '.';
+import FastImage from 'react-native-fast-image';
+import { View } from 'react-native';
 
 const LIST = generateImageList(100);
-
-const AnimatedImage = Animated.createAnimatedComponent(
-  Image,
-) as typeof Image;
 
 interface ListItemProps {
   item: GalleryItemType;
@@ -32,20 +30,19 @@ function ListItem({ item, onPress, index }: ListItemProps) {
     onPress,
   );
 
+  const sizeStyle = {
+    width: LIST.IMAGE_SIZE,
+    height: LIST.IMAGE_SIZE,
+  };
+
   return (
     <TapGestureHandler onGestureEvent={onGestureEvent}>
-      <AnimatedImage
+      <Animated.View
+        style={[styles, LIST.getContainerStyle(index), sizeStyle]}
         ref={ref}
-        style={[
-          LIST.getContainerStyle(index),
-          {
-            width: LIST.IMAGE_SIZE,
-            height: LIST.IMAGE_SIZE,
-          },
-          styles,
-        ]}
-        source={{ uri: item.uri }}
-      />
+      >
+        <FastImage style={sizeStyle} source={{ uri: item.uri }} />
+      </Animated.View>
     </TapGestureHandler>
   );
 }
@@ -55,7 +52,7 @@ export function PhotosListScreen() {
 
   function onNavigate(itemIndex: number) {
     nav.navigate('Photo View', {
-      index: itemIndex,
+      index: itemIndex, 
       list: LIST.images,
     });
   }
@@ -64,7 +61,8 @@ export function PhotosListScreen() {
     <GalleryList>
       <FlatList
         data={LIST.images}
-        numColumns={4}
+        numColumns={3}
+        removeClippedSubviews
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item, index }) => (
           <ListItem

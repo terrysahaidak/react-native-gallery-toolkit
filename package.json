@@ -16,10 +16,10 @@
     "initialize": "npm i && cd Example && npm i && npx pod-install"
   },
   "peerDependencies": {
-    "react-native-reanimated": "^2.0.0-alpha.7",
-    "react-native": "*",
     "react": "*",
-    "react-native-gesture-handler": "*"
+    "react-native": "*",
+    "react-native-gesture-handler": "*",
+    "react-native-reanimated": "^2.0.0-alpha.7"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",

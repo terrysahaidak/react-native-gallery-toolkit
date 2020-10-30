@@ -1,12 +1,16 @@
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {
-  useNavigation,
-  useRoute,
-  useTheme,
-} from '@react-navigation/native';
-import { useHeaderHeight } from '@react-navigation/stack';
-import React, { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, useWindowDimensions } from 'react-native';
-import { Dimensions, Image, ScaledSize, View } from 'react-native';
+  Dimensions,
+  Image,
+  ScaledSize,
+  StyleSheet,
+  View,
+} from 'react-native';
 import {
   GestureHandlerGestureEventNativeEvent,
   PanGestureHandlerEventExtra,
@@ -71,10 +75,11 @@ function LightboxSwipeout({
   sharedValues,
   windowDimensions = Dimensions.get('window'),
   callback,
-  renderImage,
   targetDimensions,
   renderBackdropComponent,
   renderOverlayComponent,
+  renderImage,
+  ImageComponent,
 }: LightboxSwipeoutProps) {
   const imageSource =
     typeof source === 'string'
@@ -118,8 +123,10 @@ function LightboxSwipeout({
     },
   );
 
-  runOnce(
+  useEffect(() => {
+    // runOnce(
     runOnUI(() => {
+      'worklet';
       requestAnimationFrame(() => {
         opacity.value = 0;
       });
@@ -129,16 +136,12 @@ function LightboxSwipeout({
         childrenOpacity.value = 1;
         setRenderChildren(true);
       });
-    }),
-  );
+    })();
+    // );
+  }, []);
 
   const isVisibleImage = () => {
     'worklet';
-
-    console.log(windowDimensions, {
-      x: x.value,
-      y: y.value,
-    });
 
     return (
       windowDimensions.height >= y.value &&
@@ -299,6 +302,8 @@ function LightboxSwipeout({
     };
   });
 
+  const ImageComponentToUse = ImageComponent ?? AnimatedImage;
+
   return (
     <View style={{ flex: 1 }}>
       {renderBackdropComponent &&
@@ -317,7 +322,7 @@ function LightboxSwipeout({
             imageStyles,
           })
         ) : (
-          <AnimatedImage
+          <ImageComponentToUse
             source={imageSource}
             style={[
               {
@@ -368,8 +373,14 @@ export function GalleryView({
   windowDimensions,
   onShouldHideControls,
   renderOverlayComponent,
+  ImageComponent = Image,
 }: GalleryViewProps) {
   const galleryManager = useGalleryManager();
+
+  const AnimatedImageComponent = useMemo(
+    () => Animated.createAnimatedComponent(ImageComponent),
+    [],
+  );
 
   const { refsByIndexSV, sharedValues } = galleryManager;
 
@@ -384,9 +395,14 @@ export function GalleryView({
       return sharedValues.activeIndex.value;
     },
     (index) => {
-      if (index > -1 && items[index]) {
+      try {
         const items = refsByIndexSV.value;
-        measureItem(items[index].ref, sharedValues);
+
+        if (index > -1 && items[index]) {
+          measureItem(items[index].ref, sharedValues);
+        }
+      } catch (err) {
+        console.log('Error measuring');
       }
     },
   );
@@ -485,6 +501,7 @@ export function GalleryView({
       renderBackdropComponent={renderBackdropComponent}
       renderOverlayComponent={_renderOverlayComponent}
       windowDimensions={windowDimensions}
+      ImageComponent={AnimatedImageComponent}
     >
       {({ onGesture, shouldHandleEvent }) => (
         <StandaloneGallery
@@ -496,6 +513,8 @@ export function GalleryView({
           width={windowDimensions.width}
           initialIndex={initialIndex}
           onPagerEnabledGesture={onGesture}
+          numToRender={1}
+          ImageComponent={AnimatedImageComponent}
         />
       )}
     </LightboxSwipeout>

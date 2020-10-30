@@ -79,6 +79,7 @@ export interface StandaloneGalleryProps<T, ItemT>
   onIndexChange?: (nextIndex: number) => void;
   getItem?: (data: T, index: number) => ItemT | undefined;
   getTotalCount?: (data: T) => number;
+  ImageComponent?: React.ComponentType;
 }
 
 function isImageItemType(type: any): type is GalleryItemType {
@@ -99,6 +100,7 @@ export function ImageRenderer<T = unknown>({
   onTap,
   onInteraction,
   renderImage,
+  ImageComponent,
 }: ImageRendererProps<T>) {
   if (!isImageItemType(item)) {
     throw new Error(
@@ -120,6 +122,7 @@ export function ImageRenderer<T = unknown>({
       onDoubleTap={onDoubleTap}
       onTap={onTap}
       onInteraction={onInteraction}
+      ImageComponent={ImageComponent}
     />
   );
 }
@@ -271,6 +274,7 @@ export class StandaloneGallery<
     };
 
     const props = {
+      ImageComponent: this.props.ImageComponent,
       item: pagerProps.item,
       width,
       height,

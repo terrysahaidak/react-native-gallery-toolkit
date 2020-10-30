@@ -61,8 +61,9 @@ export default function App() {
               backgroundColor: 'transparent',
             },
             headerStyle: {
-              backgroundColor: 'white',
+              backgroundColor: 'transparent',
             },
+            headerTintColor: 'white',
           }}
           name="Photo View"
         />

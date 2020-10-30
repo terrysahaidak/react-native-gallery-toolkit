@@ -25,29 +25,25 @@ export function List({ items }: { items: string[] }) {
 
   const nav = useNavigation();
 
-  return (
-    <>
-      {items.map((title) => (
-        <RectButton
-          key={title}
-          onPress={() => nav.navigate(title)}
-          style={{
-            height: 64,
-            alignItems: 'center',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            padding: 16,
-            backgroundColor: 'white',
-            borderBottomColor: '#ccc',
-            borderBottomWidth: 1,
-          }}
-        >
-          <Text style={{ fontSize: 18 }}>{title}</Text>
-          <Text style={{ fontSize: 24, color: '#4D4D4D' }}>➡</Text>
-        </RectButton>
-      ))}
-    </>
-  );
+  return items.map((title) => (
+    <RectButton
+      key={title}
+      onPress={() => nav.navigate(title)}
+      style={{
+        height: 64,
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding: 16,
+        backgroundColor: 'white',
+        borderBottomColor: '#ccc',
+        borderBottomWidth: 1,
+      }}
+    >
+      <Text style={{ fontSize: 18 }}>{title}</Text>
+      <Text style={{ fontSize: 24, color: '#4D4D4D' }}>➡</Text>
+    </RectButton>
+  ));
 }
 
 function Home() {

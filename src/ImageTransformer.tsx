@@ -78,6 +78,7 @@ export type InteractionType = 'scale' | 'pan';
 
 export interface ImageTransformerReusableProps {
   renderImage?: (props: RenderImageProps) => JSX.Element;
+  ImageComponent: React.ComponentType;
   DOUBLE_TAP_SCALE?: number;
   MAX_SCALE?: number;
   MIN_SCALE?: number;
@@ -115,10 +116,6 @@ function checkIsNotUsed(handlerState: Animated.SharedValue<State>) {
   );
 }
 
-const AnimatedImageComponent = Animated.createAnimatedComponent(
-  Image,
-);
-
 export const ImageTransformer = React.memo<ImageTransformerProps>(
   ({
     outerGestureHandlerRefs = [],
@@ -141,6 +138,7 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
     timingConfig = defaultTimingConfig,
     springConfig = defaultSpringConfig,
     enabled = true,
+    ImageComponent = Image,
   }) => {
     fixGestureHandler();
 
@@ -696,7 +694,7 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
                                 onLoad: onLoadImageSuccess,
                               })
                             ) : (
-                              <AnimatedImageComponent
+                              <ImageComponent
                                 onLoad={onLoadImageSuccess}
                                 source={imageSource}
                                 style={{

@@ -5,6 +5,7 @@ import {
 } from '@react-navigation/native';
 import React, { useCallback } from 'react';
 import { useWindowDimensions } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import Animated from 'react-native-reanimated';
 import { PhotoViewScreenRoute } from '.';
 import { GalleryView } from '../../../src';
@@ -38,6 +39,7 @@ export function PhotoViewScreen() {
       onHide={nav.goBack}
       initialIndex={index}
       items={list}
+      ImageComponent={FastImage}
       renderOverlayComponent={renderOverlayComponent}
     />
   );
