@@ -1,5 +1,6 @@
 import React from 'react';
 import { Dimensions } from 'react-native';
+import { runOnJS } from 'react-native-reanimated';
 
 import { GalleryItemType } from './types';
 
@@ -250,7 +251,7 @@ export class StandaloneGallery<
         onDoubleTap(isScaled);
       }
 
-      onShouldHideControls(isScaled);
+      runOnJS(onShouldHideControls)(isScaled);
     };
 
     const _onTap = (isScaled: boolean) => {
@@ -260,7 +261,7 @@ export class StandaloneGallery<
         onTap(isScaled);
       }
 
-      onShouldHideControls();
+      runOnJS(onShouldHideControls)();
     };
 
     const _onInteraction = (type: InteractionType) => {
@@ -270,7 +271,7 @@ export class StandaloneGallery<
         onInteraction(type);
       }
 
-      onShouldHideControls(type);
+      runOnJS(onShouldHideControls)(type);
     };
 
     const props = {
@@ -319,7 +320,7 @@ export class StandaloneGallery<
     function onIndexChangeWorklet(nextIndex: number) {
       'worklet';
 
-      setTempIndex(nextIndex);
+      runOnJS(setTempIndex)(nextIndex);
 
       if (onIndexChange) {
         onIndexChange(nextIndex);

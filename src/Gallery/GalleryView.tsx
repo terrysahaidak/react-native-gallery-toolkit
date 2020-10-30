@@ -22,6 +22,7 @@ import Animated, {
   Extrapolate,
   interpolate,
   runOnUI,
+  runOnJS,
   useAnimatedStyle,
   withSpring,
   withTiming,
@@ -29,7 +30,6 @@ import Animated, {
 import {
   createAnimatedGestureHandler,
   GalleryItemType,
-  runOnce,
   StandaloneGallery,
   useAnimatedReaction,
   useSharedValue,
@@ -44,7 +44,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 
 const defaultTimingConfig = {
   duration: 250,
-  easing: Easing.bezier(0.33, 0.01, 0, 1),
+  easing: Easing.bezier(0.5002, 0.2902, 0.3214, 0.9962),
 };
 
 interface LightboxSwipeoutProps {
@@ -88,7 +88,15 @@ function LightboxSwipeout({
         }
       : source;
 
-  const { x, y, width, height, opacity } = sharedValues;
+  const {
+    x,
+    y,
+    width,
+    height,
+    opacity,
+    targetWidth,
+    targetHeight,
+  } = sharedValues;
 
   const animationProgress = useSharedValue(0);
   const childTranslateY = useSharedValue(0);
@@ -97,12 +105,6 @@ function LightboxSwipeout({
   const scale = useSharedValue(1);
   const lightboxImageOpacity = useSharedValue(1);
   const childrenOpacity = useSharedValue(0);
-
-  const targetWidth = useSharedValue(windowDimensions.width, true);
-  const scaleFactor = targetDimensions.width / targetWidth.value;
-  const targetHeight = useSharedValue(
-    targetDimensions.height / scaleFactor,
-  );
 
   const [renderChildren, setRenderChildren] = useState<boolean>(
     false,
@@ -134,7 +136,7 @@ function LightboxSwipeout({
         'worklet';
 
         childrenOpacity.value = 1;
-        setRenderChildren(true);
+        runOnJS(setRenderChildren)(true);
       });
     })();
     // );
@@ -175,6 +177,8 @@ function LightboxSwipeout({
 
       onEnd: (evt) => {
         'worklet';
+
+        console.log(targetHeight.value, targetWidth.value);
 
         const enoughVelocity = Math.abs(evt.velocityY) > 30;
         const rightDirection =
@@ -218,8 +222,6 @@ function LightboxSwipeout({
                     : evt.velocityY,
               },
               () => {
-                'worklet';
-
                 callback();
               },
             );
@@ -324,13 +326,7 @@ function LightboxSwipeout({
         ) : (
           <ImageComponentToUse
             source={imageSource}
-            style={[
-              {
-                width: targetWidth.value,
-                height: targetHeight.value,
-              },
-              imageStyles,
-            ]}
+            style={[imageStyles]}
           />
         )}
       </Animated.View>
@@ -390,6 +386,18 @@ export function GalleryView({
     ? items[localIndex]
     : getItem(localIndex, items);
 
+  useEffect(() => {
+    runOnUI(() => {
+      const tw = windowDimensions.width;
+      sharedValues.targetWidth.value = tw;
+
+      const scaleFactor = item.width / windowDimensions.width;
+
+      const th = item.height / scaleFactor;
+      sharedValues.targetHeight.value = th;
+    })();
+  }, [item]);
+
   useAnimatedReaction(
     () => {
       return sharedValues.activeIndex.value;
@@ -410,7 +418,7 @@ export function GalleryView({
   const onIndexChange = useCallback((nextIndex: number) => {
     'worklet';
 
-    setLocalIndex(nextIndex);
+    runOnJS(setLocalIndex)(nextIndex);
     sharedValues.activeIndex.value = nextIndex;
   }, []);
 
@@ -487,7 +495,7 @@ export function GalleryView({
     sharedValues.x.value = 0;
     sharedValues.y.value = 0;
 
-    onHide();
+    runOnJS(onHide)();
   }
 
   return (

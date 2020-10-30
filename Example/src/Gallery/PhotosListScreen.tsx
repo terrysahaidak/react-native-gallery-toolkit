@@ -4,7 +4,6 @@ import {
   TapGestureHandler,
 } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
-import { Image, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { generateImageList } from '../utils/generateImageList';
 import {
@@ -14,7 +13,6 @@ import {
 } from '../../../src';
 import { PhotoListNavigationProp } from '.';
 import FastImage from 'react-native-fast-image';
-import { View } from 'react-native';
 
 const LIST = generateImageList(100);
 
@@ -39,9 +37,12 @@ function ListItem({ item, onPress, index }: ListItemProps) {
     <TapGestureHandler onGestureEvent={onGestureEvent}>
       <Animated.View
         style={[styles, LIST.getContainerStyle(index), sizeStyle]}
-        ref={ref}
       >
-        <FastImage style={sizeStyle} source={{ uri: item.uri }} />
+        <FastImage
+          ref={ref}
+          style={[sizeStyle, LIST.getContainerStyle(index)]}
+          source={{ uri: item.uri }}
+        />
       </Animated.View>
     </TapGestureHandler>
   );
@@ -52,7 +53,7 @@ export function PhotosListScreen() {
 
   function onNavigate(itemIndex: number) {
     nav.navigate('Photo View', {
-      index: itemIndex, 
+      index: itemIndex,
       list: LIST.images,
     });
   }

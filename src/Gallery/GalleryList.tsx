@@ -3,6 +3,7 @@ import {
   measure,
   useAnimatedRef,
   useAnimatedStyle,
+  runOnJS,
 } from 'react-native-reanimated';
 import { useAnimatedGestureHandler } from '../useAnimatedGestureHandler';
 import {
@@ -71,7 +72,7 @@ export function useGalleryItem(
 
       activeIndex.value = index;
 
-      onPress(index);
+      runOnJS(onPress)(index);
     },
   });
 

@@ -8,6 +8,7 @@ import React, {
 import Animated, {
   useAnimatedStyle,
   withSpring,
+  runOnJS,
   cancelAnimation,
   useDerivedValue,
 } from 'react-native-reanimated';
@@ -292,7 +293,7 @@ export const Pager = typedMemo(function Pager<
       onIndexChange(nextIndex);
     }
 
-    setActiveIndex(nextIndex);
+    runOnJS(setActiveIndex)(nextIndex);
   }, []);
 
   useEffect(() => {

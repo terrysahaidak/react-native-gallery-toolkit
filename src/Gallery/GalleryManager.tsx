@@ -18,6 +18,8 @@ export interface GalleryManagerSharedValues {
   y: Animated.SharedValue<number>;
   opacity: Animated.SharedValue<number>;
   activeIndex: Animated.SharedValue<number>;
+  targetWidth: Animated.SharedValue<number>;
+  targetHeight: Animated.SharedValue<number>;
 }
 
 export interface GalleryManagerItems {
@@ -39,6 +41,8 @@ class GalleryManager {
     y: makeMutable(0),
     opacity: makeMutable(1),
     activeIndex: makeMutable(0),
+    targetWidth: makeMutable(0),
+    targetHeight: makeMutable(0),
   };
 
   public items = new Map<number, any>();
