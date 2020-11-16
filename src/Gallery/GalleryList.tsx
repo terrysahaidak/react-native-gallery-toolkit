@@ -43,6 +43,17 @@ export function measureItem(
   sharedValues.height.value = measurements.height;
 }
 
+export function setOffTheScreen(
+  sharedValues: GalleryManagerSharedValues,
+) {
+  'worklet';
+
+  sharedValues.x.value = 999999;
+  sharedValues.y.value = 999999;
+  sharedValues.width.value = 0;
+  sharedValues.height.value = 0;
+}
+
 export function useGalleryItem(
   index: number,
   onPress: (itemIndex: number) => void,

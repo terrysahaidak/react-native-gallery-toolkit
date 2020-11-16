@@ -320,7 +320,7 @@ PODS:
     - SDWebImageWebPCoder (~> 0.4.1)
   - RNGestureHandler (1.8.0):
     - React
-  - RNReanimated (2.0.0-alpha.8):
+  - RNReanimated (2.0.0-alpha.9):
     - DoubleConversion
     - FBLazyVector
     - FBReactNativeSpec
@@ -418,7 +418,7 @@ DEPENDENCIES:
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
+  trunk:
     - boost-for-react-native
     - CocoaAsyncSocket
     - CocoaLibEvent
@@ -546,7 +546,7 @@ SPEC CHECKSUMS:
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
   RNFastImage: 35ae972d6727c84ee3f5c6897e07f84d0a3445e9
   RNGestureHandler: 7a5833d0f788dbd107fbb913e09aa0c1ff333c39
-  RNReanimated: 2041d58f790987a36052d777e34c1f82635c2ef3
+  RNReanimated: 51c39025c22b505646c853544600b28f3172cdb5
   RNScreens: b748efec66e095134c7166ca333b628cd7e6f3e2
   SDWebImage: 112503ec94a5a2a41869503844a15e8d8f1ead5c
   SDWebImageWebPCoder: 36f8f47bd9879a8aea6044765c1351120fd8e3a8

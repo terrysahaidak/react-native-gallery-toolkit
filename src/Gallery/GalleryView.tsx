@@ -38,7 +38,7 @@ import {
   useGalleryManager,
   GalleryManagerSharedValues,
 } from './GalleryManager';
-import { measureItem } from './GalleryList';
+import { measureItem, setOffTheScreen } from './GalleryList';
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 
@@ -165,6 +165,13 @@ function LightboxSwipeout({
         );
       },
 
+      onStart: () => {
+        'worklet';
+
+        lightboxImageOpacity.value = 1;
+        childrenOpacity.value = 0;
+      },
+
       onActive: (evt) => {
         'worklet';
 
@@ -177,8 +184,6 @@ function LightboxSwipeout({
 
       onEnd: (evt) => {
         'worklet';
-
-        console.log(targetHeight.value, targetWidth.value);
 
         const enoughVelocity = Math.abs(evt.velocityY) > 30;
         const rightDirection =
@@ -227,6 +232,9 @@ function LightboxSwipeout({
             );
           }
         } else {
+          lightboxImageOpacity.value = 0;
+          childrenOpacity.value = 1;
+
           childTranslateY.value = withSpring(0, {
             stiffness: 1000,
             damping: 500,
@@ -390,9 +398,7 @@ export function GalleryView({
     runOnUI(() => {
       const tw = windowDimensions.width;
       sharedValues.targetWidth.value = tw;
-
       const scaleFactor = item.width / windowDimensions.width;
-
       const th = item.height / scaleFactor;
       sharedValues.targetHeight.value = th;
     })();
@@ -409,8 +415,8 @@ export function GalleryView({
         if (index > -1 && items[index]) {
           measureItem(items[index].ref, sharedValues);
         }
-      } catch (err) {
-        console.log('Error measuring');
+      } catch {
+        setOffTheScreen(sharedValues);
       }
     },
   );
@@ -419,7 +425,7 @@ export function GalleryView({
     'worklet';
 
     runOnJS(setLocalIndex)(nextIndex);
-    sharedValues.activeIndex.value = nextIndex;
+    // sharedValues.activeIndex.value = nextIndex;
   }, []);
 
   const renderBackdropComponent = useCallback(

@@ -15,6 +15,7 @@ import ImageTransformer from './ImageTransformerExamples';
 import ScalableImage from './ScalableImageExamples';
 import Lightbox from './Lightbox';
 import Gallery from './Gallery';
+import Pager from './Pager';
 
 const Stack = createStackNavigator();
 
@@ -52,6 +53,7 @@ function Home() {
       items={[
         'Standalone Gallery',
         'Image Transformer',
+        'Pager example',
         'Scalable Image',
         'Lightbox',
         'Gallery',
@@ -90,6 +92,7 @@ export default function App() {
             component={ImageTransformer}
             name="Image Transformer"
           />
+          <Stack.Screen component={Pager} name="Pager example" />
 
           <Stack.Screen
             component={ScalableImage}
