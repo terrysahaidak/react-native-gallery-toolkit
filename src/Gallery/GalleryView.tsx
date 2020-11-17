@@ -425,7 +425,7 @@ export function GalleryView({
     'worklet';
 
     runOnJS(setLocalIndex)(nextIndex);
-    // sharedValues.activeIndex.value = nextIndex;
+    sharedValues.activeIndex.value = nextIndex;
   }, []);
 
   const renderBackdropComponent = useCallback(
