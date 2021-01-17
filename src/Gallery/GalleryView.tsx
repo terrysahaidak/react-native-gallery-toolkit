@@ -26,12 +26,12 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   withTiming,
+  useAnimatedReaction,
 } from 'react-native-reanimated';
 import {
   createAnimatedGestureHandler,
   GalleryItemType,
   StandaloneGallery,
-  useAnimatedReaction,
   useSharedValue,
 } from '../';
 import {
@@ -192,6 +192,8 @@ function LightboxSwipeout({
 
         if (enoughVelocity && rightDirection) {
           const elementVisible = isVisibleImage();
+
+          console.log(elementVisible);
 
           if (elementVisible) {
             lightboxImageOpacity.value = 1;
@@ -409,15 +411,15 @@ export function GalleryView({
       return sharedValues.activeIndex.value;
     },
     (index) => {
-      try {
-        const items = refsByIndexSV.value;
+      // try {
+      const items = refsByIndexSV.value;
 
-        if (index > -1 && items[index]) {
-          measureItem(items[index].ref, sharedValues);
-        }
-      } catch {
-        setOffTheScreen(sharedValues);
+      if (index > -1 && items[index]) {
+        measureItem(items[index].ref, sharedValues);
       }
+      // } catch {
+      //   setOffTheScreen(sharedValues);
+      // }
     },
   );
 

@@ -22,6 +22,7 @@ import Animated, {
   interpolate,
   withTiming,
   delay,
+  runOnJS,
 } from 'react-native-reanimated';
 import { ScrollView } from 'react-native-gesture-handler';
 import { DetachedHeader } from '../../DetachedHeader';
@@ -174,7 +175,7 @@ function RenderItem({
     'worklet';
 
     setControlsHidden(true);
-    StatusBar.setHidden(true);
+    runOnJS(StatusBar.setHidden)(true);
     activeItemIndex.value = _index;
   }, []);
 
@@ -184,7 +185,7 @@ function RenderItem({
     //delay for smooth hiding background opacity
     activeItemIndex.value = delay(200, withTiming(-1));
     setControlsHidden(false);
-    StatusBar.setHidden(false);
+    runOnJS(StatusBar.setHidden)(false);
   }, []);
 
   const overlayStyles = useAnimatedStyle(() => {

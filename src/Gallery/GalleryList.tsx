@@ -35,12 +35,20 @@ export function measureItem(
 ) {
   'worklet';
 
-  const measurements = measure(ref);
+  try {
+    console.log(ref);
+    const measurements = measure(ref);
 
-  sharedValues.x.value = measurements.pageX;
-  sharedValues.y.value = measurements.pageY;
-  sharedValues.width.value = measurements.width;
-  sharedValues.height.value = measurements.height;
+    sharedValues.x.value = measurements.pageX;
+    sharedValues.y.value = measurements.pageY;
+    sharedValues.width.value = measurements.width;
+    sharedValues.height.value = measurements.height;
+  } catch (err) {
+    sharedValues.x.value = 999999;
+    sharedValues.y.value = 999999;
+    sharedValues.width.value = 0;
+    sharedValues.height.value = 0;
+  }
 }
 
 export function setOffTheScreen(
@@ -63,9 +71,12 @@ export function useGalleryItem(
 
   const { opacity, activeIndex } = galleryManager!.sharedValues;
 
-  const styles = useAnimatedStyle(() => ({
-    opacity: activeIndex.value === index ? opacity.value : 1,
-  }));
+  const styles = useAnimatedStyle(
+    () => ({
+      // opacity: activeIndex.value === index ? opacity.value : 1,
+    }),
+    [],
+  );
 
   useEffect(() => {
     galleryManager.registerItem(index, ref);

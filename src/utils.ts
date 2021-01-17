@@ -85,33 +85,6 @@ export const workletNoop = () => {
   'worklet';
 };
 
-export function useAnimatedReaction<R>(
-  prepare: () => R,
-  react: (params: R) => void,
-) {
-  const inputsRef = useRef<{
-    inputs: any;
-  }>(null);
-  if (inputsRef.current === null) {
-    // @ts-ignore
-    inputsRef.current = {
-      // @ts-ignore
-      inputs: Object.values(prepare._closure),
-    };
-  }
-  const { inputs } = inputsRef.current;
-  useMapper(
-    () => {
-      'worklet';
-
-      const input = prepare();
-      react(input);
-    },
-    inputs,
-    [],
-  );
-}
-
 export function useSharedValue<T>(value: T, shouldRebuild = false) {
   const ref = useRef<T | null>(null);
   if (ref.current === null || shouldRebuild) {

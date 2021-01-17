@@ -11,15 +11,14 @@
     "src/"
   ],
   "scripts": {
-    "postinstall": "npx patch-package",
-    "prepare": "bob build",
+    "prepublishOnly": "bob build",
     "initialize": "npm i && cd Example && npm i && npx pod-install"
   },
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
     "react-native-gesture-handler": "*",
-    "react-native-reanimated": "^2.0.0-alpha.7"
+    "react-native-reanimated": "^2.0.0-rc.2"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
@@ -44,7 +43,7 @@
     "react": "16.11.0",
     "react-native": "0.62.2",
     "react-native-gesture-handler": "^1.6.1",
-    "react-native-reanimated": "^2.0.0-alpha.7",
+    "react-native-reanimated": "^2.0.0-rc.2",
     "tsdx": "^0.13.3",
     "typescript": "^3.9.5"
   },

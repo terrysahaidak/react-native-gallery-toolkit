@@ -9,10 +9,10 @@ import Animated, {
   cancelAnimation,
   useAnimatedStyle,
   withSpring,
+  useAnimatedReaction,
 } from 'react-native-reanimated';
 import { createAnimatedGestureHandler } from './useAnimatedGestureHandler';
 import {
-  useAnimatedReaction,
   useSharedValue,
   workletNoop,
 } from './utils';

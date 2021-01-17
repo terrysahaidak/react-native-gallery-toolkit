@@ -19,6 +19,7 @@ import Animated, {
   useDerivedValue,
   Easing,
   withDecay,
+  useAnimatedReaction,
 } from 'react-native-reanimated';
 import {
   PinchGestureHandler,
@@ -35,7 +36,6 @@ import {
   fixGestureHandler,
   clamp,
   workletNoop,
-  useAnimatedReaction,
   useSharedValue,
 } from './utils';
 
