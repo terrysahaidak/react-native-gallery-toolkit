@@ -26,6 +26,7 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
+  runOnJS,
 } from 'react-native-reanimated';
 import {
   StackNavigationOptions,
@@ -292,8 +293,14 @@ export default function FullFeatured() {
       },
 
       onEnd: () => {
+        'worklet';
+
         if (translateY.value > 80) {
-          translateY.value = withTiming(-800, undefined, handleClose);
+          translateY.value = withTiming(
+            -800,
+            undefined,
+            runOnJS(handleClose),
+          );
         } else {
           translateY.value = withTiming(0);
           bottomTranslateY.value = withTiming(0);
@@ -351,28 +358,22 @@ export default function FullFeatured() {
               </View>
             );
           }}
-          onInteraction={useCallback(() => {
+          onInteraction={runOnJS(() => {
             hide();
-          }, [])}
-          onTap={useCallback(() => {
+          })}
+          onTap={runOnJS(() => {
             toggleHeaderShown();
-          }, [])}
-          onDoubleTap={useCallback((isScaled: boolean) => {
+          })}
+          onDoubleTap={runOnJS((isScaled: boolean) => {
             if (!isScaled) {
               hide();
             }
-          }, [])}
+          })}
           numToRender={2}
           shouldPagerHandleGestureEvent={
             shouldPagerHandleGestureEvent
           }
-          onGesture={(evt, isActive) => {
-            'worklet';
-
-            if (isActive.value) {
-              handler(evt);
-            }
-          }}
+          onPagerEnabledGesture={handler}
           // onPagerTranslateChange={(translateX) => {
           //   console.log(translateX);
           // }}

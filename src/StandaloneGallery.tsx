@@ -1,5 +1,6 @@
 import React from 'react';
 import { Dimensions } from 'react-native';
+import { runOnJS } from 'react-native-reanimated';
 
 import { GalleryItemType } from './types';
 
@@ -7,6 +8,7 @@ import { Pager, RenderPageProps, PagerProps } from './Pager';
 import {
   ImageTransformer,
   ImageTransformerProps,
+  InteractionType,
   RenderImageProps,
 } from './ImageTransformer';
 
@@ -18,10 +20,12 @@ interface Handlers<T> {
   onInteraction?: ImageTransformerProps['onInteraction'];
   onPagerTranslateChange?: (translateX: number) => void;
   onGesture?: PagerProps<T, any>['onGesture'];
+  onPagerEnabledGesture?: PagerProps<T, any>['onEnabledGesture'];
   shouldPagerHandleGestureEvent?: PagerProps<
     T,
     any
   >['shouldHandleGestureEvent'];
+  onShouldHideControls?: (shouldHide: boolean) => void;
 }
 
 export interface StandaloneGalleryHandler {
@@ -76,6 +80,7 @@ export interface StandaloneGalleryProps<T, ItemT>
   onIndexChange?: (nextIndex: number) => void;
   getItem?: (data: T, index: number) => ItemT | undefined;
   getTotalCount?: (data: T) => number;
+  ImageComponent?: React.ComponentType;
 }
 
 function isImageItemType(type: any): type is GalleryItemType {
@@ -96,6 +101,7 @@ export function ImageRenderer<T = unknown>({
   onTap,
   onInteraction,
   renderImage,
+  ImageComponent,
 }: ImageRendererProps<T>) {
   if (!isImageItemType(item)) {
     throw new Error(
@@ -117,6 +123,7 @@ export function ImageRenderer<T = unknown>({
       onDoubleTap={onDoubleTap}
       onTap={onTap}
       onInteraction={onInteraction}
+      ImageComponent={ImageComponent}
     />
   );
 }
@@ -133,6 +140,8 @@ export class StandaloneGallery<
   static ImageRenderer = React.memo(ImageRenderer);
 
   tempIndex: number = this.props.initialIndex ?? 0;
+
+  controlsHidden = false;
 
   constructor(props: StandaloneGalleryProps<T, ItemT>) {
     super(props);
@@ -215,14 +224,67 @@ export class StandaloneGallery<
       renderImage,
     } = this.props;
 
+    const onShouldHideControls = (
+      isScaled?: boolean | InteractionType,
+    ) => {
+      let shouldHide = true;
+
+      if (typeof isScaled === 'boolean') {
+        shouldHide = !isScaled;
+      } else if (typeof isScaled === 'string') {
+        shouldHide = true;
+      } else {
+        shouldHide = !this.controlsHidden;
+      }
+
+      this.controlsHidden = shouldHide;
+
+      if (this.props.onShouldHideControls) {
+        this.props.onShouldHideControls(shouldHide);
+      }
+    };
+
+    const _onDoubleTap = (isScaled: boolean) => {
+      'worklet';
+
+      if (onDoubleTap) {
+        onDoubleTap(isScaled);
+      }
+
+      runOnJS(onShouldHideControls)(isScaled);
+    };
+
+    const _onTap = (isScaled: boolean) => {
+      'worklet';
+
+      if (onTap) {
+        onTap(isScaled);
+      }
+
+      runOnJS(onShouldHideControls)();
+    };
+
+    const _onInteraction = (type: InteractionType) => {
+      'worklet';
+
+      if (onInteraction) {
+        onInteraction(type);
+      }
+
+      runOnJS(onShouldHideControls)(type);
+    };
+
     const props = {
+      ImageComponent: this.props.ImageComponent,
       item: pagerProps.item,
       width,
       height,
       pagerProps,
-      onDoubleTap,
-      onTap,
-      onInteraction,
+
+      onDoubleTap: _onDoubleTap,
+      onTap: _onTap,
+      onInteraction: _onInteraction,
+
       renderImage: renderImage
         ? (props: RenderImageProps) => {
             return renderImage(props, pagerProps.item, index);
@@ -248,6 +310,7 @@ export class StandaloneGallery<
       numToRender,
       onGesture,
       shouldPagerHandleGestureEvent,
+      onPagerEnabledGesture,
     } = this.props;
 
     const setTempIndex = (index: number) => {
@@ -257,7 +320,7 @@ export class StandaloneGallery<
     function onIndexChangeWorklet(nextIndex: number) {
       'worklet';
 
-      setTempIndex(nextIndex);
+      runOnJS(setTempIndex)(nextIndex);
 
       if (onIndexChange) {
         onIndexChange(nextIndex);
@@ -277,6 +340,7 @@ export class StandaloneGallery<
         onPagerTranslateChange={onPagerTranslateChange}
         shouldHandleGestureEvent={shouldPagerHandleGestureEvent}
         onGesture={onGesture}
+        onEnabledGesture={onPagerEnabledGesture}
         renderPage={this._renderPage}
         numToRender={numToRender}
       />

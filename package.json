@@ -11,14 +11,14 @@
     "src/"
   ],
   "scripts": {
-    "prepare": "bob build",
+    "prepublishOnly": "bob build",
     "initialize": "npm i && cd Example && npm i && npx pod-install"
   },
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
     "react-native-gesture-handler": "*",
-    "react-native-reanimated": "^2.0.0-alpha.7"
+    "react-native-reanimated": "^2.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
@@ -42,8 +42,8 @@
     "prettier": "^1.18.2",
     "react": "16.11.0",
     "react-native": "0.62.2",
-    "react-native-gesture-handler": "^1.6.1",
-    "react-native-reanimated": "^2.0.0-alpha.7",
+    "react-native-gesture-handler": "^1.10.3",
+    "react-native-reanimated": "^2.1.0",
     "tsdx": "^0.13.3",
     "typescript": "^3.9.5"
   },

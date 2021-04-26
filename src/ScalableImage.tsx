@@ -230,6 +230,8 @@ export const ScalableImage = React.memo<ScalableImageProps>(
 
         // store scale value
         scale.value = withTiming(1, timingConfig, () => {
+          'worklet';
+
           onEnd();
         });
         vec.set(scaleTranslation, () => withTiming(0, timingConfig));

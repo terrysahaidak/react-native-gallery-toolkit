@@ -85,37 +85,9 @@ export const workletNoop = () => {
   'worklet';
 };
 
-export function useAnimatedReaction<R>(
-  prepare: () => R,
-  react: (params: R) => void,
-) {
-  const inputsRef = useRef<{
-    inputs: any;
-  }>(null);
-  if (inputsRef.current === null) {
-    // @ts-ignore
-    inputsRef.current = {
-      // @ts-ignore
-      inputs: Object.values(prepare._closure),
-    };
-  }
-  const { inputs } = inputsRef.current;
-  useMapper(
-    () => {
-      'worklet';
-
-      const input = prepare();
-      react(input);
-    },
-    inputs,
-    [],
-  );
-}
-
-export function useSharedValue<T>(value: T) {
-  const ref = useRef<T>(null);
-  if (ref.current === null) {
-    // @ts-ignore
+export function useSharedValue<T>(value: T, shouldRebuild = false) {
+  const ref = useRef<T | null>(null);
+  if (ref.current === null || shouldRebuild) {
     ref.current = value;
   }
 
@@ -123,3 +95,26 @@ export function useSharedValue<T>(value: T) {
 }
 
 export const typedMemo: <T>(c: T) => T = React.memo;
+
+export function clampVelocity(
+  velocity: number,
+  minVelocity: number,
+  maxVelocity: number,
+) {
+  'worklet';
+
+  if (velocity > 0) {
+    return Math.min(Math.max(velocity, minVelocity), maxVelocity);
+  } else {
+    return Math.max(Math.min(velocity, -minVelocity), -maxVelocity);
+  }
+}
+
+export function runOnce(fn: Function) {
+  const ref = useRef<null | true>(null);
+
+  if (!ref.current) {
+    fn();
+    ref.current = true;
+  }
+}

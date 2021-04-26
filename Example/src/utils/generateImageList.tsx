@@ -10,7 +10,7 @@ function getRandomIntInclusive(min: number, max: number) {
 const heights = [300, 400, 500, 540, 580, 600];
 
 const GUTTER_WIDTH = 3;
-const NUMBER_OF_IMAGES = 4;
+const NUMBER_OF_IMAGES = 3;
 const IMAGE_SIZE =
   (dimensions.width - GUTTER_WIDTH * (NUMBER_OF_IMAGES - 1)) /
   NUMBER_OF_IMAGES;
@@ -36,7 +36,8 @@ export function generateImageList(
   return {
     images,
     getContainerStyle: (index: number) => ({
-      marginRight: (index + 1) % 4 === 0 ? 0 : GUTTER_WIDTH,
+      marginRight:
+        (index + 1) % NUMBER_OF_IMAGES === 0 ? 0 : GUTTER_WIDTH,
       marginBottom: GUTTER_WIDTH,
     }),
     IMAGE_SIZE,

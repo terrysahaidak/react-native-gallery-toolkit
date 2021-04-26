@@ -1,15 +1,8 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-
-import PagerExample from './PagerExample';
-
-import { List } from '../Navigation';
+import { PagerExampleScreen } from './PagerExampleScreen';
 
 const Stack = createStackNavigator();
-
-function Home() {
-  return <List items={['Pager']} />;
-}
 
 export default function App() {
   return (
@@ -17,14 +10,10 @@ export default function App() {
       screenOptions={{
         gestureEnabled: false,
       }}
-      initialRouteName="Transformer"
+      initialRouteName="Pager"
       headerMode="screen"
     >
-      <Stack.Screen component={Home} name="Transformer" />
-      <Stack.Screen
-        component={PagerExample}
-        name="Pager"
-      />
+      <Stack.Screen component={PagerExampleScreen} name="Pager" />
     </Stack.Navigator>
   );
 }
