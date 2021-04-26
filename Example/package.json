@@ -19,10 +19,10 @@
     "react": "16.13.1",
     "react-native": "0.63.2",
     "react-native-fast-image": "^8.1.5",
-    "react-native-gesture-handler": "^1.8.0",
+    "react-native-gesture-handler": "^1.10.3",
     "react-native-image": "^0.1.1",
     "react-native-portalize": "^1.0.7",
-    "react-native-reanimated": "^2.0.0-rc.2",
+    "react-native-reanimated": "^2.1.0",
     "react-native-safe-area-context": "^3.1.4",
     "react-native-screens": "^2.10.1",
     "react-native-video": "^5.1.0-alpha8"
