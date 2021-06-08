@@ -22,7 +22,7 @@
     "react-native-gesture-handler": "^1.10.3",
     "react-native-image": "^0.1.1",
     "react-native-portalize": "^1.0.7",
-    "react-native-reanimated": "^2.1.0",
+    "react-native-reanimated": "2.3.0-alpha.1",
     "react-native-safe-area-context": "^3.1.4",
     "react-native-screens": "^2.10.1",
     "react-native-video": "^5.1.0-alpha8"
@@ -47,7 +47,7 @@
     "eslint-plugin-react": "^7.1.0",
     "eslint-plugin-react-native": "^3.1.0",
     "jest": "^24.9.0",
-    "metro-react-native-babel-preset": "^0.59.0",
+    "metro-react-native-babel-preset": "^0.66.0",
     "prettier": "^1.18.2",
     "react-test-renderer": "16.11.0"
   },

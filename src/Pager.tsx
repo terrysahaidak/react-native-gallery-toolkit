@@ -33,6 +33,7 @@ import {
   typedMemo,
   clampVelocity,
 } from './utils';
+import { useWorkletCallback } from 'react-native-reanimated';
 
 const dimensions = Dimensions.get('window');
 
@@ -286,9 +287,7 @@ export const Pager = typedMemo(function Pager<
     return length.value * width + gutterWidth * length.value - 2;
   }, []);
 
-  const onIndexChangeCb = useCallback((nextIndex: number) => {
-    'worklet';
-
+  const onIndexChangeCb = useWorkletCallback((nextIndex: number) => {
     if (onIndexChange) {
       onIndexChange(nextIndex);
     }

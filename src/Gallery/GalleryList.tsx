@@ -36,7 +36,7 @@ export function measureItem(
   'worklet';
 
   try {
-    console.log(ref);
+    // console.log(ref);
     const measurements = measure(ref);
 
     sharedValues.x.value = measurements.pageX;

@@ -49,7 +49,7 @@ export default function StandaloneMap() {
   const totalCount = 3;
 
   function handleIndexChange(i: number) {
-    console.log(i);
+    // console.log(i);
     // you can fetch more items and store it to the map here
   }
 

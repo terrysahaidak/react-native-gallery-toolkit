@@ -36,6 +36,7 @@ import {
   DetachedHeader,
   HeaderPropsScrapper,
 } from '../DetachedHeader';
+import { useWorkletCallback } from 'react-native-reanimated';
 
 const dimensions = Dimensions.get('window');
 
@@ -226,9 +227,9 @@ export default function FullFeatured() {
     null,
   );
 
-  function onIndexChange(nextIndex: number) {
-    setIndex(nextIndex);
-  }
+  const onIndexChange = useWorkletCallback((nextIndex: number) => {
+    runOnJS(setIndex)(nextIndex);
+  }, []);
 
   function onNext() {
     galleryRef.current!.goNext();

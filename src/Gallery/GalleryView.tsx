@@ -193,7 +193,7 @@ function LightboxSwipeout({
         if (enoughVelocity && rightDirection) {
           const elementVisible = isVisibleImage();
 
-          console.log(elementVisible);
+          // console.log(elementVisible);
 
           if (elementVisible) {
             lightboxImageOpacity.value = 1;

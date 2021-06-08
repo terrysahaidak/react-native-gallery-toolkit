@@ -1811,5 +1811,13 @@
     "node_modules/xml-name-validator": true,
     "node_modules/yaml": true
   },
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "i18n-ally.localesPaths": [
+    "Example/ios/Pods/Flipper-Folly/folly/lang",
+    "Example/ios/Pods/Folly/folly/lang",
+    "Example/ios/Pods/boost-for-react-native/boost/locale",
+    "Example/ios/Pods/boost-for-react-native/boost/predef/language",
+    "Example/ios/Pods/Headers/Private/Flipper-Folly/folly/lang",
+    "Example/ios/Pods/Headers/Public/Flipper-Folly/folly/lang"
+  ]
 }
