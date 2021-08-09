@@ -75,8 +75,6 @@ class GalleryManager {
       y,
     } = this.sharedValues;
     runOnUI(() => {
-      'worklet';
-
       width.value = 0;
       height.value = 0;
       opacity.value = 1;

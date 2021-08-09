@@ -21,12 +21,12 @@ import Animated, {
   Easing,
   Extrapolate,
   interpolate,
-  runOnUI,
   runOnJS,
+  runOnUI,
+  useAnimatedReaction,
   useAnimatedStyle,
   withSpring,
   withTiming,
-  useAnimatedReaction,
 } from 'react-native-reanimated';
 import {
   createAnimatedGestureHandler,
@@ -34,11 +34,11 @@ import {
   StandaloneGallery,
   useSharedValue,
 } from '../';
-import {
-  useGalleryManager,
-  GalleryManagerSharedValues,
-} from './GalleryManager';
 import { measureItem, setOffTheScreen } from './GalleryList';
+import {
+  GalleryManagerSharedValues,
+  useGalleryManager,
+} from './GalleryManager';
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 
@@ -265,13 +265,12 @@ function LightboxSwipeout({
     });
   }
 
-  const childrenAnimateStyle = useAnimatedStyle(
-    () => ({
+  const childrenAnimateStyle = useAnimatedStyle(() => {
+    return {
       opacity: childrenOpacity.value,
       transform: [{ translateY: childTranslateY.value }],
-    }),
-    [],
-  );
+    };
+  }, []);
 
   const backdropStyles = useAnimatedStyle(() => {
     return {
@@ -410,16 +409,16 @@ export function GalleryView({
     () => {
       return sharedValues.activeIndex.value;
     },
-    (index) => {
-      // try {
-      const items = refsByIndexSV.value;
+    (index, prevIndex) => {
+      try {
+        const items = refsByIndexSV.value;
 
-      if (index > -1 && items[index]) {
-        measureItem(items[index].ref, sharedValues);
+        if (index > -1 && items[index]) {
+          measureItem(items[index].ref, sharedValues);
+        }
+      } catch {
+        setOffTheScreen(sharedValues);
       }
-      // } catch {
-      //   setOffTheScreen(sharedValues);
-      // }
     },
   );
 
@@ -463,12 +462,11 @@ export function GalleryView({
 
   const _renderOverlayComponent = useCallback(
     ({ animationProgress }) => {
-      const animatedStyles = useAnimatedStyle(
-        () => ({
+      const animatedStyles = useAnimatedStyle(() => {
+        return {
           opacity: animationProgress.value,
-        }),
-        [],
-      );
+        };
+      }, []);
 
       return (
         <Animated.View style={[animatedStyles]}>
