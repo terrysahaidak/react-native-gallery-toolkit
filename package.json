@@ -41,7 +41,7 @@
     "eslint-plugin-react-native": "3.7.0",
     "prettier": "^1.18.2",
     "react": "16.11.0",
-    "react-native": "0.62.2",
+    "react-native": "0.62.3",
     "react-native-gesture-handler": "^1.10.3",
     "react-native-reanimated": "2.3.0-alpha.1",
     "tsdx": "^0.13.3",
