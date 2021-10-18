@@ -1,4 +1,5 @@
 import {
+  assertWorkletCreator,
   clampVelocity,
   fixGestureHandler,
   friction,
@@ -28,8 +29,11 @@ import Animated, {
   useWorkletCallback,
   withSpring,
 } from 'react-native-reanimated';
+import { runOnUI } from 'react-native-reanimated/src/reanimated2/core';
 
 const dimensions = Dimensions.get('window');
+
+const assertWorklet = assertWorkletCreator('@gallery-toolkit/pager');
 
 const GUTTER_WIDTH = Math.round(dimensions.width / 14);
 
@@ -214,7 +218,7 @@ export const Pager = typedMemo(function Pager<
   initialIndex,
   totalCount,
   numToRender = 2,
-  onIndexChange,
+  onIndexChange = workletNoop,
   renderPage,
   width = dimensions.width,
   gutterWidth = GUTTER_WIDTH,
@@ -232,6 +236,12 @@ export const Pager = typedMemo(function Pager<
   verticallyEnabled = true,
 }: PagerProps<TPages, ItemT>) {
   fixGestureHandler();
+
+  assertWorklet(onIndexChange);
+  assertWorklet(onPagerTranslateChange);
+  assertWorklet(onGesture);
+  assertWorklet(onEnabledGesture);
+  assertWorklet(shouldHandleGestureEvent);
 
   // make sure to not calculate translate with gutter
   // if we don't want to render it
@@ -282,17 +292,19 @@ export const Pager = typedMemo(function Pager<
   }, []);
 
   const onIndexChangeCb = useWorkletCallback((nextIndex: number) => {
-    if (onIndexChange) {
-      onIndexChange(nextIndex);
-    }
+    onIndexChange(nextIndex);
 
     runOnJS(setActiveIndex)(nextIndex);
   }, []);
 
   useEffect(() => {
-    offsetX.value = getPageTranslate(initialIndex);
-    index.value = initialIndex;
-    onIndexChangeCb(initialIndex);
+    runOnUI(() => {
+      'worklet';
+
+      offsetX.value = getPageTranslate(initialIndex);
+      index.value = initialIndex;
+      onIndexChangeCb(initialIndex);
+    })();
   }, [initialIndex]);
 
   function getSpringConfig(noVelocity?: boolean) {

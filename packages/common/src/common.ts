@@ -106,11 +106,11 @@ export function runOnce(fn: Function) {
 }
 
 export function assertWorkletCreator(packageName: string) {
-  return function assert(fn: () => unknown) {
+  return function assert(fn: (...args: any[]) => any) {
     // @ts-expect-error
     if (!fn.__worklet)
       throw new Error(
-        `${packageName}: onIndexChange change should be a worklet. Did you forget to add "worklet" directive?`,
+        `${packageName}: ${fn.name} change should be a worklet. Did you forget to add "worklet" directive?`,
       );
   };
 }
