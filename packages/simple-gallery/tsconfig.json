@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig",
+  "references": [
+    { "path": "../pager" },
+    { "path": "../image-transformer" },
+  ],
+  "compilerOptions": {
+    "outDir": "./lib/typescript"
+  }
+}

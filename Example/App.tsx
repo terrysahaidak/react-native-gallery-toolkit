@@ -9,19 +9,21 @@ import { ScrollView, StatusBar, Text } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 import ImageTransformerTest from './src/ImageTransformerExamples';
 import PagerTest from './src/PagerExamples';
+import SimpleGalleryTest from './src/SimpleGalleryExamples';
 
 const Stack = createStackNavigator();
 
 const routes: React.ComponentProps<typeof Stack.Screen>[] = [
   { name: 'Image Transformer', component: ImageTransformerTest },
   { name: 'Pager', component: PagerTest },
+  { name: 'Simple gallery', component: SimpleGalleryTest },
 ];
 
-export function Home() {
-  useFocusEffect(() => {
-    StatusBar.setHidden(false);
-  });
-
+export function RoutesList({
+  routes,
+}: {
+  routes: React.ComponentProps<typeof Stack.Screen>[];
+}) {
   const nav = useNavigation();
 
   return (
@@ -47,6 +49,14 @@ export function Home() {
       ))}
     </ScrollView>
   );
+}
+
+export function Home() {
+  useFocusEffect(() => {
+    StatusBar.setHidden(false);
+  });
+
+  return <RoutesList routes={routes} />;
 }
 
 export default function App() {

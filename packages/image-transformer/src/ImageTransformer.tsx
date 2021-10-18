@@ -1,43 +1,43 @@
-import React, {
-  useRef,
-  useCallback,
-  useState,
-  useEffect,
-} from 'react';
 import {
-  StyleSheet,
-  Image,
-  ImageRequireSource,
-  ViewStyle,
-  Dimensions,
-} from 'react-native';
-import Animated, {
-  withSpring,
-  withTiming,
-  useAnimatedStyle,
-  cancelAnimation,
-  useDerivedValue,
-  Easing,
-  withDecay,
-  useAnimatedReaction,
-  useSharedValue,
-} from 'react-native-reanimated';
-import {
-  PinchGestureHandler,
-  PanGestureHandler,
-  TapGestureHandler,
-  State,
-  PanGestureHandlerGestureEvent,
-  PinchGestureHandlerGestureEvent,
-  TapGestureHandlerGestureEvent,
-} from 'react-native-gesture-handler';
-import {
-  vectors,
-  useAnimatedGestureHandler,
-  fixGestureHandler,
   clamp,
+  fixGestureHandler,
+  useAnimatedGestureHandler,
+  vectors,
   workletNoop,
 } from '@gallery-toolkit/common';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import {
+  Dimensions,
+  Image,
+  ImageRequireSource,
+  StyleSheet,
+  ViewStyle,
+} from 'react-native';
+import {
+  PanGestureHandler,
+  PanGestureHandlerGestureEvent,
+  PinchGestureHandler,
+  PinchGestureHandlerGestureEvent,
+  State,
+  TapGestureHandler,
+  TapGestureHandlerGestureEvent,
+} from 'react-native-gesture-handler';
+import Animated, {
+  cancelAnimation,
+  Easing,
+  useAnimatedReaction,
+  useAnimatedStyle,
+  useDerivedValue,
+  useSharedValue,
+  withDecay,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 
 const styles = StyleSheet.create({
   fill: {
@@ -78,7 +78,7 @@ export type InteractionType = 'scale' | 'pan';
 
 export interface ImageTransformerReusableProps {
   renderImage?: (props: RenderImageProps) => JSX.Element;
-  ImageComponent: React.ComponentType;
+  ImageComponent?: React.ComponentType<any>;
   DOUBLE_TAP_SCALE?: number;
   MAX_SCALE?: number;
   MIN_SCALE?: number;

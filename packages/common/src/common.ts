@@ -105,8 +105,20 @@ export function runOnce(fn: Function) {
   }
 }
 
+export function assertWorkletCreator(packageName: string) {
+  return function assert(fn: () => unknown) {
+    // @ts-expect-error
+    if (!fn.__worklet)
+      throw new Error(
+        `${packageName}: onIndexChange change should be a worklet. Did you forget to add "worklet" directive?`,
+      );
+  };
+}
+
 export function runOnJSorUI(cb: any) {
   'worklet';
+
+  console.log(Object.keys(cb));
 
   if (cb && cb.__worklet) {
     return runOnUI(cb);
