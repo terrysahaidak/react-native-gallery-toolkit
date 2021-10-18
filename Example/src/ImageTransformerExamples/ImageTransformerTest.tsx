@@ -1,11 +1,11 @@
+import { ImageTransformer } from '@gallery-toolkit/image-transformer';
+import { useHeaderHeight } from '@react-navigation/stack';
 import React from 'react';
 import { Dimensions } from 'react-native';
-import { GalleryItemType, ImageTransformer } from '../../../src';
-import { useHeaderHeight } from '@react-navigation/stack';
 
 const { height, width } = Dimensions.get('window');
 
-const image: GalleryItemType = {
+const image = {
   id: '4',
   width: 400,
   height: 300,
