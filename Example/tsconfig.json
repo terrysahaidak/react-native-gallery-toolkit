@@ -2,6 +2,7 @@
   "extends": "../tsconfig",
   "references": [
     { "path": "../packages/image-transformer" },
+    { "path": "../packages/pager" },
   ],
   "compilerOptions": {
     // Avoid expo-cli auto-generating a tsconfig

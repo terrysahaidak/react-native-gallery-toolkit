@@ -8,11 +8,13 @@ import React from 'react';
 import { ScrollView, StatusBar, Text } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 import ImageTransformerTest from './src/ImageTransformerExamples';
+import PagerTest from './src/PagerExamples';
 
 const Stack = createStackNavigator();
 
 const routes: React.ComponentProps<typeof Stack.Screen>[] = [
   { name: 'Image Transformer', component: ImageTransformerTest },
+  { name: 'Pager', component: PagerTest },
 ];
 
 export function Home() {
