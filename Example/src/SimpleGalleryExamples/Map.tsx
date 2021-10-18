@@ -49,11 +49,9 @@ export default function StandaloneMap() {
 
   function handleIndexChange(i: number) {
     'worklet';
-    // console.log(i);
+    console.log(i);
     // you can fetch more items and store it to the map here
   }
-
-  console.log(Object.keys(handleIndexChange));
 
   return (
     <SimpleGallery

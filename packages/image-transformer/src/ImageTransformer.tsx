@@ -1,4 +1,5 @@
 import {
+  assertWorkletCreator,
   clamp,
   fixGestureHandler,
   useAnimatedGestureHandler,
@@ -30,6 +31,7 @@ import {
 import Animated, {
   cancelAnimation,
   Easing,
+  runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
@@ -38,6 +40,10 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
+
+const assertWorklet = assertWorkletCreator(
+  '@gallery-toolkit/image-transformer',
+);
 
 const styles = StyleSheet.create({
   fill: {
@@ -141,6 +147,11 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
     ImageComponent = Image,
   }) => {
     fixGestureHandler();
+
+    assertWorklet(onStateChange);
+    assertWorklet(onTap);
+    assertWorklet(onDoubleTap);
+    assertWorklet(onInteraction);
 
     if (typeof source === 'undefined') {
       throw new Error(
@@ -453,7 +464,7 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
           evt.state === State.ACTIVE &&
           evt.numberOfPointers !== 2
         ) {
-          disablePinch();
+          runOnJS(disablePinch)();
         }
       },
 
