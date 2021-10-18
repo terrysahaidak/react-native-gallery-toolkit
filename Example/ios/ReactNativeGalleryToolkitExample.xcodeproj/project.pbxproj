@@ -165,7 +165,7 @@
 				LastUpgradeCheck = 1130;
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
-						DevelopmentTeam = 82VJ4P93XA;
+						DevelopmentTeam = SJG3WXD6DD;
 						LastSwiftMigration = 1120;
 						ProvisioningStyle = Automatic;
 					};
@@ -214,7 +214,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
+			shellScript = "export NODE_BINARY=node\n../../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
 		4AD2C5508790C76CFD507DD5 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -311,7 +311,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 82VJ4P93XA;
+				DEVELOPMENT_TEAM = SJG3WXD6DD;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -324,7 +324,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.terrysahaidak.gallerytoolkit.ReactNativeGalleryToolkitExample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.terrysahaidak.gallerytoolkit.Example;
 				PRODUCT_NAME = ReactNativeGalleryToolkitExample;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -340,9 +340,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 82VJ4P93XA;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = ReactNativeGalleryToolkitExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
@@ -350,7 +350,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.terrysahaidak.gallerytoolkit.ReactNativeGalleryToolkitExample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.terrysahaidak.gallerytoolkit.Example;
 				PRODUCT_NAME = ReactNativeGalleryToolkitExample;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
