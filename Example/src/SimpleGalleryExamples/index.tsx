@@ -2,7 +2,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import { RoutesList } from '../../App';
 import Basic from './Basic';
-// import FullFeatured from './FullFeatured';
+import FullFeatured from './FullFeatured';
 import Mapping from './Map';
 
 const Stack = createStackNavigator();
@@ -10,7 +10,11 @@ const Stack = createStackNavigator();
 const routes: React.ComponentProps<typeof Stack.Screen>[] = [
   { name: 'Basic', component: Basic },
   { name: 'Map()', component: Mapping },
-  // { name: 'Custom full featured', component: FullFeatured },
+  {
+    name: 'Custom full featured',
+    component: FullFeatured,
+    options: FullFeatured.options,
+  },
 ];
 
 function StandaloneHome() {

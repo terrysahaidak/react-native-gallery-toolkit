@@ -155,10 +155,6 @@ export function createAnimatedGestureHandler<
         event.state === State.END &&
         handlers.onEnd
       ) {
-        if (handlers.onActive) {
-          handlers.onActive(event, context);
-        }
-
         handlers.onEnd(event, context, false);
       }
       if (
