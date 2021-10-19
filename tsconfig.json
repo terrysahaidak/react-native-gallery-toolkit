@@ -25,5 +25,5 @@
     "strict": true,
     "target": "esnext"
   },
-  "exclude": ["packages/*/lib"]
+  "exclude": ["packages/*/lib", "src-old"]
 }

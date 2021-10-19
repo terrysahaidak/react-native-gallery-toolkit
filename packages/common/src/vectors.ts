@@ -6,6 +6,7 @@ export type Vector<T extends SharedValueType> = {
   x: T;
   y: T;
 };
+
 export type SharedVector<T extends SharedValueType> = {
   x: Animated.SharedValue<T>;
   y: Animated.SharedValue<T>;
