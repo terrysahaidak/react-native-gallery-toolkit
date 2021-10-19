@@ -327,7 +327,6 @@ export class SimpleGallery<
     } = this.props;
 
     if (onIndexChange) {
-      // @ts-expect-error
       assertWorklet(onIndexChange);
     }
 

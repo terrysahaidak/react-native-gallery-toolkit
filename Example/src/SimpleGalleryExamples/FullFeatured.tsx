@@ -333,7 +333,7 @@ export default function FullFeatured() {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: 'black'  }}>
       <CustomHeader
         topInset={insets.top}
         bottomTranslateY={bottomTranslateY}
@@ -348,7 +348,7 @@ export default function FullFeatured() {
           initialIndex={1}
           items={images}
           keyExtractor={(item) => item.id}
-          gutterWidth={24}
+          gutterWidth={56}
           onIndexChange={onIndexChange}
           renderImage={(props, item, index) => {
             return <ImageRender index={index} {...props} />;
