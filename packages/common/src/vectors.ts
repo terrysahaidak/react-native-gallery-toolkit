@@ -31,7 +31,7 @@ const isSharedValue = (
 };
 
 const _get = <
-  T extends Animated.SharedValue<SharedValueType> | SharedValueType
+  T extends Animated.SharedValue<SharedValueType> | SharedValueType,
 >(
   value: T,
 ) => {
@@ -58,30 +58,33 @@ const _reduce = (
   const first = vectors[0];
   const rest = vectors.slice(1);
 
-  const initial = _get(_isVector(first) ? first[prop] : first);
+  let res = _get(_isVector(first) ? first[prop] : first);
 
-  const res = rest.reduce((acc, current) => {
+  for (let i = 0; i < rest.length; i++) {
+    const current = rest[i];
     const value = _get(_isVector(current) ? current[prop] : current);
-    const r = (() => {
-      switch (operation) {
-        case 'divide':
-          if (value === 0) {
-            return 0;
-          }
-          return acc / value;
-        case 'add':
-          return acc + value;
-        case 'sub':
-          return acc - value;
-        case 'multiply':
-          return acc * value;
-        default:
-          return acc;
-      }
-    })();
 
-    return r;
-  }, initial);
+    switch (operation) {
+      case 'divide':
+        if (value === 0) {
+          res = 0;
+        } else {
+          res /= value;
+        }
+        break;
+      case 'add':
+        res += value;
+        break;
+      case 'sub':
+        res -= value;
+        break;
+      case 'multiply':
+        res *= value;
+        break;
+      default:
+        break;
+    }
+  }
 
   return res;
 };

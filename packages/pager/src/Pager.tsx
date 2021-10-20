@@ -1,7 +1,6 @@
 import {
   assertWorkletCreator,
   clampVelocity,
-  fixGestureHandler,
   friction,
   getShouldRender,
   typedMemo,
@@ -11,6 +10,8 @@ import {
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Dimensions,
+  InteractionManager,
+  Platform,
   StyleSheet,
   View,
   ViewStyle,
@@ -70,7 +71,7 @@ export interface RenderPageProps<T> {
   isPagerInProgress: Animated.SharedValue<boolean>;
 }
 
-interface PageProps {
+export interface PageProps {
   item: any;
   pagerRefs: PageRefs;
   onPageStateChange: (value: boolean) => void;
@@ -88,7 +89,7 @@ interface PageProps {
   isPagerInProgress: Animated.SharedValue<boolean>;
 }
 
-const Page = typedMemo(
+const Page = React.memo(
   ({
     pagerRefs,
     item,
@@ -193,7 +194,7 @@ export interface PagerProps<T, ItemT>
   getItem?: (data: T, index: number) => ItemT | undefined;
   pagerWrapperStyles?: any;
   springConfig?: Omit<Animated.WithSpringConfig, 'velocity'>;
-
+  shouldUseInteractionManager?: boolean;
   shouldHandleGestureEvent?: (
     event: PanGestureHandlerGestureEvent['nativeEvent'],
   ) => boolean;
@@ -210,9 +211,11 @@ function workletNoopTrue() {
 const MIN_VELOCITY = 700;
 const MAX_VELOCITY = 3000;
 
+const IS_ANDROID = Platform.OS === 'android';
+
 export const Pager = typedMemo(function Pager<
   TPages,
-  ItemT = UnpackItemT<TPages>
+  ItemT = UnpackItemT<TPages>,
 >({
   pages,
   initialIndex,
@@ -232,11 +235,10 @@ export const Pager = typedMemo(function Pager<
   onEnabledGesture = workletNoop,
   shouldHandleGestureEvent = workletNoopTrue,
   initialDiffValue = 0,
+  shouldUseInteractionManager = true,
   outerGestureHandlerRefs = [],
   verticallyEnabled = true,
 }: PagerProps<TPages, ItemT>) {
-  fixGestureHandler();
-
   assertWorklet(onIndexChange);
   assertWorklet(onPagerTranslateChange);
   assertWorklet(onGesture);
@@ -249,30 +251,35 @@ export const Pager = typedMemo(function Pager<
     gutterWidth = 0;
   }
 
-  const getPageTranslate = (i: number) => {
-    'worklet';
-
-    const t = i * width;
-    const g = gutterWidth * i;
-    return -(t + g);
-  };
+  const getPageTranslate = useWorkletCallback(
+    (i: number) => {
+      const t = i * width;
+      const g = gutterWidth * i;
+      return -(t + g);
+    },
+    [gutterWidth, width],
+  );
 
   const pagerRef = useRef(null);
   const tapRef = useRef(null);
 
   const isActive = useSharedValue(true);
 
-  function onPageStateChange(value: boolean) {
-    'worklet';
-
+  const onPageStateChange = useWorkletCallback((value: boolean) => {
     isActive.value = value;
-  }
+  }, []);
 
   const velocity = useSharedValue(0);
 
   const [diffValue, setDiffValue] = useState(initialDiffValue);
   useEffect(() => {
-    setDiffValue(numToRender);
+    if (shouldUseInteractionManager) {
+      InteractionManager.runAfterInteractions(() => {
+        setDiffValue(numToRender);
+      });
+    } else {
+      setDiffValue(numToRender);
+    }
   }, [numToRender]);
 
   // S2: Pager related stuff
@@ -297,120 +304,124 @@ export const Pager = typedMemo(function Pager<
     runOnJS(setActiveIndex)(nextIndex);
   }, []);
 
-  useEffect(() => {
-    runOnUI(() => {
-      'worklet';
+  const onIndexChangeWorklet = useWorkletCallback((i: number) => {
+    offsetX.value = getPageTranslate(i);
+    index.value = i;
+    onIndexChangeCb(i);
+  }, []);
 
-      offsetX.value = getPageTranslate(initialIndex);
-      index.value = initialIndex;
-      onIndexChangeCb(initialIndex);
-    })();
+  useEffect(() => {
+    runOnUI(onIndexChangeWorklet)(initialIndex);
   }, [initialIndex]);
 
-  function getSpringConfig(noVelocity?: boolean) {
-    'worklet';
+  const getSpringConfig = useWorkletCallback(
+    (noVelocity?: boolean) => {
+      const ratio = 1.1;
+      const mass = 0.4;
+      const stiffness = IS_ANDROID ? 200.0 : 100.0;
+      const damping = ratio * 2.0 * Math.sqrt(mass * stiffness);
 
-    const ratio = 1.1;
-    const mass = 0.4;
-    const stiffness = 100.0;
-    const damping = ratio * 2.0 * Math.sqrt(mass * stiffness);
+      const configToUse =
+        typeof springConfig !== 'undefined'
+          ? springConfig
+          : {
+              stiffness,
+              mass,
+              damping,
+              restDisplacementThreshold: 1,
+              restSpeedThreshold: 5,
+            };
 
-    const configToUse =
-      typeof springConfig !== 'undefined'
-        ? springConfig
-        : {
-            stiffness,
-            mass,
-            damping,
-            restDisplacementThreshold: 1,
-            restSpeedThreshold: 5,
-          };
+      // @ts-ignore
+      // cannot use merge and spread here :(
+      configToUse.velocity = noVelocity ? 0 : velocity.value;
 
-    // @ts-ignore
-    // cannot use merge and spread here :(
-    configToUse.velocity = noVelocity ? 0 : velocity.value;
+      return configToUse;
+    },
+    [springConfig],
+  );
 
-    return configToUse;
-  }
+  const onChangePageAnimation = useWorkletCallback(
+    (noVelocity?: boolean) => {
+      const config = getSpringConfig(noVelocity);
 
-  const onChangePageAnimation = (noVelocity?: boolean) => {
-    'worklet';
+      if (offsetX.value === toValueAnimation.value) {
+        return;
+      }
 
-    const config = getSpringConfig(noVelocity);
-
-    if (offsetX.value === toValueAnimation.value) {
-      return;
-    }
-
-    offsetX.value = withSpring(
-      toValueAnimation.value,
-      config,
-      (isCanceled) => {
-        'worklet';
-
-        if (!isCanceled) {
-          velocity.value = 0;
-        }
-      },
-    );
-  };
+      offsetX.value = withSpring(
+        toValueAnimation.value,
+        config,
+        (isCanceled) => {
+          if (!isCanceled) {
+            velocity.value = 0;
+          }
+        },
+      );
+    },
+    [getSpringConfig],
+  );
 
   // S3 Pager
-  function getCanSwipe(currentTranslate: number = 0) {
-    'worklet';
+  const getCanSwipe = useWorkletCallback(
+    (currentTranslate: number = 0) => {
+      const nextTranslate = offsetX.value + currentTranslate;
 
-    const nextTranslate = offsetX.value + currentTranslate;
+      if (nextTranslate > 0) {
+        return false;
+      }
 
-    if (nextTranslate > 0) {
-      return false;
-    }
+      const totalTranslate =
+        width * (length.value - 1) + gutterWidth * (length.value - 1);
 
-    const totalTranslate =
-      width * (length.value - 1) + gutterWidth * (length.value - 1);
+      if (Math.abs(nextTranslate) >= totalTranslate) {
+        return false;
+      }
 
-    if (Math.abs(nextTranslate) >= totalTranslate) {
-      return false;
-    }
+      return true;
+    },
+    [width, gutterWidth],
+  );
 
-    return true;
-  }
+  const getNextIndex = useWorkletCallback(
+    (v: number) => {
+      const currentTranslate = Math.abs(
+        getPageTranslate(index.value),
+      );
+      const currentIndex = index.value;
+      const currentOffset = Math.abs(offsetX.value);
 
-  const getNextIndex = (v: number) => {
-    'worklet';
+      const nextIndex = v < 0 ? currentIndex + 1 : currentIndex - 1;
 
-    const currentTranslate = Math.abs(getPageTranslate(index.value));
-    const currentIndex = index.value;
-    const currentOffset = Math.abs(offsetX.value);
+      if (
+        nextIndex < currentIndex &&
+        currentOffset > currentTranslate
+      ) {
+        return currentIndex;
+      }
 
-    const nextIndex = v < 0 ? currentIndex + 1 : currentIndex - 1;
+      if (
+        nextIndex > currentIndex &&
+        currentOffset < currentTranslate
+      ) {
+        return currentIndex;
+      }
 
-    if (
-      nextIndex < currentIndex &&
-      currentOffset > currentTranslate
-    ) {
-      return currentIndex;
-    }
+      if (nextIndex > length.value - 1 || nextIndex < 0) {
+        return currentIndex;
+      }
 
-    if (
-      nextIndex > currentIndex &&
-      currentOffset < currentTranslate
-    ) {
-      return currentIndex;
-    }
-
-    if (nextIndex > length.value - 1 || nextIndex < 0) {
-      return currentIndex;
-    }
-
-    return nextIndex;
-  };
+      return nextIndex;
+    },
+    [getPageTranslate],
+  );
 
   const isPagerInProgress = useDerivedValue(() => {
     return (
       Math.floor(Math.abs(getPageTranslate(index.value))) !==
       Math.floor(Math.abs(offsetX.value + pagerX.value))
     );
-  }, []);
+  }, [getPageTranslate]);
 
   const onPan = useAnimatedGestureHandler<
     PanGestureHandlerGestureEvent,

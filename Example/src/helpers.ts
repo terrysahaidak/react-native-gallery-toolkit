@@ -15,6 +15,13 @@ const IMAGE_SIZE =
   (dimensions.width - GUTTER_WIDTH * (NUMBER_OF_IMAGES - 1)) /
   NUMBER_OF_IMAGES;
 
+export interface ImageItem {
+  id: string;
+  uri: string;
+  width: number;
+  height: number;
+}
+
 export function generateImageList(
   length: number,
   countFrom: number = 10,

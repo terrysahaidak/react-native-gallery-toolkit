@@ -5,7 +5,10 @@ import {
   State,
 } from 'react-native-gesture-handler';
 import { makeRemote } from 'react-native-reanimated/src/reanimated2/core';
-import { useEvent } from 'react-native-reanimated/src/reanimated2/Hooks';
+import {
+  useEvent,
+  useWorkletCallback,
+} from 'react-native-reanimated/src/reanimated2/Hooks';
 
 function useRemoteContext<T extends object>(initialValue: T) {
   const initRef = useRef<{ context: T } | null>(null);
@@ -82,14 +85,14 @@ type OnGestureEvent<T extends GestureHandlerGestureEvent> = (
 
 export function createAnimatedGestureHandler<
   T extends GestureHandlerGestureEvent,
-  TContext extends Context
+  TContext extends Context,
 >(handlers: GestureHandlers<T['nativeEvent'], TContext>) {
   const context = useRemoteContext<any>({
     __initialized: false,
   });
   const isAndroid = Platform.OS === 'android';
 
-  const handler = (event: T['nativeEvent']) => {
+  const handler = useWorkletCallback((event: T['nativeEvent']) => {
     'worklet';
 
     if (handlers.onInit && !context.__initialized) {
@@ -192,14 +195,14 @@ export function createAnimatedGestureHandler<
       context._shouldSkip = undefined;
       context._shouldCancel = undefined;
     }
-  };
+  }, []);
 
   return handler;
 }
 
 export function useAnimatedGestureHandler<
   T extends GestureHandlerGestureEvent,
-  TContext extends Context
+  TContext extends Context,
 >(
   handlers: GestureHandlers<T['nativeEvent'], TContext>,
 ): OnGestureEvent<T> {

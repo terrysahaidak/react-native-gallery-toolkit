@@ -1,7 +1,6 @@
 import {
   assertWorkletCreator,
   clamp,
-  fixGestureHandler,
   useAnimatedGestureHandler,
   vectors,
   workletNoop,
@@ -9,6 +8,7 @@ import {
 import React, {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -40,6 +40,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
+import { useWorkletCallback } from 'react-native-reanimated/src/reanimated2/Hooks';
 
 const assertWorklet = assertWorkletCreator(
   '@gallery-toolkit/image-transformer',
@@ -146,7 +147,7 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
     enabled = true,
     ImageComponent = Image,
   }) => {
-    fixGestureHandler();
+    // fixGestureHandler();
 
     assertWorklet(onStateChange);
     assertWorklet(onTap);
@@ -159,12 +160,15 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
       );
     }
 
-    const imageSource =
-      typeof source === 'string'
-        ? {
-            uri: source,
-          }
-        : source;
+    const imageSource = useMemo(
+      () =>
+        typeof source === 'string'
+          ? {
+              uri: source,
+            }
+          : source,
+      [source],
+    );
 
     const interactionsEnabled = useSharedValue(false);
     const setInteractionsEnabled = useCallback((value: boolean) => {
@@ -203,37 +207,47 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
     const scaleTranslation = vectors.useSharedVector(0, 0);
     const offset = vectors.useSharedVector(0, 0);
 
-    const canvas = vectors.create(
-      windowDimensions.width,
-      windowDimensions.height,
+    const canvas = useMemo(
+      () =>
+        vectors.create(
+          windowDimensions.width,
+          windowDimensions.height,
+        ),
+      [windowDimensions.width, windowDimensions.height],
     );
     const targetWidth = windowDimensions.width;
     const scaleFactor = width / targetWidth;
     const targetHeight = height / scaleFactor;
-    const image = vectors.create(targetWidth, targetHeight);
+    const image = useMemo(
+      () => vectors.create(targetWidth, targetHeight),
+      [targetHeight, targetWidth],
+    );
 
     const canPanVertically = useDerivedValue(() => {
       return windowDimensions.height < targetHeight * scale.value;
     }, []);
 
-    function resetSharedState(animated?: boolean) {
-      'worklet';
+    const resetSharedState = useWorkletCallback(
+      (animated?: boolean) => {
+        'worklet';
 
-      if (animated) {
-        scale.value = withTiming(1, timingConfig);
-        scaleOffset.value = 1;
+        if (animated) {
+          scale.value = withTiming(1, timingConfig);
+          scaleOffset.value = 1;
 
-        vectors.set(offset, () => withTiming(0, timingConfig));
-      } else {
-        scale.value = 1;
-        scaleOffset.value = 1;
-        vectors.set(translation, 0);
-        vectors.set(scaleTranslation, 0);
-        vectors.set(offset, 0);
-      }
-    }
+          vectors.set(offset, () => withTiming(0, timingConfig));
+        } else {
+          scale.value = 1;
+          scaleOffset.value = 1;
+          vectors.set(translation, 0);
+          vectors.set(scaleTranslation, 0);
+          vectors.set(offset, 0);
+        }
+      },
+      [timingConfig],
+    );
 
-    const maybeRunOnEnd = () => {
+    const maybeRunOnEnd = useWorkletCallback(() => {
       'worklet';
 
       const target = vectors.create(0, 0);
@@ -320,7 +334,14 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
       } else {
         offset.y.value = withSpring(target.y, springConfig);
       }
-    };
+    }, [
+      MIN_SCALE,
+      MAX_SCALE,
+      image,
+      canvas,
+      springConfig,
+      timingConfig,
+    ]);
 
     const onPanEvent = useAnimatedGestureHandler<
       PanGestureHandlerGestureEvent,
@@ -550,41 +571,44 @@ export const ImageTransformer = React.memo<ImageTransformerProps>(
       },
     });
 
-    function handleScaleTo(x: number, y: number) {
-      'worklet';
+    const handleScaleTo = useWorkletCallback(
+      (x: number, y: number) => {
+        'worklet';
 
-      scale.value = withTiming(DOUBLE_TAP_SCALE, timingConfig);
-      scaleOffset.value = DOUBLE_TAP_SCALE;
+        scale.value = withTiming(DOUBLE_TAP_SCALE, timingConfig);
+        scaleOffset.value = DOUBLE_TAP_SCALE;
 
-      const targetImageSize = vectors.multiply(
-        image,
-        DOUBLE_TAP_SCALE,
-      );
+        const targetImageSize = vectors.multiply(
+          image,
+          DOUBLE_TAP_SCALE,
+        );
 
-      const CENTER = vectors.divide(canvas, 2);
-      const imageCenter = vectors.divide(image, 2);
+        const CENTER = vectors.divide(canvas, 2);
+        const imageCenter = vectors.divide(image, 2);
 
-      const focal = vectors.create(x, y);
+        const focal = vectors.create(x, y);
 
-      const origin = vectors.multiply(
-        -1,
-        vectors.sub(vectors.divide(targetImageSize, 2), CENTER),
-      );
+        const origin = vectors.multiply(
+          -1,
+          vectors.sub(vectors.divide(targetImageSize, 2), CENTER),
+        );
 
-      const koef = vectors.sub(
-        vectors.multiply(vectors.divide(1, imageCenter), focal),
-        1,
-      );
+        const koef = vectors.sub(
+          vectors.multiply(vectors.divide(1, imageCenter), focal),
+          1,
+        );
 
-      const target = vectors.multiply(origin, koef);
+        const target = vectors.multiply(origin, koef);
 
-      if (targetImageSize.y < canvas.y) {
-        target.y = 0;
-      }
+        if (targetImageSize.y < canvas.y) {
+          target.y = 0;
+        }
 
-      offset.x.value = withTiming(target.x, timingConfig);
-      offset.y.value = withTiming(target.y, timingConfig);
-    }
+        offset.x.value = withTiming(target.x, timingConfig);
+        offset.y.value = withTiming(target.y, timingConfig);
+      },
+      [DOUBLE_TAP_SCALE, timingConfig, image, canvas],
+    );
 
     const onDoubleTapEvent = useAnimatedGestureHandler<
       TapGestureHandlerGestureEvent,
