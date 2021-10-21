@@ -30,7 +30,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   DetachedHeader,
   HeaderPropsScrapper
-} from './DetachedHeader';
+} from '../DetachedHeader';
 
 const dimensions = Dimensions.get('window');
 

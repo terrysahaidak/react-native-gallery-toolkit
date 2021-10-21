@@ -4,6 +4,7 @@
     { "path": "../packages/image-transformer" },
     { "path": "../packages/pager" },
     { "path": "../packages/simple-gallery" },
+    { "path": "../packages/scalable-image" },
   ],
   "compilerOptions": {
     // Avoid expo-cli auto-generating a tsconfig

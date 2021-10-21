@@ -3,6 +3,7 @@ import { Header, StackHeaderProps } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
 import type { ViewStyle } from 'react-native';
 import Animated from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const headerPropsMap = new Map<string, StackHeaderProps>();
 const subs: Array<() => void> = [];
@@ -53,10 +54,11 @@ DetachedHeader.Container = ({
   children: JSX.Element;
   style?: ViewStyle;
 }) => {
+  const insets = useSafeAreaInsets();
   return (
     <Animated.View
       style={[
-        { position: 'absolute', top: 0, left: 0, right: 0 },
+        { position: 'absolute', top: 0, left: 0, right: 0, paddingTop: insets.top  },
         style,
       ]}
     >
