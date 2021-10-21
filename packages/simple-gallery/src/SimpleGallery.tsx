@@ -1,0 +1,366 @@
+import { assertWorkletCreator } from '@gallery-toolkit/common';
+import {
+  ImageTransformer,
+  ImageTransformerProps,
+  InteractionType,
+  RenderImageProps,
+} from '@gallery-toolkit/image-transformer';
+import {
+  Pager,
+  PagerProps,
+  RenderPageProps,
+} from '@gallery-toolkit/pager';
+import React from 'react';
+import { Dimensions } from 'react-native';
+import { runOnJS } from 'react-native-reanimated';
+
+const dimensions = Dimensions.get('window');
+
+const assertWorklet = assertWorkletCreator(
+  '@gallery-toolkit/simple-gallery',
+);
+
+export interface SimpleGalleryItemType {
+  width: number;
+  height: number;
+  uri: string;
+}
+
+interface Handlers<T> {
+  onTap?: ImageTransformerProps['onTap'];
+  onDoubleTap?: ImageTransformerProps['onDoubleTap'];
+  onInteraction?: ImageTransformerProps['onInteraction'];
+  onPagerTranslateChange?: (translateX: number) => void;
+  onGesture?: PagerProps<T, any>['onGesture'];
+  onPagerEnabledGesture?: PagerProps<T, any>['onEnabledGesture'];
+  shouldPagerHandleGestureEvent?: PagerProps<
+    T,
+    any
+  >['shouldHandleGestureEvent'];
+  onShouldHideControls?: (shouldHide: boolean) => void;
+}
+
+export interface SimpleGalleryHandler {
+  goNext: () => void;
+  goBack: () => void;
+  setIndex: (nextIndex: number) => void;
+}
+
+export interface ImageRendererProps<T> extends Handlers<T> {
+  item: RenderPageProps<T>['item'];
+  pagerProps: RenderPageProps<T>;
+  width: number;
+  height: number;
+  renderImage?: (
+    props: RenderImageProps,
+    index?: number,
+  ) => JSX.Element;
+  ImageComponent?: React.ComponentType<any>;
+}
+
+type UnpackItemT<T> = T extends (infer ItemT)[]
+  ? ItemT
+  : T extends ReadonlyArray<infer ItemT>
+  ? ItemT
+  : T extends Map<any, infer ItemT>
+  ? ItemT
+  : T extends Set<infer ItemT>
+  ? ItemT
+  : T extends {
+      [key: string]: infer ItemT;
+    }
+  ? ItemT
+  : any;
+
+export interface SimpleGalleryProps<T, ItemT>
+  extends Handlers<ItemT> {
+  items: T;
+  renderPage?: (
+    props: ImageRendererProps<ItemT>,
+    index: number,
+  ) => JSX.Element;
+  renderImage?: (
+    props: RenderImageProps,
+    item: ItemT,
+    index: number,
+  ) => JSX.Element;
+  keyExtractor?: (item: ItemT, index: number) => string;
+  initialIndex?: number;
+  width?: number;
+  height?: number;
+  numToRender?: number;
+  gutterWidth?: number;
+  onIndexChange?: (nextIndex: number) => void;
+  getItem?: (data: T, index: number) => ItemT | undefined;
+  getTotalCount?: (data: T) => number;
+  ImageComponent?: React.ComponentType;
+}
+
+function isImageItemType(type: any): type is SimpleGalleryItemType {
+  return (
+    typeof type === 'object' &&
+    'width' in type &&
+    'height' in type &&
+    'uri' in type
+  );
+}
+
+export function ImageRenderer<T = unknown>({
+  item,
+  pagerProps,
+  width,
+  height,
+  onDoubleTap,
+  onTap,
+  onInteraction,
+  renderImage,
+  ImageComponent,
+}: ImageRendererProps<T>) {
+  if (!isImageItemType(item)) {
+    throw new Error(
+      'ImageRenderer: item should have both width and height',
+    );
+  }
+
+  return (
+    <ImageTransformer
+      outerGestureHandlerActive={pagerProps.isPagerInProgress}
+      isActive={pagerProps.isPageActive}
+      windowDimensions={{ width, height }}
+      height={item.height}
+      renderImage={renderImage}
+      onStateChange={pagerProps.onPageStateChange}
+      outerGestureHandlerRefs={pagerProps.pagerRefs}
+      source={item.uri}
+      width={item.width}
+      onDoubleTap={onDoubleTap}
+      onTap={onTap}
+      onInteraction={onInteraction}
+      ImageComponent={ImageComponent}
+    />
+  );
+}
+
+export class SimpleGallery<
+  T,
+  ItemT = UnpackItemT<T>
+> extends React.PureComponent<
+  SimpleGalleryProps<T, ItemT>,
+  {
+    localIndex: number;
+  }
+> {
+  static ImageRenderer = React.memo(ImageRenderer);
+
+  tempIndex: number = this.props.initialIndex ?? 0;
+
+  controlsHidden = false;
+
+  constructor(props: SimpleGalleryProps<T, ItemT>) {
+    super(props);
+
+    this._renderPage = this._renderPage.bind(this);
+    this._keyExtractor = this._keyExtractor.bind(this);
+  }
+
+  state = {
+    localIndex: this.props.initialIndex ?? 0,
+  };
+
+  get totalCount() {
+    if (Array.isArray(this.props.items)) {
+      return this.props.items.length;
+    }
+
+    if (typeof this.props.getTotalCount === 'function') {
+      return this.props.getTotalCount(this.props.items);
+    }
+
+    throw new Error(
+      'SimpleGallery: either items should be an array or getTotalCount should be defined',
+    );
+  }
+
+  private setLocalIndex(nextIndex: number) {
+    this.setState({
+      localIndex: nextIndex,
+    });
+  }
+
+  private setTempIndex(nextIndex: number) {
+    this.tempIndex = nextIndex;
+  }
+
+  setIndex(nextIndex: number) {
+    this.setLocalIndex(nextIndex);
+  }
+
+  goNext() {
+    const nextIndex = this.tempIndex + 1;
+    if (nextIndex > this.totalCount - 1) {
+      console.warn(
+        'SimpleGallery: Index cannot be bigger than pages count',
+      );
+      return;
+    }
+
+    this.setIndex(nextIndex);
+  }
+
+  goBack() {
+    const nextIndex = this.tempIndex - 1;
+
+    if (nextIndex < 0) {
+      console.warn('SimpleGallery: Index cannot be negative');
+      return;
+    }
+
+    this.setIndex(nextIndex);
+  }
+
+  _keyExtractor(item: ItemT, index: number) {
+    if (typeof this.props.keyExtractor === 'function') {
+      return this.props.keyExtractor(item, index);
+    }
+
+    return index.toString();
+  }
+
+  _renderPage(pagerProps: RenderPageProps<ItemT>, index: number) {
+    const {
+      onDoubleTap,
+      onTap,
+      onInteraction,
+      width = dimensions.width,
+      height = dimensions.height,
+      renderPage,
+      renderImage,
+    } = this.props;
+
+    const onShouldHideControls = (
+      isScaled?: boolean | InteractionType,
+    ) => {
+      let shouldHide = true;
+
+      if (typeof isScaled === 'boolean') {
+        shouldHide = !isScaled;
+      } else if (typeof isScaled === 'string') {
+        shouldHide = true;
+      } else {
+        shouldHide = !this.controlsHidden;
+      }
+
+      this.controlsHidden = shouldHide;
+
+      if (this.props.onShouldHideControls) {
+        this.props.onShouldHideControls(shouldHide);
+      }
+    };
+
+    const _onDoubleTap = (isScaled: boolean) => {
+      'worklet';
+
+      if (onDoubleTap) {
+        onDoubleTap(isScaled);
+      }
+
+      runOnJS(onShouldHideControls)(isScaled);
+    };
+
+    const _onTap = (isScaled: boolean) => {
+      'worklet';
+
+      if (onTap) {
+        onTap(isScaled);
+      }
+
+      runOnJS(onShouldHideControls)();
+    };
+
+    const _onInteraction = (type: InteractionType) => {
+      'worklet';
+
+      if (onInteraction) {
+        onInteraction(type);
+      }
+
+      runOnJS(onShouldHideControls)(type);
+    };
+
+    const props = {
+      ImageComponent: this.props.ImageComponent,
+      item: pagerProps.item,
+      width,
+      height,
+      pagerProps,
+
+      onDoubleTap: _onDoubleTap,
+      onTap: _onTap,
+      onInteraction: _onInteraction,
+
+      renderImage: renderImage
+        ? (props: RenderImageProps) => {
+            return renderImage(props, pagerProps.item, index);
+          }
+        : undefined,
+    };
+
+    if (typeof renderPage === 'function') {
+      return renderPage(props, index);
+    }
+
+    return <ImageRenderer {...props} />;
+  }
+
+  render() {
+    const {
+      items,
+      gutterWidth,
+      onIndexChange,
+      getItem,
+      width = dimensions.width,
+      onPagerTranslateChange,
+      numToRender,
+      onGesture,
+      shouldPagerHandleGestureEvent,
+      onPagerEnabledGesture,
+    } = this.props;
+
+    if (onIndexChange) {
+      assertWorklet(onIndexChange);
+    }
+
+    const setTempIndex = (index: number) => {
+      this.setTempIndex(index);
+    };
+
+    function onIndexChangeWorklet(nextIndex: number) {
+      'worklet';
+
+      runOnJS(setTempIndex)(nextIndex);
+
+      if (onIndexChange) {
+        onIndexChange(nextIndex);
+      }
+    }
+
+    return (
+      <Pager
+        totalCount={this.totalCount}
+        getItem={getItem}
+        keyExtractor={this._keyExtractor}
+        initialIndex={this.state.localIndex}
+        pages={items}
+        width={width}
+        gutterWidth={gutterWidth}
+        onIndexChange={onIndexChangeWorklet}
+        onPagerTranslateChange={onPagerTranslateChange}
+        shouldHandleGestureEvent={shouldPagerHandleGestureEvent}
+        onGesture={onGesture}
+        onEnabledGesture={onPagerEnabledGesture}
+        renderPage={this._renderPage}
+        numToRender={numToRender}
+      />
+    );
+  }
+}

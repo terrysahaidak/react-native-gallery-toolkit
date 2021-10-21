@@ -1,16 +1,34 @@
-import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-
-import ScalableImageExample from './ScalableImageExample';
-import InstagramFeed from './InstagramFeed/InstagramFeed';
-
-import { List } from '../Navigation';
+import React from 'react';
+import { RoutesList } from '../../App';
 import { HeaderPropsScrapper } from '../DetachedHeader';
+import InstagramFeed from './InstagramFeed/InstagramFeed';
+import ScalableImageExample from './ScalableImageExample';
 
 const Stack = createStackNavigator();
 
+const routes: React.ComponentProps<typeof Stack.Screen>[] = [
+  {
+    name: 'Scalable image',
+    options: {
+      header: HeaderPropsScrapper,
+    },
+    component: ScalableImageExample,
+  },
+  {
+    name: 'Instagram Feed',
+    component: InstagramFeed,
+    options: {
+      header: HeaderPropsScrapper,
+    },
+    // @ts-ignore
+    headerBackTitleVisible: false,
+    title: 'Instagram',
+  },
+];
+
 function Home() {
-  return <List items={['Scalable image', 'Instagram Feed']} />;
+  return <RoutesList routes={routes} />;
 }
 
 export default function App() {
@@ -23,22 +41,9 @@ export default function App() {
       headerMode="screen"
     >
       <Stack.Screen component={Home} name="Transformer" />
-      <Stack.Screen
-        options={{
-          header: HeaderPropsScrapper,
-        }}
-        component={ScalableImageExample}
-        name="Scalable image"
-      />
-      <Stack.Screen
-        options={{
-          header: HeaderPropsScrapper,
-          headerBackTitleVisible: false,
-          title: 'Instagram',
-        }}
-        component={InstagramFeed}
-        name="Instagram Feed"
-      />
+      {routes.map((route) => (
+        <Stack.Screen key={route.name} {...route} />
+      ))}
     </Stack.Navigator>
   );
 }

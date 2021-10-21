@@ -1,0 +1,74 @@
+{
+  "name": "@gallery-toolkit/pager",
+  "description": "Pager component for your galleries",
+  "version": "0.0.1",
+  "keywords": [
+    "react-native-component",
+    "react-component",
+    "react-native",
+    "gallery",
+    "pager",
+    "paging",
+    "ios",
+    "android"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/terrysahaidak/react-native-gallery-toolkit.git",
+    "directory": "packages/pager"
+  },
+  "bugs": {
+    "url": "https://github.com/terrysahaidak/react-native-gallery-toolkit/issues"
+  },
+  "homepage": "https://github.com/terrysahaidak/react-native-gallery-toolkit/",
+  "main": "lib/commonjs/index.js",
+  "react-native": "src/index.tsx",
+  "source": "src/index.tsx",
+  "module": "lib/module/index.js",
+  "types": "lib/typescript/src/index.d.ts",
+  "files": [
+    "src",
+    "lib",
+    "!**/__tests__"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "clean": "del lib"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/react": "^17.0.9",
+    "@types/react-native": "~0.64.9",
+    "del-cli": "^3.0.1",
+    "react": "^17.0.2",
+    "react-native": "^0.65.1",
+    "react-native-builder-bob": "^0.18.1",
+    "react-native-gesture-handler": "~1.10.2",
+    "typescript": "^4.3.2",
+    "react-native-reanimated": "2.2.3"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-native-gesture-handler": ">= 1.0.0",
+    "react-native-reanimated": ">= 2.2.3"
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      "commonjs",
+      "module",
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json"
+        }
+      ]
+    ]
+  }
+}

@@ -1,16 +1,17 @@
 {
-  "include": ["./src/**/*"],
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "react-native-gallery-toolkit": ["./src/index"]
+      "@gallery-toolkit/*": ["./packages/*/src"]
     },
+    "composite": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "esModuleInterop": true,
+    "importsNotUsedAsValues": "error",
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
-    "lib": ["esnext"],
+    "lib": ["esnext", "dom"],
     "module": "esnext",
     "moduleResolution": "node",
     "noFallthroughCasesInSwitch": true,
@@ -22,7 +23,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "esnext",
-    "isolatedModules": true,
-  }
+    "target": "esnext"
+  },
+  "exclude": ["packages/*/lib", "src-old"]
 }

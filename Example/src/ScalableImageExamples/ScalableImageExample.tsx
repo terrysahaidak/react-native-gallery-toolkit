@@ -1,19 +1,18 @@
-import React, { useCallback, useMemo } from 'react';
-import { View, StyleSheet, StatusBar } from 'react-native';
-import { GalleryItemType, ScalableImage } from '../../../src';
+import { ScalableImage } from '@gallery-toolkit/scalable-image';
+import React from 'react';
+import { StatusBar, StyleSheet, View } from 'react-native';
 import Animated, {
   Extrapolate,
-  useAnimatedStyle,
   interpolate,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  useWorkletCallback,
 } from 'react-native-reanimated';
 import { DetachedHeader } from '../DetachedHeader';
-import {
-  normalizeDimensions,
-  useSharedValue,
-} from '../../../src/utils';
 import { useControls } from '../hooks/useControls';
 
-const image: GalleryItemType = {
+const image = {
   id: '4',
   width: 250,
   height: 250,
@@ -25,14 +24,14 @@ export default function StandaloneGalleryBasicScreen() {
 
   const opacity = useSharedValue(0);
 
-  const overlayStyles = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    backgroundColor: 'black',
-  }));
+  const overlayStyles = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+      backgroundColor: 'black',
+    };
+  });
 
-  const onScale = useCallback((scale: number) => {
-    'worklet';
-
+  const onScale = useWorkletCallback((scale: number) => {
     opacity.value = interpolate(
       scale,
       [1, 2],
@@ -40,6 +39,23 @@ export default function StandaloneGalleryBasicScreen() {
       Extrapolate.CLAMP,
     );
   }, []);
+
+  const onGestureStartCallback = () => {
+    StatusBar.setHidden(true);
+  };
+  const onGestureReleaseCallback = () => {
+    StatusBar.setHidden(false);
+  };
+
+  const onGestureStart = useWorkletCallback(() => {
+    setControlsHidden(true);
+    runOnJS(onGestureStartCallback)();
+  });
+
+  const onGestureRelease = useWorkletCallback(() => {
+    setControlsHidden(false);
+    runOnJS(onGestureReleaseCallback)();
+  });
 
   return (
     <View style={{ flex: 1, backgroundColor: 'transparent' }}>
@@ -60,14 +76,8 @@ export default function StandaloneGalleryBasicScreen() {
           height={image.height}
           source={image.uri}
           onScale={onScale}
-          onGestureStart={() => {
-            setControlsHidden(true);
-            StatusBar.setHidden(true);
-          }}
-          onGestureRelease={() => {
-            setControlsHidden(false);
-            StatusBar.setHidden(false);
-          }}
+          onGestureStart={onGestureStart}
+          onGestureRelease={onGestureRelease}
         />
       </View>
 

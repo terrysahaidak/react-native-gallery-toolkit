@@ -1,35 +1,79 @@
+import { normalizeDimensions } from '@gallery-toolkit/common';
+import { Pager, RenderPageProps } from '@gallery-toolkit/pager';
+import { ScalableImage } from '@gallery-toolkit/scalable-image';
+import type { SimpleGalleryItemType } from '@gallery-toolkit/simple-gallery';
 import React, { useCallback, useMemo, useRef } from 'react';
 import {
-  Dimensions,
-  View,
-  Text,
-  StatusBar,
-  FlatList,
-  Image,
-  FlatListProps,
+  Dimensions, FlatList, FlatListProps, Image, StatusBar, StyleSheet, Text, View
 } from 'react-native';
-import {
-  GalleryItemType,
-  ScalableImage,
-  Pager,
-  RenderPageProps,
-  normalizeDimensions,
-} from '../../../../src';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  Extrapolate,
-  interpolate,
-  withTiming,
-  delay,
-  runOnJS,
-} from 'react-native-reanimated';
 import { ScrollView } from 'react-native-gesture-handler';
+import Animated, {
+  Extrapolate,
+  interpolate, runOnJS, useAnimatedStyle,
+  useSharedValue, useWorkletCallback, withDelay, withTiming
+} from 'react-native-reanimated';
 import { DetachedHeader } from '../../DetachedHeader';
+import { generateImageList } from '../../helpers';
 import { useControls } from '../../hooks/useControls';
-import { generateImageList } from '../../utils/generateImageList';
-import { getConstants } from '../../utils/getConstants';
-import s from './styles';
+
+const s = StyleSheet.create({
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+    backgroundColor: 'black',
+  },
+  itemContainer: {
+    backgroundColor: 'white',
+  },
+  itemHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    margin: 12,
+  },
+  itemText: {
+    fontWeight: 'bold',
+    fontSize: 14,
+    marginLeft: 8,
+  },
+  itemPager: {},
+  row: {
+    flexDirection: 'row',
+  },
+  icon: {
+    height: 28,
+    width: 28,
+    marginRight: 12,
+  },
+  iconBookmark: {
+    height: 28,
+    width: 28,
+  },
+  image: {
+    height: 32,
+    width: 32,
+    borderRadius: 16,
+  },
+  footerItem: {
+    zIndex: -1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    margin: 12,
+  },
+  paginationContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: -28,
+    zIndex: -1,
+  },
+});
+
 
 const { width } = Dimensions.get('window');
 
@@ -41,7 +85,7 @@ const bookmark = require('../../../assets/images/Bookmark.svg');
 interface ListItemT {
   id: string;
   name: string;
-  images: GalleryItemType[];
+  images: SimpleGalleryItemType[];
 }
 
 const data: ListItemT[] = [
@@ -77,7 +121,10 @@ const data: ListItemT[] = [
   },
 ];
 
-const Header = ({ uri, name }) => (
+const Header = ({ uri, name }: {
+  uri: string;
+  name: string;
+}) => (
   <View style={s.itemHeader}>
     <Image source={{ uri }} style={s.image} />
     <Text style={s.itemText}>{name}</Text>
@@ -94,7 +141,10 @@ const Footer = () => (
   </View>
 );
 
-const Pagination = ({ length, activeIndexInPager }) => {
+const Pagination = ({ length, activeIndexInPager }: {
+  length: number;
+  activeIndexInPager: Animated.SharedValue<number>;
+}) => {
   const dots = Array.from({ length: length }, (_, i) => {
     const animatedDotStyle = useAnimatedStyle(() => {
       const color =
@@ -153,9 +203,7 @@ function RenderItem({
     [images],
   );
 
-  const onScale = useCallback((scale: number) => {
-    'worklet';
-
+  const onScale = useWorkletCallback((scale: number) => {
     opacity.value = interpolate(
       scale,
       [1, 2],
@@ -171,19 +219,15 @@ function RenderItem({
     );
   }, []);
 
-  const onGestureStart = useCallback(() => {
-    'worklet';
-
+  const onGestureStart = useWorkletCallback(() => {
     setControlsHidden(true);
     runOnJS(StatusBar.setHidden)(true);
     activeItemIndex.value = _index;
   }, []);
 
-  const onGestureRelease = useCallback(() => {
-    'worklet';
-
+  const onGestureRelease = useWorkletCallback(() => {
     //delay for smooth hiding background opacity
-    activeItemIndex.value = delay(200, withTiming(-1));
+    activeItemIndex.value = withDelay(200, withTiming(-1));
     setControlsHidden(false);
     runOnJS(StatusBar.setHidden)(false);
   }, []);
@@ -209,10 +253,7 @@ function RenderItem({
     [normalizedImages],
   );
 
-  function RenderPage({
-    item,
-    pagerRefs,
-  }: RenderPageProps<GalleryItemType>) {
+  const renderPage = useCallback(({ item, pagerRefs }: RenderPageProps<SimpleGalleryItemType>) => {
     return (
       <ScalableImage
         outerGestureHandlerRefs={[...pagerRefs, scrollViewRef]}
@@ -224,13 +265,11 @@ function RenderItem({
         onGestureRelease={onGestureRelease}
       />
     );
-  }
+  }, []);
 
-  function onIndexChangeWorklet(nextIndex: number) {
-    'worklet';
-
+  const onIndexChangeWorklet = useWorkletCallback((nextIndex: number) => {
     activeIndexInPager.value = nextIndex;
-  }
+  }, []);
 
   const content = (() => {
     if (images.length === 1) {
@@ -257,7 +296,8 @@ function RenderItem({
             gutterWidth={0}
             outerGestureHandlerRefs={[scrollViewRef]}
             verticallyEnabled={false}
-            renderPage={RenderPage}
+            // @ts-expect-error
+            renderPage={renderPage}
             onIndexChange={onIndexChangeWorklet}
           />
 
@@ -294,8 +334,6 @@ export default function InstagramFeed() {
 
   const { controlsStyles, setControlsHidden } = useControls();
 
-  const { APPBAR_HEIGHT, STATUSBAR_HEIGHT } = getConstants();
-
   const CellRendererComponent = useMemo<
     FlatListProps<ListItemT>['CellRendererComponent']
   >(
@@ -322,7 +360,7 @@ export default function InstagramFeed() {
     <>
       <FlatList
         contentContainerStyle={{
-          paddingTop: APPBAR_HEIGHT + STATUSBAR_HEIGHT,
+          // paddingTop: APPBAR_HEIGHT + STATUSBAR_HEIGHT,
         }}
         initialNumToRender={2}
         maxToRenderPerBatch={2}
