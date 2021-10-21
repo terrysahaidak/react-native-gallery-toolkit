@@ -24,13 +24,13 @@ import {
 import Animated, {
   cancelAnimation,
   runOnJS,
+  runOnUI,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
   useWorkletCallback,
   withSpring,
 } from 'react-native-reanimated';
-import { runOnUI } from 'react-native-reanimated/src/reanimated2/core';
 
 const dimensions = Dimensions.get('window');
 
@@ -270,13 +270,16 @@ export const Pager = typedMemo(function Pager<
   }, []);
 
   const velocity = useSharedValue(0);
+  const isMounted = useRef(false);
 
   const [diffValue, setDiffValue] = useState(initialDiffValue);
   useEffect(() => {
-    if (shouldUseInteractionManager) {
+    if (shouldUseInteractionManager && !isMounted.current) {
       InteractionManager.runAfterInteractions(() => {
         setDiffValue(numToRender);
+        console.log('numToRender in interaction');
       });
+      isMounted.current = true;
     } else {
       setDiffValue(numToRender);
     }
@@ -586,6 +589,7 @@ export const Pager = typedMemo(function Pager<
     return temp;
   }, [
     activeIndex,
+    diffValue,
     keyExtractor,
     getItem,
     totalCount,
