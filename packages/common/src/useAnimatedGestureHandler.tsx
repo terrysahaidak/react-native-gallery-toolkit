@@ -4,11 +4,12 @@ import {
   GestureHandlerGestureEvent,
   State,
 } from 'react-native-gesture-handler';
-import { makeRemote } from 'react-native-reanimated/src/reanimated2/core';
 import {
+  // @ts-expect-error
   useEvent,
   useWorkletCallback,
-} from 'react-native-reanimated/src/reanimated2/Hooks';
+} from 'react-native-reanimated';
+import { makeRemote } from 'react-native-reanimated/src/reanimated2/core';
 
 function useRemoteContext<T extends object>(initialValue: T) {
   const initRef = useRef<{ context: T } | null>(null);

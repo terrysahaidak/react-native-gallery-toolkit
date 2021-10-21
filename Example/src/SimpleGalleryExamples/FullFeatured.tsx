@@ -10,12 +10,11 @@ import type { StackNavigationOptions } from '@react-navigation/stack';
 import React, { useCallback, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Dimensions, StatusBar,
+  Dimensions, Image, StatusBar,
   StyleSheet,
   Text,
   View
 } from 'react-native';
-import Image from 'react-native-fast-image';
 import {
   PanGestureHandlerGestureEvent,
   RectButton

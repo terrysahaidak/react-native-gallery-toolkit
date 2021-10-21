@@ -39,8 +39,8 @@ import Animated, {
   withDecay,
   withSpring,
   withTiming,
+  useWorkletCallback,
 } from 'react-native-reanimated';
-import { useWorkletCallback } from 'react-native-reanimated/src/reanimated2/Hooks';
 
 const assertWorklet = assertWorkletCreator(
   '@gallery-toolkit/image-transformer',
