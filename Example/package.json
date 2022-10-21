@@ -20,7 +20,7 @@
     "react-native-gesture-handler": "^1.10.3",
     "react-native-image": "^0.1.1",
     "react-native-portalize": "^1.0.7",
-    "react-native-reanimated": "2.2.3",
+    "react-native-reanimated": "2.10.0",
     "react-native-safe-area-context": "^3.1.4",
     "react-native-screens": "^2.10.1",
     "react-native-video": "^5.1.0-alpha8"
